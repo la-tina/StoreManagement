@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">#33a79b</color>
+    <color name="colorPrimaryDark">#00574b</color>
     <color name="colorAccent">#250517</color>
     <color name="barColor">#b7a8ba</color>
     <color name="titleColor">#fffafa</color>
+    <color name="productItemColor">#b2dfdb</color>
 
 </resources>
+
+

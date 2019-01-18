@@ -1,33 +1,30 @@
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <androidx.drawerlayout.widget.DrawerLayout
-            android:id="@+id/drawerLayout"
+    <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.0" app:layout_constraintVertical_bias="1.0"/>
+
+    <android.support.design.widget.BottomNavigationView
+            android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/gameBackground">
+            android:layout_height="56dp"
+            android:background="@color/barColor"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:menu="@menu/bottom_navigation_menu"
+            app:itemIconTint="@color/titleColor"
+            app:itemTextColor="@android:color/white">
 
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+    </android.support.design.widget.BottomNavigationView>
 
-            <fragment
-                    android:id="@+id/myNavHostFragment"
-                    android:name="androidx.navigation.fragment.NavHostFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:defaultNavHost="true"
-                    app:navGraph="@navigation/navigation" />
-        </LinearLayout>
-
-        <com.google.android.material.navigation.NavigationView
-                android:id="@+id/navView"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
-                app:headerLayout="@layout/nav_header"
-                app:menu="@menu/navdrawer_menu" />
-    </androidx.drawerlayout.widget.DrawerLayout>
-</layout>
-
+</android.support.constraint.ConstraintLayout>

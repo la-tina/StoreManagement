@@ -15,7 +15,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="140dp"
                 android:id="@+id/toolbarTop"
-                app:title="Create Order"
+                app:title="Store"
                 android:background="@color/barColor"
                 app:titleTextColor="@color/titleColor"
                 app:titleTextAppearance="@style/Toolbar.TitleText">

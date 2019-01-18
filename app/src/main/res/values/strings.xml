@@ -3,4 +3,19 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="store_navigation">Store</string>
+    <string name="products_navigation">Products</string>
+    <string name="orders_navigation">Orders</string>
+    <string name="all_products">All</string>
+    <string name="in_stock_products">In stock</string>
+    <string name="low_stock_products">Low stock</string>
+    <string name="product_name">Name</string>
+    <string name="name">Name</string>
+    <string name="scan_barcode">Scan Barcode</string>
+    <string name="overcharge">Overcharge, лв</string>
+    <string name="barcode">Barcode</string>
+    <string name="price">Price, лв</string>
+    <string name="add_product">ADD PRODUCT</string>
+    <string name="empty_not_saved">Not saved</string>
+    <string name="leva">лв</string>
 </resources>
