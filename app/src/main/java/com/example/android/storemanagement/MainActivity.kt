@@ -2,7 +2,6 @@ package com.example.android.storemanagement
 
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.example.android.storemanagement.database.ProductViewModel
@@ -19,7 +18,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
         const val createProductTag = "createProductFragment"
     }
 
-    private val viewModel: ProductViewModel
+    private val productViewModel: ProductViewModel
         get() = ViewModelProviders.of(this).get(ProductViewModel(application)::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +32,13 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
             .beginTransaction()
             .add(R.id.fragment_container, fragment, titleTag)
             .commit()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        //koi currentFragment
+        //viewModel?
+        //viewModel =
     }
 
     override fun onStart() {
@@ -67,6 +73,8 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
         val previouslyAddedCreateOrderFragment = supportFragmentManager.findFragmentByTag(createOrderTag)
         val fragment = (previouslyAddedCreateOrderFragment as? CreateOrderFragment) ?: CreateOrderFragment()
 
+        fragment.productsViewModel = this.productViewModel
+
         openTab(fragment, createOrderTag)
     }
 
@@ -74,7 +82,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
         val previouslyAddedCreateProductFragment = supportFragmentManager.findFragmentByTag(createProductTag)
         val fragment = (previouslyAddedCreateProductFragment as? CreateProductFragment) ?: CreateProductFragment()
 
-        fragment.viewModel = this.viewModel
+        fragment.productViewModel = this.productViewModel
 
         openTab(fragment, createProductTag)
     }
@@ -99,7 +107,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
         val previouslyAddedProductFragment = supportFragmentManager.findFragmentByTag(productTag)
         val fragment = (previouslyAddedProductFragment as? ProductsFragment) ?: ProductsFragment()
 
-        fragment.viewModel = this.viewModel
+        fragment.productViewModel = this.productViewModel
 
         fragment.onNavigationChangedListener = this
 

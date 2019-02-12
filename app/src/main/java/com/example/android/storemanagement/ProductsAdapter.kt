@@ -7,12 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.product_item.view.*
 
+
 class ProductsAdapter(private val context: Context) :
     RecyclerView.Adapter<ProductsHolder>() {
 
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var products = emptyList<Product>() // Cached copy of products
-
 
     // Gets the number of items in the list
     override fun getItemCount(): Int {
@@ -35,6 +34,10 @@ class ProductsAdapter(private val context: Context) :
         this.products = products
         notifyDataSetChanged()
     }
+
+    fun getProductAtPosition(position: Int): Product {
+        return products[position]
+    }
 }
 
 class ProductsHolder(textView: View) : RecyclerView.ViewHolder(textView) {
@@ -42,6 +45,8 @@ class ProductsHolder(textView: View) : RecyclerView.ViewHolder(textView) {
     val productType = textView.product_item_text!!
     val productPrice = textView.product_item_price!!
 }
+
+
 
 
 

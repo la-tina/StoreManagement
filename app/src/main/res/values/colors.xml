@@ -2,11 +2,17 @@
 <resources>
     <color name="colorPrimary">#33a79b</color>
     <color name="colorPrimaryDark">#00574b</color>
-    <color name="colorAccent">#250517</color>
-    <color name="barColor">#b7a8ba</color>
+    <color name="colorAccent">#19000E</color>
+    <color name="barColor">#AEA0B2</color>
     <color name="titleColor">#fffafa</color>
-    <color name="productItemColor">#b2dfdb</color>
+    <color name="buttonFadeBackground">#bfb3b2</color>
+    <color name="buttonFadeText">#595757</color>
+    <color name="buttonFadeBackgroundGray">#e4e4e4</color>
+    <color name="checkBoxColor">#736367</color>
+    <color name="gray">#FFF0EEF1</color>
 
 </resources>
+
+
 
 

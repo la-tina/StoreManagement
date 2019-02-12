@@ -1,34 +1,36 @@
-package com.example.android.storemanagement.database
+package com.example.android.storemanagement.orders_database
 
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
-import com.example.android.storemanagement.Product
+import com.example.android.storemanagement.Order
+import com.example.android.storemanagement.OrderDao
 import com.example.android.storemanagement.ProductDao
+import com.example.android.storemanagement.database.ProductRoomDatabase
 
-//Room is a database layer on top of an SQLite database.
-@Database(entities = [Product::class], version = 1)
-abstract class ProductRoomDatabase : RoomDatabase() {
 
-    abstract fun productDao(): ProductDao
+@Database(entities = [Order::class], version = 1)
+abstract class OrderRoomDatabase: RoomDatabase(){
+
+    abstract fun orderDao(): OrderDao
 
     //ProductRoomDatabase is singleton to prevent having multiple instances of the database opened at the same time.
     companion object {
         @Volatile
-        private var INSTANCE: ProductRoomDatabase? = null
+        private var INSTANCE: OrderRoomDatabase? = null
 
 
         fun getDatabase(
             context: Context
-        ): ProductRoomDatabase {
+        ): OrderRoomDatabase {
             return INSTANCE ?: synchronized(this) {
                 // Create database here
                 //create a RoomDatabase object in the application context from the ProductRoomDatabase class
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    ProductRoomDatabase::class.java,
-                    "Product_database"
+                    OrderRoomDatabase::class.java,
+                    "Order_database"
                 ).build()
                 INSTANCE = instance
                 instance
@@ -36,8 +38,3 @@ abstract class ProductRoomDatabase : RoomDatabase() {
         }
     }
 }
-
-
-
-
-

@@ -3,6 +3,7 @@ package com.example.android.storemanagement.database
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
+import android.support.annotation.WorkerThread
 import com.example.android.storemanagement.Product
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +16,10 @@ import kotlin.coroutines.CoroutineContext
 
  class ProductViewModel(application: Application) : AndroidViewModel(application)
 {
+    var quantities = mutableMapOf<String, Int>()
+//    private var productLowStock = mutableMapOf<String, Int>()
+//    private var productInStock = mutableMapOf<String, Int>()
+
     //Define a parentJob, and a coroutineContext.
     //The coroutineContext, by default, uses the parentJob and the main dispatcher
     //to create a new instance of a CoroutineScope based on the coroutineContext.
@@ -30,15 +35,19 @@ import kotlin.coroutines.CoroutineContext
     //Add a private LiveData member variable to cache the list of products.
     val allProducts: LiveData<List<Product>>
 
+    var inStockProducts: LiveData<List<Product>>
+    var lowStockProducts: LiveData<List<Product>>
+
     //Create an init block that gets a reference to the ProductDao from the
     //ProductRoomDatabase and constructs the ProductRepository based on it.
     init {
         val productsDao = ProductRoomDatabase.getDatabase(
-            application,
-            scope
+            application
         ).productDao()
         repository = ProductRepository(productsDao)
         allProducts = repository.allProducts
+        inStockProducts = repository.inStockProducts
+        lowStockProducts = repository.lowStockProducts
     }
 
     //Because we're doing a database operation, we're using the IO Dispatcher.
@@ -46,13 +55,28 @@ import kotlin.coroutines.CoroutineContext
         repository.insert(product)
     }
 
+    fun deleteProduct(product: Product) = scope.launch(Dispatchers.IO) {
+        repository.deleteProduct(product)
+    }
+
+    fun updateQuantity(product: String, quantity: Int) = scope.launch(Dispatchers.IO) {
+        repository.updateQuantity(product, quantity)
+        quantities[product] = quantity
+    }
+
+    fun getInStockProducts() = scope.launch(Dispatchers.IO){
+        repository.getInStockProducts()
+    }
+
+    fun getLowStockProducts() = scope.launch(Dispatchers.IO){
+        repository.getLowStockProducts()
+    }
+
     //when the ViewModel is no longer used
     override fun onCleared() {
         super.onCleared()
         parentJob.cancel()
     }
-
-
 }
 
 
