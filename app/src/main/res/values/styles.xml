@@ -27,4 +27,11 @@
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/custom_text_color</item>
     </style>
+
+    <style name="Theme.RedPlanetTheme" parent="android:Theme">
+        <item name="android:shadowColor">@color/barColor</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">0.7</item>
+    </style>
+
 </resources>

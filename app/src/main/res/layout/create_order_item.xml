@@ -54,7 +54,7 @@
         android:layout_marginEnd="8dp"
         android:text="@string/leva"
         android:textAlignment="textStart"
-        android:textColor="@color/buttonFadeText"
+        android:textColor="@color/textColor"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/order_item_price"
         app:layout_constraintStart_toEndOf="@+id/order_item_price"
@@ -95,7 +95,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="5dp"
-        android:background="@color/barColor"
+        android:background="@color/dividingStrip"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 

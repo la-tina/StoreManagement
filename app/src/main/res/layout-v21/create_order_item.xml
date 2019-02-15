@@ -27,7 +27,7 @@
         android:fontFamily="sans-serif-medium"
         android:padding="20dp"
         android:textAlignment="textStart"
-        android:textColor="@color/checkBoxColor"
+        android:textColor="@color/textColor"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -96,7 +96,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="5dp"
-        android:background="@color/barColor"
+        android:background="@color/dividingStrip"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 

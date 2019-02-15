@@ -4,7 +4,6 @@ package com.example.android.storemanagement
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -12,17 +11,16 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.android.storemanagement.database.ProductViewModel
 import com.example.android.storemanagement.orders_database.OrderViewModel
-import kotlinx.android.synthetic.main.fragment_products.*
 import kotlinx.android.synthetic.main.fragment_title.*
 
 
+class OrdersFragment : Fragment() {
 
-class TitleFragment : Fragment() {
+    private val viewModel: OrderViewModel by lazy {
+        ViewModelProviders.of(this).get(OrderViewModel::class.java)
+    }
 
-
-    lateinit var viewModel: OrderViewModel
     lateinit var onNavigationChangedListener: OnNavigationChangedListener
 
     private val helper by lazy {
@@ -78,8 +76,6 @@ class TitleFragment : Fragment() {
         orders_recycler_view.layoutManager = LinearLayoutManager(requireContext())
         val ordersAdapter = OrdersAdapter(requireContext())
         orders_recycler_view.adapter = ordersAdapter
-
-        viewModel = ViewModelProviders.of(this).get(OrderViewModel::class.java)
 
         // Observer on the LiveData
         // The onChanged() method fires when the observed data changes and the activity is

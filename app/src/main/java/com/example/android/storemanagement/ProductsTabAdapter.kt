@@ -1,36 +1,25 @@
 package com.example.android.storemanagement
 
-import android.support.annotation.Nullable
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import java.nio.file.Files.size
 import android.support.v4.app.FragmentStatePagerAdapter
 
+class ProductsTabAdapter(
+    fragmentManager: FragmentManager,
+    private var fragments: List<Fragment>
+) : FragmentStatePagerAdapter(fragmentManager) {
 
-class ProductsTabAdapter internal constructor(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {
+    private val tabTitles = arrayOf("All", "In Stock", "Low Stock")
+
+    override fun getPageTitle(position: Int): CharSequence? {
+        return tabTitles[position]
+    }
 
     override fun getItem(position: Int): Fragment {
-        return when (position) {
-            0 -> ProductsFragment()
-            1 -> ProductsInStock()
-            else -> {
-                return ProductsLowStock()
-            }
-        }
+        return fragments[position]
     }
 
     override fun getCount(): Int {
-        return 3
+        return fragments.size
     }
-
-//    override fun getPageTitle(position: Int): CharSequence {
-//        return when (position) {
-//            0 -> "First Tab"
-//            1 -> "Second Tab"
-//            else -> {
-//                return "Third Tab"
-//            }
-//        }
-//    }
 }

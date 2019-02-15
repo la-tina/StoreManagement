@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.product_item.view.*
 class ProductsAdapter(private val context: Context) :
     RecyclerView.Adapter<ProductsHolder>() {
 
-    private var products = emptyList<Product>() // Cached copy of products
+    private var products: MutableList<Product> = mutableListOf()
 
     // Gets the number of items in the list
     override fun getItemCount(): Int {
@@ -28,10 +28,12 @@ class ProductsAdapter(private val context: Context) :
         val current = products[position]
         holder.productType.text = current.name
         holder.productPrice.text = current.price.toString()
+        holder.productQuantity.text = current.quantity.toString()
     }
 
     internal fun setProducts(products: List<Product>) {
-        this.products = products
+        this.products.clear()
+        this.products.addAll(products)
         notifyDataSetChanged()
     }
 
@@ -44,6 +46,7 @@ class ProductsHolder(textView: View) : RecyclerView.ViewHolder(textView) {
     // Holds the ProductTextView that will add each product to
     val productType = textView.product_item_text!!
     val productPrice = textView.product_item_price!!
+    val productQuantity = textView.product_item_quantity!!
 }
 
 

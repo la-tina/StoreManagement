@@ -23,11 +23,11 @@
             android:layout_width="match_parent"
             android:layout_height="140dp"
             android:background="@color/barColor"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="Create Order"
             app:titleTextAppearance="@style/Toolbar.TitleText"
-            app:titleTextColor="@color/titleColor"
-            app:layout_scrollFlags="scroll|enterAlways|snap"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            app:titleTextColor="@color/titleColor" />
 
     </android.support.design.widget.AppBarLayout>
 

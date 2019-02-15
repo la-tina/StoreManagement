@@ -23,7 +23,6 @@
         android:layout_width="168dp"
         android:layout_height="59dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-medium"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -84,7 +83,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="5dp"
-        android:background="@color/barColor"
+        android:background="@color/dividingStrip"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 

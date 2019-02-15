@@ -1,14 +1,12 @@
 package com.example.android.storemanagement
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import com.example.android.storemanagement.database.ProductViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 
-class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
+class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
 
     companion object {
         const val titleTag = "titleFragment"
@@ -18,31 +16,57 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
         const val createProductTag = "createProductFragment"
     }
 
-    private val productViewModel: ProductViewModel
-        get() = ViewModelProviders.of(this).get(ProductViewModel(application)::class.java)
+    private var currentFragment: Fragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val fragment = TitleFragment()
-        fragment.onNavigationChangedListener = this
+        if (savedInstanceState != null) {
+            currentFragment = supportFragmentManager.getFragment(savedInstanceState, "FragmentName")
+            if (currentFragment is ProductsFragment)
+                (currentFragment as ProductsFragment).onNavigationChangedListener = this
 
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.fragment_container, fragment, titleTag)
-            .commit()
+            if (currentFragment is OrdersFragment)
+                (currentFragment as OrdersFragment).onNavigationChangedListener = this
+        } else {
+            val fragment = OrdersFragment()
+            currentFragment = fragment
+            fragment.onNavigationChangedListener = this
+        }
+
+        if (currentFragment?.isAdded == false) {
+            val getFragmentTag = getFragmentTag(currentFragment!!)
+
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.fragment_container, currentFragment!!, getFragmentTag)
+                .commit()
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        //koi currentFragment
-        //viewModel?
-        //viewModel =
+    private fun getFragmentTag(fragment: Fragment): String =
+        when (fragment) {
+            is ProductsFragment -> productTag
+            is OrdersFragment -> titleTag
+            is StoreFragment -> storeTag
+            is CreateOrderFragment -> createOrderTag
+            is CreateProductFragment -> createProductTag
+            else -> throw IllegalStateException()
+        }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        //Save the fragment's instance
+        if (currentFragment!!.isAdded)
+            supportFragmentManager.putFragment(outState, "FragmentName", currentFragment as Fragment)
     }
+
 
     override fun onStart() {
         super.onStart()
+
         bottom_navigation.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_orders -> {
@@ -73,16 +97,12 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
         val previouslyAddedCreateOrderFragment = supportFragmentManager.findFragmentByTag(createOrderTag)
         val fragment = (previouslyAddedCreateOrderFragment as? CreateOrderFragment) ?: CreateOrderFragment()
 
-        fragment.productsViewModel = this.productViewModel
-
         openTab(fragment, createOrderTag)
     }
 
     private fun openCreateProductTab() {
         val previouslyAddedCreateProductFragment = supportFragmentManager.findFragmentByTag(createProductTag)
         val fragment = (previouslyAddedCreateProductFragment as? CreateProductFragment) ?: CreateProductFragment()
-
-        fragment.productViewModel = this.productViewModel
 
         openTab(fragment, createProductTag)
     }
@@ -96,7 +116,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
 
     private fun openOrdersTab() {
         val previouslyAddedTitleFragment = supportFragmentManager.findFragmentByTag(titleTag)
-        val fragment = (previouslyAddedTitleFragment as? TitleFragment) ?: TitleFragment()
+        val fragment = (previouslyAddedTitleFragment as? OrdersFragment) ?: OrdersFragment()
 
         fragment.onNavigationChangedListener = this
 
@@ -107,14 +127,13 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
         val previouslyAddedProductFragment = supportFragmentManager.findFragmentByTag(productTag)
         val fragment = (previouslyAddedProductFragment as? ProductsFragment) ?: ProductsFragment()
 
-        fragment.productViewModel = this.productViewModel
-
         fragment.onNavigationChangedListener = this
 
         openTab(fragment, productTag)
     }
 
     private fun openTab(fragment: Fragment, tag: String) {
+        currentFragment = fragment
 
         supportFragmentManager
             .beginTransaction()
@@ -122,13 +141,6 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener{
             .addToBackStack("a")
             .commit()
     }
-
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-        Timber.i("onRestoreInstanceState Called")
-    }
-
 }
 
 interface OnNavigationChangedListener {

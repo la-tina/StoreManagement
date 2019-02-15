@@ -15,4 +15,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/products_app_bar" />
 
+    <ImageView
+        android:id="@+id/empty_view_products_low_stock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:gravity="center"
+        android:src="@drawable/empty_view"
+        android:visibility="gone" />
+
 </android.support.design.widget.CoordinatorLayout>

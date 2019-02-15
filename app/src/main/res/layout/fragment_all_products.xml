@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/products_in_stock_recycler_view"
+        android:id="@+id/products_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -16,11 +16,12 @@
         app:layout_constraintTop_toBottomOf="@+id/products_app_bar" />
 
     <ImageView
-        android:id="@+id/empty_view_products_in_stock"
+        android:id="@+id/empty_view_products"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
         android:gravity="center"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
         android:src="@drawable/empty_view"
         android:visibility="gone" />
 
