@@ -17,8 +17,6 @@ import kotlin.coroutines.CoroutineContext
  class ProductViewModel(application: Application) : AndroidViewModel(application)
 {
     var quantities = mutableMapOf<String, Int>()
-//    private var productLowStock = mutableMapOf<String, Int>()
-//    private var productInStock = mutableMapOf<String, Int>()
 
     //Define a parentJob, and a coroutineContext.
     //The coroutineContext, by default, uses the parentJob and the main dispatcher
@@ -35,8 +33,9 @@ import kotlin.coroutines.CoroutineContext
     //Add a private LiveData member variable to cache the list of products.
     val allProducts: LiveData<List<Product>>
 
-    var inStockProducts: LiveData<List<Product>>
-    var lowStockProducts: LiveData<List<Product>>
+    val inStockProducts: LiveData<List<Product>>
+
+    val lowStockProducts: LiveData<List<Product>>
 
     //Create an init block that gets a reference to the ProductDao from the
     //ProductRoomDatabase and constructs the ProductRepository based on it.

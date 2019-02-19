@@ -24,4 +24,12 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <ImageView
+        android:id="@+id/empty_view_products_low_stock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:src="@drawable/empty_view"
+        android:visibility="gone" />
+
 </android.support.design.widget.CoordinatorLayout>

@@ -1,6 +1,7 @@
 package com.example.android.storemanagement
 
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -9,16 +10,22 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import com.example.android.storemanagement.database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_create_product.*
 
 
 class CreateProductFragment : Fragment() {
 
+    var message = "A product with the same barcode already exists."
+
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
     }
+
+    private val barcodes: MutableList<String> = mutableListOf()
+
+    fun isBarcodeDuplicated(barcode: String) =
+        barcodes.any { currentBarcode -> currentBarcode == barcode }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,63 +38,114 @@ class CreateProductFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        onEditTextChanged(product_name, product_price, product_overcharge, product_barcode)
+        val name = product_name.toString()
+        val price = product_price.toString()
+        val overcharge = product_overcharge.toString()
+        val barcode = product_barcode.toString()
+
+        onProductTextChanged(price, overcharge, barcode)
+        onPriceTextChanged(name, overcharge, barcode)
+        onOverchargeTextChanged(name, price, barcode)
+        onBarcodeTextChanged(name, price, overcharge)
 
         button_add_product.setOnClickListener {
-
-            val productName = product_name!!.text.toString()
-            val productPrice = product_price!!.text.toString()
-            val productOvercharge = product_overcharge!!.text.toString()
-            val productBarcode = product_barcode!!.text.toString()
-
             val quantity = 0
-            val product = Product(
-                productName,
-                productPrice.toFloat(),
-                productOvercharge.toFloat(),
-                productBarcode.toLong(),
-                quantity
-            )
+            val product = Product(name, price.toFloat(), overcharge.toFloat(), barcode, quantity)
             productViewModel.insert(product)
-
             fragmentManager?.popBackStackImmediate()
         }
-    }
 
-    private fun onEditTextChanged(
-        productName: EditText,
-        productPrice: EditText,
-        productOvercharge: EditText,
-        productBarcode: EditText
-    ) {
-        product_name.addTextChangedListener(object : TextWatcher {
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-
-                button_add_product.isEnabled = !(productName.toString().isEmpty() &&
-                        productPrice.toString().isEmpty() &&
-                        productOvercharge.toString().isEmpty() &&
-                        productBarcode.toString().isEmpty())
-            }
-
-            override fun beforeTextChanged(
-                s: CharSequence, start: Int, count: Int,
-                after: Int
-            ) {
-                button_add_product.isEnabled = false
-            }
-
-            override fun afterTextChanged(s: Editable) {
-
+        productViewModel.allProducts.observe(this, Observer { products ->
+            // Update the cached copy of the words in the adapter.
+            products?.let {
+                barcodes.clear()
+                val productsBarcodes = it.map { product -> product.barcode }
+                barcodes.addAll(productsBarcodes)
             }
         })
     }
 
-    override fun onResume() {
-        super.onResume()
-        name_text.isHintAnimationEnabled = true
+    private fun onProductTextChanged(productPrice: String, productOvercharge: String, productBarcode: String) {
+        product_name.addTextChangedListener(object : TextWatcher {
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                button_add_product.isEnabled = false
+            }
+
+            override fun afterTextChanged(name: Editable) {
+                setupButton(name.toString(), productPrice, productOvercharge, productBarcode)
+            }
+        })
     }
 
+    private fun onPriceTextChanged(productName: String, productOvercharge: String, productBarcode: String) {
+        product_price.addTextChangedListener(object : TextWatcher {
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                button_add_product.isEnabled = false
+            }
+
+            override fun afterTextChanged(price: Editable) {
+                setupButton(productName, price.toString(), productOvercharge, productBarcode)
+            }
+        })
+    }
+
+    private fun onOverchargeTextChanged(productName: String, productPrice: String, productBarcode: String) {
+        product_overcharge.addTextChangedListener(object : TextWatcher {
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                button_add_product.isEnabled = false
+            }
+
+            override fun afterTextChanged(overcharge: Editable) {
+                setupButton(productName, productPrice, overcharge.toString(), productBarcode)
+            }
+        })
+    }
+
+    private fun onBarcodeTextChanged(productName: String, productPrice: String, productOvercharge: String) {
+        product_barcode.addTextChangedListener(object : TextWatcher {
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                button_add_product.isEnabled = false
+            }
+
+            override fun afterTextChanged(barcode: Editable) {
+                setupButton(productName, productPrice, productOvercharge, barcode.toString())
+            }
+        })
+    }
+
+    private fun setupButton(productName: String, productPrice: String, productOvercharge: String, barcode: String) {
+        val anyFieldEmpty = isAnyFieldEmpty(productName, productPrice, productOvercharge, barcode)
+
+        val isBarcodeDuplicated = isBarcodeDuplicated(barcode)
+
+        button_add_product.isEnabled = !(anyFieldEmpty || isBarcodeDuplicated)
+
+        if (isBarcodeDuplicated) product_barcode.error = message
+    }
+
+    private fun isAnyFieldEmpty(productName: String, productPrice: String, productOvercharge: String,
+        productBarcode: String): Boolean =
+        !(productName.isEmpty() && productPrice.isEmpty() && productOvercharge.isEmpty() &&
+                productBarcode.isEmpty())
 }
+
+
+
 
 

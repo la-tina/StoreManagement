@@ -61,7 +61,7 @@ class CreateOrderFragment : Fragment() {
 
     private fun updateFinalPrice(price: Float) {
         finalPrice += price // finalPrice + string
-        final_price.text = finalPrice.toString()
+        final_price.text = String.format("%.1f", finalPrice).toFloat().toString()
     }
 
     private fun updateQuantity(productName: String, quantity: Int) {

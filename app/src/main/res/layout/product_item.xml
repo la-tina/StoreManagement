@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:textAlignment="center"
         android:textColor="@color/buttonFadeText"
         android:textSize="20sp"
@@ -62,41 +62,38 @@
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/product_item_price"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.019"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toEndOf="@+id/product_item_price"
         app:layout_constraintTop_toTopOf="@+id/product_item_price"
+        app:layout_constraintVertical_bias="1.0"
         app:layout_goneMarginEnd="8dp" />
 
     <TextView
         android:id="@+id/product_item_quantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="28dp"
+        android:text="123"
         android:textAlignment="textStart"
         android:textColor="@color/textColor"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@+id/quantity"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/quantity"
-        app:layout_constraintVertical_bias="1.0"
-        app:layout_goneMarginEnd="8dp" />
+        tools:ignore="RtlHardcoded"
+        tools:layout_editor_absoluteX="352dp"
+        tools:layout_editor_absoluteY="8dp" />
 
     <TextView
         android:id="@+id/quantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="72dp"
         android:background="@drawable/custom_text_view"
         android:text="@string/quantity"
-        android:textAlignment="textStart"
         android:textColor="@color/buttonFadeText"
         android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@+id/product_item_quantity"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_goneMarginEnd="8dp" />
+        app:layout_constraintBottom_toBottomOf="@id/product_item_quantity"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/product_item_quantity"
+        app:layout_constraintVertical_bias="0.0" />
 
     <LinearLayout
         android:layout_width="match_parent"

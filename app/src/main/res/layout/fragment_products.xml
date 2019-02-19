@@ -11,19 +11,15 @@
         android:id="@+id/products_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:fitsSystemWindows="true">
+        app:layout_constraintStart_toStartOf="parent">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbarTop"
             android:layout_width="match_parent"
             android:layout_height="140dp"
             android:background="@color/barColor"
-            app:layout_scrollFlags="scroll|enterAlways|snap"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="Products"
             app:titleTextAppearance="@style/Toolbar.TitleText"
             app:titleTextColor="@color/titleColor" />

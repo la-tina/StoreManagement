@@ -37,28 +37,31 @@
         android:id="@+id/order_item_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="8dp"
+        android:text="123"
         android:textColor="@color/buttonFadeText"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/order_item_quantity"
-        app:layout_constraintStart_toStartOf="@id/order_item_quantity"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/order_item_quantity" />
 
     <TextView
         android:id="@+id/leva"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/leva"
         android:textAlignment="textStart"
-        android:textColor="@color/textColor"
+        android:textColor="@color/buttonFadeText"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/order_item_price"
-        app:layout_constraintStart_toEndOf="@+id/order_item_price"
-        app:layout_constraintTop_toTopOf="@+id/order_item_price" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/order_item_price"
+        app:layout_constraintVertical_bias="1.0" />
 
     <EditText
         android:id="@+id/order_item_quantity"
@@ -92,13 +95,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <LinearLayout
+    <View
         android:layout_width="match_parent"
         android:layout_height="5dp"
         android:background="@color/dividingStrip"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-
-    </LinearLayout>
+    </View>
 
 </android.support.constraint.ConstraintLayout>

@@ -41,7 +41,7 @@ class AllProductsFragment : Fragment() {
                     val myProduct = adapter.getProductAtPosition(position)
 
                     // Delete the product by calling deleteProduct() on the ProductViewModel:
-                    productViewModel?.deleteProduct(myProduct)
+                    productViewModel.deleteProduct(myProduct)
                 }
             })
     }
@@ -65,7 +65,7 @@ class AllProductsFragment : Fragment() {
         // The onChanged() method fires when the observed data changes and the activity is
         // in the foreground.
 
-        productViewModel?.allProducts?.observe(this, Observer { products ->
+        productViewModel.allProducts.observe(this, Observer { products ->
             // Update the cached copy of the words in the adapter.
             products?.let {
                 productsAdapter.setProducts(it)

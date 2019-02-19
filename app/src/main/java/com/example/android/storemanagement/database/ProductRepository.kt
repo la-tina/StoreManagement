@@ -40,6 +40,4 @@ class ProductRepository (private val productDao: ProductDao) {
     suspend fun getLowStockProducts(){
         productDao.getLowStockProducts()
     }
-
-
 }

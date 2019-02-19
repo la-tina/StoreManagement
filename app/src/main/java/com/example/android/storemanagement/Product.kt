@@ -11,7 +11,7 @@ data class Product(
     @ColumnInfo(name = "Price") val price: Float,
     @ColumnInfo(name = "Overcharge") val overcharge: Float,
     @PrimaryKey
-    @ColumnInfo(name = "Barcode") val barcode: Long,
+    @ColumnInfo(name = "Barcode") val barcode: String,
     @ColumnInfo(name = "Quantity") val quantity: Int
 )
 
@@ -33,10 +33,10 @@ interface ProductDao {
     @Query("UPDATE Products SET Quantity = :quantity WHERE Product = :product")
     fun updateQuantity(product: String, quantity: Int)
 
-    @Query("SELECT * FROM Products WHERE Quantity > 0 ")
+    @Query("SELECT * FROM Products WHERE Quantity > 0 ORDER BY Product ASC")
     fun getInStockProducts(): LiveData<List<Product>>
 
-    @Query("SELECT * FROM Products WHERE Quantity < 5 ")
+    @Query("SELECT * FROM Products WHERE Quantity < 5 ORDER BY Product ASC")
     fun getLowStockProducts(): LiveData<List<Product>>
 }
 
