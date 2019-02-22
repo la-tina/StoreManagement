@@ -56,7 +56,6 @@ class CreateOrderAdapter(
         holder.orderCheckBox.addTextChangedListener(getTextWatcher(holder))
     }
 
-
     private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher {
         return object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -100,8 +99,8 @@ class CreateOrderHolder(view: View) : RecyclerView.ViewHolder(view) {
     // Holds the ProductTextView that will add each product to
     val productName = view.order_item_text!!
     val productPrice = view.order_item_price!!
-    val productQuantity = view.order_item_quantity
-    val orderCheckBox = view.order_check_box
+    val productQuantity = view.order_item_quantity!!
+    val orderCheckBox = view.order_check_box!!
 }
 
 
