@@ -1,10 +1,8 @@
-package com.example.android.storemanagement.database
+package com.example.android.storemanagement.products_database
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
-import android.support.annotation.WorkerThread
-import com.example.android.storemanagement.Product
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

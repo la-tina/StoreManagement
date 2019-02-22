@@ -1,11 +1,9 @@
-package com.example.android.storemanagement.database
+package com.example.android.storemanagement.products_database
 
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
-import com.example.android.storemanagement.Product
-import com.example.android.storemanagement.ProductDao
 
 //Room is a database layer on top of an SQLite database.
 @Database(entities = [Product::class], version = 1)

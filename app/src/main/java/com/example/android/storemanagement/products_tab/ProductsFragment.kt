@@ -1,10 +1,12 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.products_tab
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.android.storemanagement.OnNavigationChangedListener
+import com.example.android.storemanagement.R
 import kotlinx.android.synthetic.main.fragment_products.*
 
 
@@ -29,12 +31,15 @@ class ProductsFragment : Fragment() {
     private fun setupViewPager() {
         // Create an adapter that knows which fragment should be shown on each page
         val allProductsFragment: Fragment = AllProductsFragment()
-        val productsInStockFragment: Fragment = ProductsInStockFragment()
-        val productsLowStockFragment: Fragment = ProductsLowStockFragment()
+        val productsInStockFragment: Fragment =
+            ProductsInStockFragment()
+        val productsLowStockFragment: Fragment =
+            ProductsLowStockFragment()
 
         val fragments = listOf(allProductsFragment, productsInStockFragment, productsLowStockFragment)
 
-        val adapter = ProductsTabAdapter(childFragmentManager, fragments)
+        val adapter =
+            ProductsTabAdapter(childFragmentManager, fragments)
         // Set the adapter onto the view pager
         products_viewpager.adapter = adapter
 

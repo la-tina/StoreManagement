@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.store_tab
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -7,6 +7,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.android.storemanagement.R
+import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.store_item.view.*
 
 

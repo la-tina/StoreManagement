@@ -1,10 +1,7 @@
 package com.example.android.storemanagement.orders_database
 
 import android.arch.lifecycle.LiveData
-import android.os.AsyncTask
 import android.support.annotation.WorkerThread
-import com.example.android.storemanagement.Order
-import com.example.android.storemanagement.OrderDao
 
 class OrderRepository(private val orderDao: OrderDao) {
 

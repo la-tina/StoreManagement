@@ -1,10 +1,7 @@
-package com.example.android.storemanagement.database
+package com.example.android.storemanagement.products_database
 
 import android.arch.lifecycle.LiveData
 import android.support.annotation.WorkerThread
-import com.example.android.storemanagement.Product
-import com.example.android.storemanagement.ProductDao
-import android.os.AsyncTask
 
 
 //A Repository class abstracts access to multiple data sources

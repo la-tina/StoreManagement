@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.products_tab
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager

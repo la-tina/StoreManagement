@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.orders_database
 
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*

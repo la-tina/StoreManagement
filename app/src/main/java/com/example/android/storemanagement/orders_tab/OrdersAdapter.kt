@@ -1,11 +1,12 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.orders_tab
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_create_order.view.*
+import com.example.android.storemanagement.R
+import com.example.android.storemanagement.orders_database.Order
 import kotlinx.android.synthetic.main.order_item.view.*
 
 class OrdersAdapter(private val context: Context) :
@@ -20,7 +21,13 @@ class OrdersAdapter(private val context: Context) :
 
     // Inflates the item views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrdersHolder {
-        return OrdersHolder(LayoutInflater.from(context).inflate(R.layout.order_item, parent, false))
+        return OrdersHolder(
+            LayoutInflater.from(context).inflate(
+                R.layout.order_item,
+                parent,
+                false
+            )
+        )
     }
 
     //Binds each product in the list to a view

@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.create_product
 
 import android.app.Activity
 import android.os.Bundle

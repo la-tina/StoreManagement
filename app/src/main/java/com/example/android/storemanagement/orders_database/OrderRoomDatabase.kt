@@ -4,10 +4,6 @@ import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
-import com.example.android.storemanagement.Order
-import com.example.android.storemanagement.OrderDao
-import com.example.android.storemanagement.ProductDao
-import com.example.android.storemanagement.database.ProductRoomDatabase
 
 
 @Database(entities = [Order::class], version = 1)

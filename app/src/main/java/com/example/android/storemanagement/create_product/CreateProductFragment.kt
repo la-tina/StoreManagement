@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.create_product
 
 
 import android.Manifest
@@ -14,7 +14,10 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.android.storemanagement.database.ProductViewModel
+import com.example.android.storemanagement.MainActivity
+import com.example.android.storemanagement.R
+import com.example.android.storemanagement.products_database.Product
+import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_create_product.*
 import me.dm7.barcodescanner.zbar.ZBarScannerView
 
@@ -100,7 +103,9 @@ class CreateProductFragment : Fragment() {
             )
         } else {
             val intent = Intent(requireContext(), BarcodeScanningActivity()::class.java)
-            startActivityForResult(intent, MainActivity.BARCODE_ACTIVITY_REQUEST_CODE)
+            startActivityForResult(intent,
+                MainActivity.BARCODE_ACTIVITY_REQUEST_CODE
+            )
         }
     }
 
@@ -179,7 +184,8 @@ class CreateProductFragment : Fragment() {
 
         button_add_product.isEnabled = !(anyFieldEmpty || isBarcodeDuplicated)
 
-        if (isBarcodeDuplicated) product_barcode.error = message
+        if (isBarcodeDuplicated) product_barcode.error =
+            message
     }
 
     private fun isAnyFieldEmpty(

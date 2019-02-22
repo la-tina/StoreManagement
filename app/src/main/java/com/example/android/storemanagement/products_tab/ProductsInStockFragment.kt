@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.products_tab
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -10,11 +10,11 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.android.storemanagement.database.ProductViewModel
-import kotlinx.android.synthetic.main.fragment_all_products.*
+import com.example.android.storemanagement.R
+import com.example.android.storemanagement.products_database.ProductViewModel
+import kotlinx.android.synthetic.main.fragment_products_in_stock.*
 
-
-class AllProductsFragment : Fragment() {
+class ProductsInStockFragment : Fragment() {
 
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
@@ -37,7 +37,7 @@ class AllProductsFragment : Fragment() {
 
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     val position = viewHolder.adapterPosition
-                    val adapter = products_recycler_view.adapter as ProductsAdapter
+                    val adapter = products_in_stock_recycler_view.adapter as ProductsAdapter
                     val myProduct = adapter.getProductAtPosition(position)
 
                     // Delete the product by calling deleteProduct() on the ProductViewModel:
@@ -50,42 +50,40 @@ class AllProductsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_all_products, container, false)
+        return inflater.inflate(R.layout.fragment_products_in_stock, container, false)
     }
 
     private fun setupRecyclerView() {
-        products_recycler_view?.let {recyclerView ->
+        products_in_stock_recycler_view?.let { recyclerView ->
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val productsAdapter = ProductsAdapter(requireContext())
+            val productsAdapter = ProductsAdapter(requireContext())
             recyclerView.adapter = productsAdapter
 
-        // Observer on the LiveData
-        // The onChanged() method fires when the observed data changes and the activity is
-        // in the foreground.
+            // Observer on the LiveData
+            // The onChanged() method fires when the observed data changes and the activity is
+            // in the foreground.
 
-        productViewModel.allProducts.observe(this, Observer { products ->
-            // Update the cached copy of the words in the adapter.
-            products?.let {
-                productsAdapter.setProducts(it)
-                setupEmptyView()
-            }
-        })
-        helper.attachToRecyclerView(recyclerView)
+            productViewModel.inStockProducts.observe(this, Observer { inStockProducts ->
+                // Update the cached copy of the words in the adapter.
+                inStockProducts?.let {
+                    productsAdapter.setProducts(it)
+                    setupEmptyView()
+                    //quantity > 0
+                }
+            })
+            helper.attachToRecyclerView(recyclerView)
         }
     }
 
     private fun setupEmptyView() {
-        val products = products_recycler_view.adapter!!
+        val products = products_in_stock_recycler_view.adapter!!
         if (products.itemCount == 0) {
-            products_recycler_view.visibility = View.GONE
-            empty_view_products.visibility = View.VISIBLE
+            products_in_stock_recycler_view.visibility = View.GONE
+            empty_view_products_in_stock.visibility = View.VISIBLE
         } else {
-            products_recycler_view.visibility = View.VISIBLE
-            empty_view_products.visibility = View.GONE
+            products_in_stock_recycler_view.visibility = View.VISIBLE
+            empty_view_products_in_stock.visibility = View.GONE
         }
     }
 }
-
-

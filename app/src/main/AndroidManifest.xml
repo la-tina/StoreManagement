@@ -26,7 +26,7 @@
         </activity>
 
         <activity
-            android:name=".BarcodeScanningActivity"
+            android:name=".create_product.BarcodeScanningActivity"
             android:windowSoftInputMode="adjustPan">
         </activity>
     </application>

@@ -3,8 +3,6 @@ package com.example.android.storemanagement.orders_database
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
-import com.example.android.storemanagement.Order
-import com.example.android.storemanagement.Product
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

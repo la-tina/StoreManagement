@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.create_order
 
 
 import android.arch.lifecycle.Observer
@@ -9,7 +9,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.android.storemanagement.database.ProductViewModel
+import com.example.android.storemanagement.R
+import com.example.android.storemanagement.orders_database.Order
+import com.example.android.storemanagement.products_database.ProductViewModel
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import kotlinx.android.synthetic.main.fragment_create_order.*
 import java.time.LocalDate
@@ -77,7 +79,11 @@ class CreateOrderFragment : Fragment() {
 
     private fun setupRecyclerView() {
         create_order_recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        val createOrdersAdapter = CreateOrderAdapter(requireContext(), ::updateFinalPrice, ::setOrderButtonEnabled)
+        val createOrdersAdapter = CreateOrderAdapter(
+            requireContext(),
+            ::updateFinalPrice,
+            ::setOrderButtonEnabled
+        )
         create_order_recycler_view.adapter = createOrdersAdapter
 
         ordersViewModel = ViewModelProviders.of(this).get(OrderViewModel::class.java)

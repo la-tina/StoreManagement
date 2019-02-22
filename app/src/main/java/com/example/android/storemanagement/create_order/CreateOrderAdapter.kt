@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.create_order
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -7,6 +7,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.android.storemanagement.R
+import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.create_order_item.view.*
 
 class CreateOrderAdapter(
@@ -30,7 +32,12 @@ class CreateOrderAdapter(
     // Inflates the item views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CreateOrderHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.create_order_item, parent, false)
-        return CreateOrderHolder(updateFinalPriceAction, ::updateQuantityForProduct, ::onCheckChangedAction, view)
+        return CreateOrderHolder(
+            updateFinalPriceAction,
+            ::updateQuantityForProduct,
+            ::onCheckChangedAction,
+            view
+        )
     }
 
     private fun onCheckChangedAction(productName: String, isChecked: Boolean) {

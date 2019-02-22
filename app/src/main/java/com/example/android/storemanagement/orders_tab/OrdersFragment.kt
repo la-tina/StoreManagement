@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.orders_tab
 
 
 import android.arch.lifecycle.Observer
@@ -11,6 +11,8 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.android.storemanagement.OnNavigationChangedListener
+import com.example.android.storemanagement.R
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import kotlinx.android.synthetic.main.fragment_title.*
 

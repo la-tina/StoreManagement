@@ -6,7 +6,13 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import com.example.android.storemanagement.CreateProductFragment.Companion.CAMERA_PERMISSION_CODE
+import com.example.android.storemanagement.create_product.CreateProductFragment.Companion.CAMERA_PERMISSION_CODE
+import com.example.android.storemanagement.create_order.CreateOrderFragment
+import com.example.android.storemanagement.create_product.BarcodeScanningActivity
+import com.example.android.storemanagement.create_product.CreateProductFragment
+import com.example.android.storemanagement.orders_tab.OrdersFragment
+import com.example.android.storemanagement.products_tab.ProductsFragment
+import com.example.android.storemanagement.store_tab.StoreFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
