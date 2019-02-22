@@ -90,11 +90,11 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
-                android:inputType="number|textPersonName"
-                android:textColorHint="@color/colorAccent"
                 android:hint="@string/price"
-                android:visibility="visible"
-                android:textColor="@color/colorAccent"/>
+                android:inputType="number"
+                android:textColor="@color/colorAccent"
+                android:textColorHint="@color/colorAccent"
+                android:visibility="visible" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -113,7 +113,7 @@
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
                 android:hint="@string/overcharge"
-                android:inputType="textPersonName|number"
+                android:inputType="number"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
                 android:visibility="visible" />
@@ -135,11 +135,11 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
-                android:inputType="textPersonName|number"
+                android:hint="@string/barcode"
+                android:inputType="number"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
-                android:hint="@string/barcode"
-                android:visibility="visible"/>
+                android:visibility="visible" />
 
         </android.support.design.widget.TextInputLayout>
 

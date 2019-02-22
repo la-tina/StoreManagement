@@ -16,7 +16,6 @@ class CreateOrderAdapter(
 ) : RecyclerView.Adapter<CreateOrderHolder>() {
 
     private var products = emptyList<Product>() // Cached copy of products
-    private var orders = emptyList<Order>() // Cached copy of orders
 
     //productName -> quantity
     var quantities = mutableMapOf<String, Int>()
@@ -43,10 +42,9 @@ class CreateOrderAdapter(
     // Binds each product in the list to a view
     override fun onBindViewHolder(holder: CreateOrderHolder, position: Int) {
         val currentProduct = products[position]
-//        val currentOrder = orders[position]
+
         holder.productName.text = currentProduct.name
         holder.productPrice.text = currentProduct.price.toString()
-//        holder.finalPrice.text = currentOrder.finalPrice.toString()
     }
 
     private fun updateQuantityForProduct(productName: String, quantity: Int) {

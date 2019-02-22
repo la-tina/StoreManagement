@@ -15,7 +15,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.android.storemanagement"
-        minSdkVersion 19
+        minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -52,4 +52,6 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0'
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    implementation 'me.dm7.barcodescanner:zbar:1.9.8'
 }

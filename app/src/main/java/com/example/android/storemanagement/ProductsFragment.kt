@@ -35,7 +35,6 @@ class ProductsFragment : Fragment() {
         val fragments = listOf(allProductsFragment, productsInStockFragment, productsLowStockFragment)
 
         val adapter = ProductsTabAdapter(childFragmentManager, fragments)
-
         // Set the adapter onto the view pager
         products_viewpager.adapter = adapter
 

@@ -18,7 +18,6 @@ abstract class ProductRoomDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: ProductRoomDatabase? = null
 
-
         fun getDatabase(
             context: Context
         ): ProductRoomDatabase {

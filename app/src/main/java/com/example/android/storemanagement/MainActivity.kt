@@ -1,10 +1,13 @@
 package com.example.android.storemanagement
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
+import com.example.android.storemanagement.CreateProductFragment.Companion.CAMERA_PERMISSION_CODE
 import kotlinx.android.synthetic.main.activity_main.*
-import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
 
@@ -14,6 +17,10 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         const val storeTag = "storeFragment"
         const val createOrderTag = "createOrderFragment"
         const val createProductTag = "createProductFragment"
+
+        const val BARCODE_KEY = "Barcode"
+
+        const val BARCODE_ACTIVITY_REQUEST_CODE = 0
     }
 
     private var currentFragment: Fragment? = null
@@ -45,16 +52,6 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         }
     }
 
-    private fun getFragmentTag(fragment: Fragment): String =
-        when (fragment) {
-            is ProductsFragment -> productTag
-            is OrdersFragment -> titleTag
-            is StoreFragment -> storeTag
-            is CreateOrderFragment -> createOrderTag
-            is CreateProductFragment -> createProductTag
-            else -> throw IllegalStateException()
-        }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
@@ -62,7 +59,6 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         if (currentFragment!!.isAdded)
             supportFragmentManager.putFragment(outState, "FragmentName", currentFragment as Fragment)
     }
-
 
     override fun onStart() {
         super.onStart()
@@ -86,6 +82,24 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_CODE && grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            val intent = Intent(this, BarcodeScanningActivity()::class.java)
+            startActivityForResult(intent, BARCODE_ACTIVITY_REQUEST_CODE)
+        } else {
+            Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == BARCODE_ACTIVITY_REQUEST_CODE) {
+            currentFragment?.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
     override fun onNavigationChanged(tabNumber: Int) {
         when (tabNumber) {
             0 -> openCreateOrderTab()
@@ -93,25 +107,35 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         }
     }
 
+    private fun getFragmentTag(fragment: Fragment): String =
+        when (fragment) {
+            is ProductsFragment -> productTag
+            is OrdersFragment -> titleTag
+            is StoreFragment -> storeTag
+            is CreateOrderFragment -> createOrderTag
+            is CreateProductFragment -> createProductTag
+            else -> throw IllegalStateException()
+        }
+
     private fun openCreateOrderTab() {
         val previouslyAddedCreateOrderFragment = supportFragmentManager.findFragmentByTag(createOrderTag)
         val fragment = (previouslyAddedCreateOrderFragment as? CreateOrderFragment) ?: CreateOrderFragment()
 
-        openTab(fragment, createOrderTag)
+        openCreateTab(fragment, createOrderTag)
     }
 
     private fun openCreateProductTab() {
         val previouslyAddedCreateProductFragment = supportFragmentManager.findFragmentByTag(createProductTag)
         val fragment = (previouslyAddedCreateProductFragment as? CreateProductFragment) ?: CreateProductFragment()
 
-        openTab(fragment, createProductTag)
+        openCreateTab(fragment, createProductTag)
     }
 
     private fun openStoreTab() {
         val previouslyAddedStoreFragment = supportFragmentManager.findFragmentByTag(storeTag)
         val fragment = (previouslyAddedStoreFragment as? StoreFragment) ?: StoreFragment()
 
-        openTab(fragment, storeTag)
+        openMainTab(fragment, storeTag)
     }
 
     private fun openOrdersTab() {
@@ -120,7 +144,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
 
         fragment.onNavigationChangedListener = this
 
-        openTab(fragment, titleTag)
+        openMainTab(fragment, titleTag)
     }
 
     private fun openProductsTab() {
@@ -129,16 +153,31 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
 
         fragment.onNavigationChangedListener = this
 
-        openTab(fragment, productTag)
+        openMainTab(fragment, productTag)
     }
 
-    private fun openTab(fragment: Fragment, tag: String) {
+    private fun openCreateTab(fragment: Fragment, tag: String) {
         currentFragment = fragment
 
         supportFragmentManager
             .beginTransaction()
+            .setCustomAnimations(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out)
             .replace(R.id.fragment_container, fragment, tag)
             .addToBackStack("a")
+            .commit()
+    }
+
+    private fun openMainTab(fragment: Fragment, tag: String) {
+        currentFragment = fragment
+
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out)
+            .replace(R.id.fragment_container, fragment, tag)
             .commit()
     }
 }
@@ -146,3 +185,4 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
 interface OnNavigationChangedListener {
     fun onNavigationChanged(tabNumber: Int)
 }
+

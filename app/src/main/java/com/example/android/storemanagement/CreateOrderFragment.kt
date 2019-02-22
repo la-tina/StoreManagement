@@ -3,9 +3,7 @@ package com.example.android.storemanagement
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
@@ -16,7 +14,6 @@ import com.example.android.storemanagement.orders_database.OrderViewModel
 import kotlinx.android.synthetic.main.fragment_create_order.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 
 class CreateOrderFragment : Fragment() {
 
@@ -36,7 +33,6 @@ class CreateOrderFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_create_order, container, false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStart() {
         super.onStart()
         setupRecyclerView()
