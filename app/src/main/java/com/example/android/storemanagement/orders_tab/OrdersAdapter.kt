@@ -34,6 +34,7 @@ class OrdersAdapter(private val context: Context) :
     override fun onBindViewHolder(holder: OrdersHolder, position: Int) {
         val currentOrder = orders[position]
         holder.finalPrice.text = currentOrder.finalPrice.toString()
+        //String.format("%.1f", finalPrice).toFloat().toString()
         holder.date.text = currentOrder.date
     }
 

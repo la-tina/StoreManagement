@@ -91,7 +91,7 @@
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
                 android:hint="@string/price"
-                android:inputType="number"
+                android:inputType="number|numberDecimal"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
                 android:visibility="visible" />
@@ -113,7 +113,7 @@
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
                 android:hint="@string/overcharge"
-                android:inputType="number"
+                android:inputType="number|numberDecimal"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
                 android:visibility="visible" />

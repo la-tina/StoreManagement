@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_store.*
@@ -35,6 +36,7 @@ class StoreFragment : Fragment() {
             val quantities: MutableMap<String, Int> = (store_recycler_view.adapter as StoreAdapter).quantities
             quantities.forEach { productName, quantity ->
                 updateQuantity(productName, quantity)
+                Toast.makeText(requireContext(), "Quantity saved!", Toast.LENGTH_SHORT).show()
             }
         }
     }

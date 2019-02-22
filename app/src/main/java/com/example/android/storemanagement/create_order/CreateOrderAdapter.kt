@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
+import com.example.android.storemanagement.store_tab.StoreProductsHolder
 import kotlinx.android.synthetic.main.create_order_item.view.*
 
 class CreateOrderAdapter(
@@ -32,12 +33,7 @@ class CreateOrderAdapter(
     // Inflates the item views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CreateOrderHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.create_order_item, parent, false)
-        return CreateOrderHolder(
-            updateFinalPriceAction,
-            ::updateQuantityForProduct,
-            ::onCheckChangedAction,
-            view
-        )
+        return CreateOrderHolder(view)
     }
 
     private fun onCheckChangedAction(productName: String, isChecked: Boolean) {
@@ -52,6 +48,42 @@ class CreateOrderAdapter(
 
         holder.productName.text = currentProduct.name
         holder.productPrice.text = currentProduct.price.toString()
+        holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
+
+        holder.orderCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            onCheckChanged(isChecked, holder)
+        }
+        holder.orderCheckBox.addTextChangedListener(getTextWatcher(holder))
+    }
+
+
+    private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher {
+        return object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (holder.productQuantity.text.toString().isEmpty()) return
+                updateQuantityForProduct(holder.productName.text.toString(), holder.productQuantity.text.toString().toInt())
+                updateFinalPriceAction(getPrice(holder))
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                if (holder.productQuantity.text.toString().isEmpty()) return
+                updateFinalPriceAction(getPrice(holder) * -1)
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        }
+    }
+
+    private fun getPrice(holder: CreateOrderHolder): Float {
+        val quantity = holder.productQuantity.text.toString().toInt()
+        val productPriceInt = holder.productPrice.text.toString().toFloat()
+        return quantity * productPriceInt
+    }
+
+    private fun onCheckChanged(isChecked: Boolean, holder: CreateOrderHolder) {
+        holder.productQuantity.isEnabled = isChecked
+        onCheckChangedAction(holder.productName.text.toString(), isChecked)
     }
 
     private fun updateQuantityForProduct(productName: String, quantity: Int) {
@@ -64,52 +96,12 @@ class CreateOrderAdapter(
     }
 }
 
-class CreateOrderHolder(
-    updateFinalPriceAction: (Float) -> Unit,
-    updateQuantityForProductAction: (String, Int) -> Unit,
-    val onCheckChangedAction: (String, Boolean) -> Unit,
-    view: View
-) : RecyclerView.ViewHolder(view) {
+class CreateOrderHolder(view: View) : RecyclerView.ViewHolder(view) {
     // Holds the ProductTextView that will add each product to
     val productName = view.order_item_text!!
     val productPrice = view.order_item_price!!
-
-    private val orderItemQuantity = view.order_item_quantity!!
-    //private val quantityInt = orderItemQuantity.text!!.toString().toInt()
-    //private val productPriceInt = productPrice.text!!.toString().toFloat()
-
-    private val textWatcher = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) {
-            if (orderItemQuantity.text.toString().isEmpty()) return
-            updateQuantityForProductAction(productName.text.toString(), orderItemQuantity.text.toString().toInt())
-            updateFinalPriceAction(getPrice())
-        }
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            if (orderItemQuantity.text.toString().isEmpty()) return
-            updateFinalPriceAction(getPrice() * -1)
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        }
-    }
-
-    private fun getPrice(): Float {
-        val quantity = orderItemQuantity.text.toString().toInt()
-        val productPriceInt = productPrice.text.toString().toFloat()
-        return quantity * productPriceInt
-    }
-
-    init {
-        view.order_check_box.setOnCheckedChangeListener { _, isChecked ->
-            onCheckChanged(isChecked, view)
-        }
-        view.order_item_quantity.addTextChangedListener(textWatcher)
-    }
-
-    private fun onCheckChanged(isChecked: Boolean, view: View) {
-        view.order_item_quantity.isEnabled = isChecked
-        onCheckChangedAction(productName.text.toString(), isChecked)
-    }
+    val productQuantity = view.order_item_quantity
+    val orderCheckBox = view.order_check_box
 }
+
 
