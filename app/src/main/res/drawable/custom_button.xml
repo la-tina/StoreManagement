@@ -5,8 +5,8 @@
     <item android:state_enabled="true" >
         <shape>
             <gradient
-                android:startColor="@color/barColor"
-                android:endColor="@android:color/background_light"
+                android:startColor="@color/lightBarColor"
+                android:endColor="@color/lightBarColor"
                 android:angle="270" />
             <corners
                 android:radius="3dp" />

@@ -7,16 +7,28 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.create_product.CreateProductFragment
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.store_tab.StoreProductsHolder
 import kotlinx.android.synthetic.main.create_order_item.view.*
+import kotlinx.android.synthetic.main.fragment_create_product.*
 
 class CreateOrderAdapter(
     private val context: Context,
     private val updateFinalPriceAction: (Float) -> Unit,
     private val setOrderButtonEnabled: (Boolean) -> Unit
 ) : RecyclerView.Adapter<CreateOrderHolder>() {
+
+    companion object {
+        const val MESSAGE_QUANTITY_ABOVE_MAX_SIZE = "Тhe maximum allowed quantity is 500лв."
+        const val MESSAGE_ZERO_QUANTITY = "You can't make order if the quantity is empty."
+    }
+
+    var isQuantityZero: Boolean = false
+    var isQuantityAboveMaxSize: Boolean = false
+
 
     private var products = emptyList<Product>() // Cached copy of products
 
@@ -38,8 +50,7 @@ class CreateOrderAdapter(
 
     private fun onCheckChangedAction(productName: String, isChecked: Boolean) {
         enabledProducts[productName] = isChecked
-        val hasEnabled = enabledProducts.values.any { it }
-        setOrderButtonEnabled(hasEnabled)
+
     }
 
     // Binds each product in the list to a view
@@ -59,14 +70,39 @@ class CreateOrderAdapter(
     private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher {
         return object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (holder.productQuantity.text.toString().isEmpty()) return
-                updateQuantityForProduct(holder.productName.text.toString(), holder.productQuantity.text.toString().toInt())
-                updateFinalPriceAction(getPrice(holder))
+                if (holder.productQuantity.text.toString().isEmpty() || holder.productQuantity.text.toString() == "0") {
+
+                    val hasEnabled = false
+                    setOrderButtonEnabled(hasEnabled)
+                    isQuantityZero = true
+                    holder.productQuantity.error = MESSAGE_ZERO_QUANTITY
+
+                } else if(!holder.productQuantity.text.toString().isEmpty() &&
+                    holder.productQuantity.text.toString().toInt() > 500){
+
+                    val hasEnabled = false
+                    setOrderButtonEnabled(hasEnabled)
+                    isQuantityAboveMaxSize = true
+                    holder.productQuantity.error = MESSAGE_QUANTITY_ABOVE_MAX_SIZE
+
+                } else if(!holder.productQuantity.text.toString().isEmpty() &&
+                    holder.productQuantity.text.toString().toInt() <= 500){
+
+                    val hasEnabled = enabledProducts.values.any { it }
+                    setOrderButtonEnabled(hasEnabled)
+                    updateQuantityForProduct(holder.productName.text.toString(),
+                        holder.productQuantity.text.toString().toInt())
+                    updateFinalPriceAction(getPrice(holder))
+                }
+
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 if (holder.productQuantity.text.toString().isEmpty()) return
-                updateFinalPriceAction(getPrice(holder) * -1)
+                if(!holder.productQuantity.text.toString().isEmpty() &&
+                    holder.productQuantity.text.toString().toInt() <= 500) {
+                    updateFinalPriceAction(getPrice(holder) * -1)
+                }
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -88,6 +124,10 @@ class CreateOrderAdapter(
     private fun updateQuantityForProduct(productName: String, quantity: Int) {
         quantities[productName] = quantity
     }
+
+//    private fun isQuantityValid(productName: String, quantity: String): Boolean {
+//        if(quantity.isEmpty() || quantity == "0" || quantity > "500")
+//    }
 
     internal fun setProducts(products: List<Product>) {
         this.products = products

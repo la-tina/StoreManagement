@@ -11,9 +11,16 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.ProductViewModel
+import kotlinx.android.synthetic.main.fragment_create_order.*
 import kotlinx.android.synthetic.main.fragment_store.*
+import kotlinx.android.synthetic.main.store_item.*
+import timber.log.Timber
 
 class StoreFragment : Fragment() {
+
+    companion object {
+        const val KEY_QUANTITY = "quantity_key"
+    }
 
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
@@ -25,6 +32,12 @@ class StoreFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_store, container, false)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        //if (savedInstanceState != null)
     }
 
     override fun onStart() {
@@ -41,13 +54,24 @@ class StoreFragment : Fragment() {
         }
     }
 
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        outState.putString(KEY_QUANTITY, store_item_quantity.toString())
+//        Timber.i("onSaveInstanceState Called")
+//        super.onSaveInstanceState(outState)
+//    }
+//
+//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+//        super.onViewStateRestored(savedInstanceState)
+//        Timber.i("onRestoreInstanceState Called")
+//    }
+
     private fun updateQuantity(productName: String, quantity: Int) {
         productViewModel.updateQuantity(productName, quantity)
     }
 
     private fun setupRecyclerView() {
         store_recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        val storeAdapter = StoreAdapter(requireContext())
+        val storeAdapter = StoreAdapter(requireContext(), ::setOrderButtonEnabled)
         store_recycler_view.adapter = storeAdapter
 
         productViewModel.inStockProducts.observe(this, Observer { inStockProducts ->
@@ -68,5 +92,9 @@ class StoreFragment : Fragment() {
             store_recycler_view.visibility = View.VISIBLE
             empty_view_products_store.visibility = View.GONE
         }
+    }
+
+    private fun setOrderButtonEnabled(enabled: Boolean) {
+        button_save_quantity.isEnabled = enabled
     }
 }

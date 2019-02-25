@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/intro_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <ImageView
+        android:id="@+id/imageViewShop"
+        android:layout_width="543dp"
+        android:layout_height="190dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_shop_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="cursive"
+        android:text="@string/store_management"
+        android:textAlignment="center"
+        android:textColor="@color/checkBoxColor"
+        android:textSize="52sp"
+        android:textStyle="bold"
+        app:layout_goneMarginBottom="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageViewShop" />
+
+    <ImageView
+        android:id="@+id/imageViewBlueberry"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/blueberry"
+        android:padding="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/imageViewPineApple"
+        app:layout_constraintEnd_toEndOf="@+id/imageViewPineApple"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/imageViewPineApple" />
+
+    <ImageView
+        android:id="@+id/imageViewKiwi"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="10dp"
+        android:src="@drawable/kiwi"
+        app:layout_constraintBottom_toTopOf="@+id/imageViewRaspberry"
+        app:layout_constraintEnd_toStartOf="@+id/imageViewApple" />
+
+    <ImageView
+        android:id="@+id/imageViewPeach"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/peach"
+        android:padding="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/imageViewApple"
+        app:layout_constraintEnd_toEndOf="@+id/imageViewApple"
+        app:layout_constraintStart_toStartOf="@+id/imageViewApple" />
+
+    <ImageView
+        android:id="@+id/imageViewPineApple"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/pineapple"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageViewApple"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.528" />
+
+    <ImageView
+        android:id="@+id/imageViewRaspberry"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="5dp"
+        android:src="@drawable/raspberry"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imageViewApple"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.528" />
+
+    <ImageView
+        android:id="@+id/imageViewApple"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/apple"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView"
+        app:layout_constraintVertical_bias="0.528" />
+
+    <ImageView
+        android:id="@+id/imageViewAvocado"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/avocado"
+        android:padding="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/imageViewRaspberry"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewRaspberry" />
+
+    <ImageView
+        android:id="@+id/imageViewWatermelon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="7dp"
+        android:src="@drawable/watermelon"
+        app:layout_constraintStart_toStartOf="@+id/imageViewPineApple"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewPineApple" />
+
+    <ImageView
+        android:id="@+id/imageViewCherry"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="5dp"
+        android:src="@drawable/cherry"
+        app:layout_constraintEnd_toStartOf="@id/imageViewWatermelon"
+        app:layout_constraintStart_toEndOf="@id/imageViewAvocado"
+        app:layout_constraintTop_toBottomOf="@id/imageViewApple" />
+
+</android.support.constraint.ConstraintLayout>
+

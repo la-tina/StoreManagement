@@ -58,8 +58,8 @@ class ProductsLowStockFragment : Fragment() {
     private fun setupRecyclerView() {
         products_low_stock_recycler_view?.let { recyclerView ->
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            val productsAdapter = ProductsAdapter(requireContext())
-            recyclerView.adapter = productsAdapter
+            val productsLowStockAdapter = ProductsLowStockAdapter(requireContext())
+            recyclerView.adapter = productsLowStockAdapter
 
             // Observer on the LiveData
             // The onChanged() method fires when the observed data changes and the activity is
@@ -68,7 +68,7 @@ class ProductsLowStockFragment : Fragment() {
             productViewModel.lowStockProducts.observe(this, Observer { products ->
                 // Update the cached copy of the words in the adapter.
                 products?.let {
-                    productsAdapter.setProducts(it)
+                    productsLowStockAdapter.setProducts(it)
                     setupEmptyView()
                     //quantity < 5
                 }

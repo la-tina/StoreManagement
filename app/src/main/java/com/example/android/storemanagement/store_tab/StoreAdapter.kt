@@ -1,9 +1,11 @@
 package com.example.android.storemanagement.store_tab
 
 import android.content.Context
+import android.os.Bundle
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +14,13 @@ import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.store_item.view.*
 
 
-class StoreAdapter(private val context: Context) :
-    RecyclerView.Adapter<StoreProductsHolder>() {
+class StoreAdapter(private val context: Context,
+private val setOrderButtonEnabled: (Boolean) -> Unit) :
+    RecyclerView.Adapter<StoreProductsHolder>(){
+
+    companion object {
+        const val MESSAGE_QUANTITY_ABOVE_MAX_SIZE = "Тhe maximum allowed quantity is 500лв."
+    }
 
     private var products = emptyList<Product>() // Cached copy of products
 
@@ -44,10 +51,22 @@ class StoreAdapter(private val context: Context) :
     private fun getTextWatcher(holder: StoreProductsHolder): TextWatcher {
         return object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                updateQuantityForProduct(
-                    holder.productName.text.toString(),
-                    holder.productQuantity.text.toString().toInt()
-                )
+
+                if (!holder.productQuantity.text.toString().isEmpty()
+                    && holder.productQuantity.text.toString().toInt() > 500 ){
+                    holder.productQuantity.error = MESSAGE_QUANTITY_ABOVE_MAX_SIZE
+
+                    val hasEnabled = false
+                    setOrderButtonEnabled(hasEnabled)
+                }
+                else{
+                    updateQuantityForProduct(
+                        holder.productName.text.toString(),
+                        holder.productQuantity.text.toString()
+                    )
+                    val hasEnabled = true
+                    setOrderButtonEnabled(hasEnabled)
+                }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -55,12 +74,16 @@ class StoreAdapter(private val context: Context) :
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
             }
         }
     }
 
-    private fun updateQuantityForProduct(productName: String, quantity: Int) {
-        quantities[productName] = quantity
+    private fun updateQuantityForProduct(productName: String, quantity: String) {
+        when (quantity) {
+            "" -> quantities[productName] = 0
+            else -> quantities[productName] = quantity.toInt()
+        }
     }
 
     internal fun setProducts(products: List<Product>) {

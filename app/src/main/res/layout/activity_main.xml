@@ -20,10 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/barColor"
+        app:itemTextColor="@drawable/custom_color_navigation_view"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_navigation_menu"
-        app:itemIconTint="@color/titleColor"
-        app:itemTextColor="@android:color/white">
+        app:itemIconTint="@color/titleColor">
 
     </android.support.design.widget.BottomNavigationView>
 

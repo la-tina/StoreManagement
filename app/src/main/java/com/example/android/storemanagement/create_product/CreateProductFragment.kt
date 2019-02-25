@@ -24,13 +24,17 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView
 
 class CreateProductFragment : Fragment() {
 
-
     companion object {
         const val CAMERA_PERMISSION_CODE = 0
-        const val message = "A product with the same barcode already exists."
+        const val MESSAGE = "A product with the same barcode already exists or the barcode is empty."
+        const val MESSAGE_PRICE = "Тhe maximum allowed price is 100лв."
+        const val MESSAGE_OVERCHARGE = "Тhe maximum allowed overcharge is 100лв."
+        const val MESSAGE_PRICE_ZERO = "Тhe price can't be 0лв."
+        const val MAX_PRICE = 100
     }
 
     private lateinit var mScannerView: ZBarScannerView
+
 
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
@@ -49,8 +53,14 @@ class CreateProductFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_create_product, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        //clean()
+    }
+
     override fun onStart() {
         super.onStart()
+
         mScannerView = ZBarScannerView(context)
 
         val name = product_name.text
@@ -103,7 +113,8 @@ class CreateProductFragment : Fragment() {
             )
         } else {
             val intent = Intent(requireContext(), BarcodeScanningActivity()::class.java)
-            startActivityForResult(intent,
+            startActivityForResult(
+                intent,
                 MainActivity.BARCODE_ACTIVITY_REQUEST_CODE
             )
         }
@@ -178,14 +189,38 @@ class CreateProductFragment : Fragment() {
         val productOvercharge = productOverchargeView.toString()
         val barcode = barcodeView.toString()
 
+        var isProductPriceIncorrect = false
+        var isProductOverchargeIncorrect = false
+        var isProductPriceAboveLimit = false
+        var isProductOverchargeAboveLimit = false
+        var isProductPriceZero = false
+
         val anyFieldEmpty = isAnyFieldEmpty(productName, productPrice, productOvercharge, barcode)
 
         val isBarcodeDuplicated = isBarcodeDuplicated(barcode)
 
         button_add_product.isEnabled = !(anyFieldEmpty || isBarcodeDuplicated)
 
-        if (isBarcodeDuplicated) product_barcode.error =
-            message
+        if (!productPrice.isEmpty()) {
+            isProductPriceAboveLimit = productPrice.toFloat() > MAX_PRICE
+            isProductPriceZero = productPrice.toFloat() <= 0
+            isProductPriceIncorrect = isProductPriceAboveLimit || isProductPriceZero
+        }
+
+        if (!productOvercharge.isEmpty()) {
+            isProductOverchargeAboveLimit = productOvercharge.toFloat() > MAX_PRICE
+            isProductOverchargeIncorrect = isProductOverchargeAboveLimit
+        }
+
+        button_add_product.isEnabled = !(anyFieldEmpty
+                || isBarcodeDuplicated
+                || isProductPriceIncorrect
+                || isProductOverchargeIncorrect)
+
+        if (isBarcodeDuplicated) product_barcode.error = MESSAGE
+        if (isProductPriceAboveLimit) product_price.error = MESSAGE_PRICE
+        if (isProductOverchargeAboveLimit) product_overcharge.error = MESSAGE_OVERCHARGE
+        if (isProductPriceZero) product_price.error = MESSAGE_PRICE_ZERO
     }
 
     private fun isAnyFieldEmpty(
@@ -193,4 +228,11 @@ class CreateProductFragment : Fragment() {
         productBarcode: String
     ): Boolean =
         productName.isEmpty() || productPrice.isEmpty() || productOvercharge.isEmpty() || productBarcode.isEmpty()
+
+//    private fun clean() {
+//        product_barcode.setText("")
+//        product_name.setText("")
+//        product_overcharge.setText("")
+//        product_price.setText("")
+//    }
 }
