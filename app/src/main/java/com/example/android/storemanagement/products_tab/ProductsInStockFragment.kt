@@ -11,8 +11,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.orders_tab.OrdersAdapter
 import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_products_in_stock.*
+import kotlinx.android.synthetic.main.fragment_title.*
 
 class ProductsInStockFragment : Fragment() {
 
@@ -23,27 +25,6 @@ class ProductsInStockFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         setupRecyclerView()
-    }
-
-    private val helper by lazy {
-        ItemTouchHelper(
-            object : ItemTouchHelper.SimpleCallback(
-                0,
-                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-            ) {
-                override fun onMove(
-                    recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
-                ): Boolean = false
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    val adapter = products_in_stock_recycler_view.adapter as ProductsAdapter
-                    val myProduct = adapter.getProductAtPosition(position)
-
-                    // Delete the product by calling deleteProduct() on the ProductViewModel:
-                    productViewModel.deleteProduct(myProduct)
-                }
-            })
     }
 
     override fun onCreateView(
@@ -72,7 +53,6 @@ class ProductsInStockFragment : Fragment() {
                     //quantity > 0
                 }
             })
-            helper.attachToRecyclerView(recyclerView)
         }
     }
 

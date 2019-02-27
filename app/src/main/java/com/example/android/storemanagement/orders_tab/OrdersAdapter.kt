@@ -33,7 +33,8 @@ class OrdersAdapter(private val context: Context) :
     //Binds each product in the list to a view
     override fun onBindViewHolder(holder: OrdersHolder, position: Int) {
         val currentOrder = orders[position]
-        holder.finalPrice.text = currentOrder.finalPrice.toString()
+        val orderPrice= String.format("%.1f", currentOrder.finalPrice).toFloat().toString()
+        holder.finalPrice.text = orderPrice
         //String.format("%.1f", finalPrice).toFloat().toString()
         holder.date.text = currentOrder.date
     }

@@ -11,8 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.orders_database.Order
-import com.example.android.storemanagement.products_database.ProductViewModel
 import com.example.android.storemanagement.orders_database.OrderViewModel
+import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_create_order.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -63,7 +63,9 @@ class CreateOrderFragment : Fragment() {
     }
 
     private fun updateQuantity(productName: String, quantity: Int) {
-        productViewModel.updateQuantity(productName, quantity)
+        val currentQuantity = productViewModel.quantities[productName]
+        val finalQuantity = if (currentQuantity != null) quantity + currentQuantity else quantity
+        productViewModel.updateQuantity(productName, finalQuantity)
     }
 
     private fun setupEmptyView() {
@@ -105,6 +107,3 @@ class CreateOrderFragment : Fragment() {
         button_add_order.isEnabled = enabled
     }
 }
-
-
-

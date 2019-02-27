@@ -18,10 +18,6 @@ import timber.log.Timber
 
 class StoreFragment : Fragment() {
 
-    companion object {
-        const val KEY_QUANTITY = "quantity_key"
-    }
-
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
     }
@@ -32,12 +28,6 @@ class StoreFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_store, container, false)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        //if (savedInstanceState != null)
     }
 
     override fun onStart() {

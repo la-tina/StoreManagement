@@ -26,15 +26,15 @@ class CreateProductFragment : Fragment() {
 
     companion object {
         const val CAMERA_PERMISSION_CODE = 0
-        const val MESSAGE = "A product with the same barcode already exists or the barcode is empty."
+        const val MESSAGE_BARCODE = "A product with the same barcode already exists or the barcode is empty."
         const val MESSAGE_PRICE = "Тhe maximum allowed price is 100лв."
         const val MESSAGE_OVERCHARGE = "Тhe maximum allowed overcharge is 100лв."
         const val MESSAGE_PRICE_ZERO = "Тhe price can't be 0лв."
+        const val MESSAGE_EMPTY_NAME = "Product name can't be empty."
         const val MAX_PRICE = 100
     }
 
     private lateinit var mScannerView: ZBarScannerView
-
 
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
@@ -53,13 +53,10 @@ class CreateProductFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_create_product, container, false)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        //clean()
-    }
-
     override fun onStart() {
         super.onStart()
+
+        clean()
 
         mScannerView = ZBarScannerView(context)
 
@@ -73,15 +70,7 @@ class CreateProductFragment : Fragment() {
         onOverchargeTextChanged(name, price, barcode)
         onBarcodeTextChanged(name, price, overcharge)
 
-        button_add_product.setOnClickListener {
-            val quantity = 0
-            val product = Product(
-                name.toString(), price.toString().toFloat(),
-                overcharge.toString().toFloat(), barcode.toString(), quantity
-            )
-            productViewModel.insert(product)
-            fragmentManager?.popBackStackImmediate()
-        }
+        button_add_product.setOnClickListener { onAddButtonClicked(name, price, overcharge, barcode) }
 
         productViewModel.allProducts.observe(this, Observer { products ->
             // Update the cached copy of the words in the adapter.
@@ -93,6 +82,21 @@ class CreateProductFragment : Fragment() {
         })
 
         button_scan_barcode.setOnClickListener { onBarcodeButtonPressed() }
+    }
+
+    private fun onAddButtonClicked(
+        name: Editable,
+        price: Editable,
+        overcharge: Editable,
+        barcode: Editable
+    ) {
+        val quantity = 0
+        val product = Product(
+            name.toString(), price.toString().toFloat(),
+            overcharge.toString().toFloat(), barcode.toString(), quantity
+        )
+        productViewModel.insert(product)
+        fragmentManager?.popBackStackImmediate()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -119,6 +123,17 @@ class CreateProductFragment : Fragment() {
             )
         }
     }
+
+    //    override fun onSaveInstanceState(outState: Bundle) {
+//        outState.putString(KEY_QUANTITY, store_item_quantity.toString())
+//        Timber.i("onSaveInstanceState Called")
+//        super.onSaveInstanceState(outState)
+//    }
+//
+//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+//        super.onViewStateRestored(savedInstanceState)
+//        Timber.i("onRestoreInstanceState Called")
+//    }
 
     private fun onProductTextChanged(productPrice: Editable, productOvercharge: Editable, productBarcode: Editable) {
         product_name.addTextChangedListener(object : TextWatcher {
@@ -190,38 +205,42 @@ class CreateProductFragment : Fragment() {
         val barcode = barcodeView.toString()
 
         var isProductPriceIncorrect = false
-        var isProductOverchargeIncorrect = false
         var isProductPriceAboveLimit = false
         var isProductOverchargeAboveLimit = false
         var isProductPriceZero = false
+        var isProductNameEmpty = false
 
         val anyFieldEmpty = isAnyFieldEmpty(productName, productPrice, productOvercharge, barcode)
 
         val isBarcodeDuplicated = isBarcodeDuplicated(barcode)
 
-        button_add_product.isEnabled = !(anyFieldEmpty || isBarcodeDuplicated)
-
-        if (!productPrice.isEmpty()) {
+        if (productPrice.startsWithDigit()) {
             isProductPriceAboveLimit = productPrice.toFloat() > MAX_PRICE
             isProductPriceZero = productPrice.toFloat() <= 0
             isProductPriceIncorrect = isProductPriceAboveLimit || isProductPriceZero
         }
 
-        if (!productOvercharge.isEmpty()) {
+        if (productName.isBlank())
+            isProductNameEmpty = true
+
+        if (productOvercharge.startsWithDigit())
             isProductOverchargeAboveLimit = productOvercharge.toFloat() > MAX_PRICE
-            isProductOverchargeIncorrect = isProductOverchargeAboveLimit
-        }
 
         button_add_product.isEnabled = !(anyFieldEmpty
                 || isBarcodeDuplicated
                 || isProductPriceIncorrect
-                || isProductOverchargeIncorrect)
+                || isProductOverchargeAboveLimit
+                || isProductNameEmpty)
 
-        if (isBarcodeDuplicated) product_barcode.error = MESSAGE
+        if (isBarcodeDuplicated) product_barcode.error = MESSAGE_BARCODE
         if (isProductPriceAboveLimit) product_price.error = MESSAGE_PRICE
         if (isProductOverchargeAboveLimit) product_overcharge.error = MESSAGE_OVERCHARGE
         if (isProductPriceZero) product_price.error = MESSAGE_PRICE_ZERO
+        if (isProductNameEmpty) product_name.error = MESSAGE_EMPTY_NAME
     }
+
+    private fun String.startsWithDigit() : Boolean =
+        !this.isEmpty() && Character.isDigit(this.first())
 
     private fun isAnyFieldEmpty(
         productName: String, productPrice: String, productOvercharge: String,
@@ -229,10 +248,10 @@ class CreateProductFragment : Fragment() {
     ): Boolean =
         productName.isEmpty() || productPrice.isEmpty() || productOvercharge.isEmpty() || productBarcode.isEmpty()
 
-//    private fun clean() {
-//        product_barcode.setText("")
-//        product_name.setText("")
-//        product_overcharge.setText("")
-//        product_price.setText("")
-//    }
+    private fun clean() {
+        product_barcode.setText("")
+        product_name.setText("")
+        product_overcharge.setText("")
+        product_price.setText("")
+    }
 }

@@ -26,10 +26,6 @@ class CreateOrderAdapter(
         const val MESSAGE_ZERO_QUANTITY = "You can't make order if the quantity is empty."
     }
 
-    var isQuantityZero: Boolean = false
-    var isQuantityAboveMaxSize: Boolean = false
-
-
     private var products = emptyList<Product>() // Cached copy of products
 
     //productName -> quantity
@@ -50,7 +46,6 @@ class CreateOrderAdapter(
 
     private fun onCheckChangedAction(productName: String, isChecked: Boolean) {
         enabledProducts[productName] = isChecked
-
     }
 
     // Binds each product in the list to a view
@@ -64,51 +59,37 @@ class CreateOrderAdapter(
         holder.orderCheckBox.setOnCheckedChangeListener { _, isChecked ->
             onCheckChanged(isChecked, holder)
         }
-        holder.orderCheckBox.addTextChangedListener(getTextWatcher(holder))
     }
 
-    private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher {
-        return object : TextWatcher {
+    private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher =
+        object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (holder.productQuantity.text.toString().isEmpty() || holder.productQuantity.text.toString() == "0") {
+                val quantity = holder.productQuantity.text.toString()
 
-                    val hasEnabled = false
-                    setOrderButtonEnabled(hasEnabled)
-                    isQuantityZero = true
+                if (quantity.isEmpty() || quantity == "0") {
+                    setOrderButtonEnabled(false)
                     holder.productQuantity.error = MESSAGE_ZERO_QUANTITY
-
-                } else if(!holder.productQuantity.text.toString().isEmpty() &&
-                    holder.productQuantity.text.toString().toInt() > 500){
-
-                    val hasEnabled = false
-                    setOrderButtonEnabled(hasEnabled)
-                    isQuantityAboveMaxSize = true
+                } else if (quantity.toInt() > 500) {
+                    setOrderButtonEnabled(false)
                     holder.productQuantity.error = MESSAGE_QUANTITY_ABOVE_MAX_SIZE
-
-                } else if(!holder.productQuantity.text.toString().isEmpty() &&
-                    holder.productQuantity.text.toString().toInt() <= 500){
-
-                    val hasEnabled = enabledProducts.values.any { it }
-                    setOrderButtonEnabled(hasEnabled)
-                    updateQuantityForProduct(holder.productName.text.toString(),
-                        holder.productQuantity.text.toString().toInt())
+                } else {
+                    setOrderButtonEnabled(enabledProducts.values.any { it })
+                    updateQuantityForProduct(holder.productName.text.toString(), quantity.toInt())
                     updateFinalPriceAction(getPrice(holder))
                 }
-
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                if (holder.productQuantity.text.toString().isEmpty()) return
-                if(!holder.productQuantity.text.toString().isEmpty() &&
-                    holder.productQuantity.text.toString().toInt() <= 500) {
+                val quantity = holder.productQuantity.text.toString()
+
+                if (quantity.isEmpty()) return
+                if (quantity.toInt() <= 500)
                     updateFinalPriceAction(getPrice(holder) * -1)
-                }
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         }
-    }
 
     private fun getPrice(holder: CreateOrderHolder): Float {
         val quantity = holder.productQuantity.text.toString().toInt()
@@ -125,10 +106,6 @@ class CreateOrderAdapter(
         quantities[productName] = quantity
     }
 
-//    private fun isQuantityValid(productName: String, quantity: String): Boolean {
-//        if(quantity.isEmpty() || quantity == "0" || quantity > "500")
-//    }
-
     internal fun setProducts(products: List<Product>) {
         this.products = products
         notifyDataSetChanged()
@@ -142,5 +119,3 @@ class CreateOrderHolder(view: View) : RecyclerView.ViewHolder(view) {
     val productQuantity = view.order_item_quantity!!
     val orderCheckBox = view.order_check_box!!
 }
-
-

@@ -36,6 +36,8 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         setContentView(R.layout.activity_main)
 
         //deleteDatabase("Product_database")
+        //deleteDatabase("Order_database")
+
         if (savedInstanceState != null) {
             currentFragment = supportFragmentManager.getFragment(savedInstanceState, "FragmentName")
             if (currentFragment is ProductsFragment)

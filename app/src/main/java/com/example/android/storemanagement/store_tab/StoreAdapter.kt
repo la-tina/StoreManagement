@@ -1,11 +1,9 @@
 package com.example.android.storemanagement.store_tab
 
 import android.content.Context
-import android.os.Bundle
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +12,11 @@ import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.store_item.view.*
 
 
-class StoreAdapter(private val context: Context,
-private val setOrderButtonEnabled: (Boolean) -> Unit) :
-    RecyclerView.Adapter<StoreProductsHolder>(){
+class StoreAdapter(
+    private val context: Context,
+    private val setOrderButtonEnabled: (Boolean) -> Unit
+) :
+    RecyclerView.Adapter<StoreProductsHolder>() {
 
     companion object {
         const val MESSAGE_QUANTITY_ABOVE_MAX_SIZE = "Тhe maximum allowed quantity is 500лв."
@@ -28,9 +28,8 @@ private val setOrderButtonEnabled: (Boolean) -> Unit) :
     var quantities = mutableMapOf<String, Int>()
 
     // Gets the number of items in the list
-    override fun getItemCount(): Int {
-        return products.size
-    }
+    override fun getItemCount(): Int =
+        products.size
 
     // Inflates the item views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreProductsHolder {
@@ -48,18 +47,18 @@ private val setOrderButtonEnabled: (Boolean) -> Unit) :
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
     }
 
-    private fun getTextWatcher(holder: StoreProductsHolder): TextWatcher {
-        return object : TextWatcher {
+    private fun getTextWatcher(holder: StoreProductsHolder): TextWatcher =
+        object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
 
                 if (!holder.productQuantity.text.toString().isEmpty()
-                    && holder.productQuantity.text.toString().toInt() > 500 ){
+                    && holder.productQuantity.text.toString().toInt() > 500
+                ) {
                     holder.productQuantity.error = MESSAGE_QUANTITY_ABOVE_MAX_SIZE
 
                     val hasEnabled = false
                     setOrderButtonEnabled(hasEnabled)
-                }
-                else{
+                } else {
                     updateQuantityForProduct(
                         holder.productName.text.toString(),
                         holder.productQuantity.text.toString()
@@ -77,7 +76,6 @@ private val setOrderButtonEnabled: (Boolean) -> Unit) :
 
             }
         }
-    }
 
     private fun updateQuantityForProduct(productName: String, quantity: String) {
         when (quantity) {
@@ -97,13 +95,3 @@ class StoreProductsHolder(view: View) : RecyclerView.ViewHolder(view) {
     val productPrice = view.store_item_price!!
     val productQuantity = view.store_item_quantity!!
 }
-
-
-
-
-
-
-
-
-
-

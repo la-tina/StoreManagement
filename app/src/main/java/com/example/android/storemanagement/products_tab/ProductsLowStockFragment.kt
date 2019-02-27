@@ -26,27 +26,6 @@ class ProductsLowStockFragment : Fragment() {
         setupRecyclerView()
     }
 
-    private val helper by lazy {
-        ItemTouchHelper(
-            object : ItemTouchHelper.SimpleCallback(
-                0,
-                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-            ) {
-                override fun onMove(
-                    recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
-                ): Boolean = false
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    val adapter = products_low_stock_recycler_view.adapter as ProductsAdapter
-                    val myProduct = adapter.getProductAtPosition(position)
-
-                    // Delete the product by calling deleteProduct() on the ProductViewModel:
-                    productViewModel.deleteProduct(myProduct)
-                }
-            })
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -73,7 +52,6 @@ class ProductsLowStockFragment : Fragment() {
                     //quantity < 5
                 }
             })
-            helper.attachToRecyclerView(recyclerView)
         }
     }
 

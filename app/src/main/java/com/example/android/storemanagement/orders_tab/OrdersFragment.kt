@@ -25,26 +25,26 @@ class OrdersFragment : Fragment() {
 
     lateinit var onNavigationChangedListener: OnNavigationChangedListener
 
-    private val helper by lazy {
-        ItemTouchHelper(
-            object : ItemTouchHelper.SimpleCallback(
-                0,
-                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-            ) {
-                override fun onMove(
-                    recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
-                ): Boolean = false
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    val adapter = orders_recycler_view.adapter as OrdersAdapter
-                    val myOrder = adapter.getOrderAtPosition(position)
-
-                    // Delete the product by calling deleteProduct() on the ProductViewModel:
-                    viewModel.deleteOrder(myOrder)
-                }
-            })
-    }
+//    private val helper by lazy {
+//        ItemTouchHelper(
+//            object : ItemTouchHelper.SimpleCallback(
+//                0,
+//                ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+//            ) {
+//                override fun onMove(
+//                    recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
+//                ): Boolean = false
+//
+//                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//                    val position = viewHolder.adapterPosition
+//                    val adapter = orders_recycler_view.adapter as OrdersAdapter
+//                    val myOrder = adapter.getOrderAtPosition(position)
+//
+//                    // Delete the product by calling deleteProduct() on the ProductViewModel:
+//                    viewModel.deleteOrder(myOrder)
+//                }
+//            })
+//    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_title, container, false)
@@ -90,8 +90,7 @@ class OrdersFragment : Fragment() {
                 setupEmptyView()
             }
         })
-
-        helper.attachToRecyclerView(orders_recycler_view)
+//        helper.attachToRecyclerView(orders_recycler_view)
     }
 }
 
