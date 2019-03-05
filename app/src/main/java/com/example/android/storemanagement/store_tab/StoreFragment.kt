@@ -10,28 +10,41 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.create_product.CreateProductFragment
 import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_create_order.*
+import kotlinx.android.synthetic.main.fragment_create_product.*
 import kotlinx.android.synthetic.main.fragment_store.*
 import kotlinx.android.synthetic.main.store_item.*
 import timber.log.Timber
 
 class StoreFragment : Fragment() {
+    companion object {
+        const val KEY_QUANTITY_VALUE = "productQuantityValue"
+    }
 
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
     }
 
+    private var savedProductQuantity: String = ""
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_store, container, false)
+        val view = inflater.inflate(R.layout.fragment_store, container, false)
+
+        if (savedInstanceState != null) {
+            savedProductQuantity = savedInstanceState.getCharSequence(StoreFragment.KEY_QUANTITY_VALUE).toString()
+        }
+        return view
     }
 
     override fun onStart() {
         super.onStart()
+        product_name.setText(savedProductQuantity)
+
         setupRecyclerView()
 
         button_save_quantity.setOnClickListener {
@@ -44,16 +57,10 @@ class StoreFragment : Fragment() {
         }
     }
 
-//    override fun onSaveInstanceState(outState: Bundle) {
-//        outState.putString(KEY_QUANTITY, store_item_quantity.toString())
-//        Timber.i("onSaveInstanceState Called")
-//        super.onSaveInstanceState(outState)
-//    }
-//
-//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-//        super.onViewStateRestored(savedInstanceState)
-//        Timber.i("onRestoreInstanceState Called")
-//    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putCharSequence(StoreFragment.KEY_QUANTITY_VALUE, store_item_quantity.text)
+    }
 
     private fun updateQuantity(productName: String, quantity: Int) {
         productViewModel.updateQuantity(productName, quantity)

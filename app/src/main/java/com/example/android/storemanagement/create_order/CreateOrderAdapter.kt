@@ -1,5 +1,6 @@
 package com.example.android.storemanagement.create_order
 
+import android.arch.lifecycle.ViewModel
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -11,6 +12,7 @@ import android.widget.EditText
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_product.CreateProductFragment
 import com.example.android.storemanagement.products_database.Product
+import com.example.android.storemanagement.products_database.ProductViewModel
 import com.example.android.storemanagement.store_tab.StoreProductsHolder
 import kotlinx.android.synthetic.main.create_order_item.view.*
 import kotlinx.android.synthetic.main.fragment_create_product.*
@@ -23,9 +25,8 @@ class CreateOrderAdapter(
 
     companion object {
         const val MESSAGE_QUANTITY_ABOVE_MAX_SIZE = "Тhe maximum allowed quantity is 500лв."
-        const val MESSAGE_ZERO_QUANTITY = "You can't make order if the quantity is empty."
+        const val MESSAGE_ZERO_QUANTITY = "You can't make an order if the quantity is empty."
     }
-
     private var products = emptyList<Product>() // Cached copy of products
 
     //productName -> quantity
@@ -74,6 +75,7 @@ class CreateOrderAdapter(
                     holder.productQuantity.error = MESSAGE_QUANTITY_ABOVE_MAX_SIZE
                 } else {
                     setOrderButtonEnabled(enabledProducts.values.any { it })
+
                     updateQuantityForProduct(holder.productName.text.toString(), quantity.toInt())
                     updateFinalPriceAction(getPrice(holder))
                 }
@@ -86,7 +88,6 @@ class CreateOrderAdapter(
                 if (quantity.toInt() <= 500)
                     updateFinalPriceAction(getPrice(holder) * -1)
             }
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         }
@@ -103,6 +104,7 @@ class CreateOrderAdapter(
     }
 
     private fun updateQuantityForProduct(productName: String, quantity: Int) {
+        val currentQuantity = quantities[productName]
         quantities[productName] = quantity
     }
 

@@ -46,5 +46,4 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         super.onCleared()
         parentJob.cancel()
     }
-
 }

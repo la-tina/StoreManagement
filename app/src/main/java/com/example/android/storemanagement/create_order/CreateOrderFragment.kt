@@ -10,18 +10,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.create_product.CreateProductFragment
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.products_database.ProductViewModel
+import kotlinx.android.synthetic.main.create_order_item.*
 import kotlinx.android.synthetic.main.fragment_create_order.*
+import kotlinx.android.synthetic.main.fragment_create_product.*
+import kotlinx.android.synthetic.main.product_item.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class CreateOrderFragment : Fragment() {
 
+    companion object{
+        const val KEY_QUANTITY_VALUE = "productQuantityValue"
+        const val KEY_CHECK_BOX_VALUE = "checkBoxValue"
+    }
+
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
     }
+
+    private var savedProductQuantity: String = ""
+    private var savedCheckBoxValue: Boolean = false
 
     lateinit var ordersViewModel: OrderViewModel
 
@@ -31,13 +43,19 @@ class CreateOrderFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_create_order, container, false)
+        val view = inflater.inflate(R.layout.fragment_create_order, container, false)
+
+        if (savedInstanceState?.getSerializable(KEY_QUANTITY_VALUE) != null) {
+            savedProductQuantity = savedInstanceState.getCharSequence(CreateOrderFragment.KEY_QUANTITY_VALUE ).toString()
+        }
+        return view
     }
 
     override fun onStart() {
         super.onStart()
         setupRecyclerView()
+
+        product_name.setText(savedProductQuantity)
 
         button_add_order.setOnClickListener {
 
@@ -55,6 +73,12 @@ class CreateOrderFragment : Fragment() {
 
             fragmentManager?.popBackStackImmediate()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putCharSequence(CreateOrderFragment.KEY_QUANTITY_VALUE, order_item_quantity.text)
+        outState.putBoolean(KEY_CHECK_BOX_VALUE, true)
     }
 
     private fun updateFinalPrice(price: Float) {

@@ -61,14 +61,6 @@ import kotlin.coroutines.CoroutineContext
         quantities[product] = quantity
     }
 
-    fun getInStockProducts() = scope.launch(Dispatchers.IO){
-        repository.getInStockProducts()
-    }
-
-    fun getLowStockProducts() = scope.launch(Dispatchers.IO){
-        repository.getLowStockProducts()
-    }
-
     //when the ViewModel is no longer used
     override fun onCleared() {
         super.onCleared()

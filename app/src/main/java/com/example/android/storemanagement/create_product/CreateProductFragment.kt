@@ -14,6 +14,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import com.example.android.storemanagement.MainActivity
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
@@ -32,6 +33,10 @@ class CreateProductFragment : Fragment() {
         const val MESSAGE_PRICE_ZERO = "Тhe price can't be 0лв."
         const val MESSAGE_EMPTY_NAME = "Product name can't be empty."
         const val MAX_PRICE = 100
+        const val KEY_PRODUCT_NAME_VALUE = "productNameValue"
+        const val KEY_PRODUCT_PRICE_VALUE = "productPriceValue"
+        const val KEY_PRODUCT_OVERCHARGE_VALUE = "productOverchargeValue"
+        const val KEY_PRODUCT_BARCODE_VALUE = "productBarcodeValue"
     }
 
     private lateinit var mScannerView: ZBarScannerView
@@ -40,17 +45,29 @@ class CreateProductFragment : Fragment() {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
     }
 
+    private var savedProductName: String = ""
+    private var savedProductPrice: String = ""
+    private var savedProductOvercharge: String = ""
+    private var savedProductBarcode: String = ""
+
     private val barcodes: MutableList<String> = mutableListOf()
+
+    private val priceRegex = Regex(pattern = "^((?=.)(?=[0-9]+))|([0-9]+)|((?=[0-9]+)(?=.)(?=[0-9]+))\$")
 
     private fun isBarcodeDuplicated(barcode: String) =
         barcodes.any { currentBarcode -> currentBarcode == barcode }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_create_product, container, false)
+        val view = inflater.inflate(R.layout.fragment_create_product, container, false)
+
+        if (savedInstanceState != null) {
+            savedProductName = savedInstanceState.getCharSequence(KEY_PRODUCT_NAME_VALUE).toString()
+            savedProductPrice = savedInstanceState.getCharSequence(KEY_PRODUCT_PRICE_VALUE).toString()
+            savedProductOvercharge = savedInstanceState.getCharSequence(KEY_PRODUCT_OVERCHARGE_VALUE).toString()
+            savedProductBarcode = savedInstanceState.getCharSequence(KEY_PRODUCT_BARCODE_VALUE).toString()
+        }
+        return view
     }
 
     override fun onStart() {
@@ -59,6 +76,11 @@ class CreateProductFragment : Fragment() {
         clean()
 
         mScannerView = ZBarScannerView(context)
+
+        product_name.setText(savedProductName)
+        product_price.setText(savedProductPrice)
+        product_overcharge.setText(savedProductOvercharge)
+        product_barcode.setText(savedProductBarcode)
 
         val name = product_name.text
         val price = product_price.text
@@ -82,6 +104,14 @@ class CreateProductFragment : Fragment() {
         })
 
         button_scan_barcode.setOnClickListener { onBarcodeButtonPressed() }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putCharSequence(KEY_PRODUCT_NAME_VALUE, product_name.text)
+        outState.putCharSequence(KEY_PRODUCT_PRICE_VALUE, product_price.text)
+        outState.putCharSequence(KEY_PRODUCT_OVERCHARGE_VALUE, product_overcharge.text)
+        outState.putCharSequence(KEY_PRODUCT_BARCODE_VALUE, product_barcode.text)
     }
 
     private fun onAddButtonClicked(
@@ -123,17 +153,6 @@ class CreateProductFragment : Fragment() {
             )
         }
     }
-
-    //    override fun onSaveInstanceState(outState: Bundle) {
-//        outState.putString(KEY_QUANTITY, store_item_quantity.toString())
-//        Timber.i("onSaveInstanceState Called")
-//        super.onSaveInstanceState(outState)
-//    }
-//
-//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-//        super.onViewStateRestored(savedInstanceState)
-//        Timber.i("onRestoreInstanceState Called")
-//    }
 
     private fun onProductTextChanged(productPrice: Editable, productOvercharge: Editable, productBarcode: Editable) {
         product_name.addTextChangedListener(object : TextWatcher {
@@ -214,23 +233,25 @@ class CreateProductFragment : Fragment() {
 
         val isBarcodeDuplicated = isBarcodeDuplicated(barcode)
 
-        if (productPrice.startsWithDigit()) {
+        if (isPriceValid(productPrice)) {
             isProductPriceAboveLimit = productPrice.toFloat() > MAX_PRICE
             isProductPriceZero = productPrice.toFloat() <= 0
             isProductPriceIncorrect = isProductPriceAboveLimit || isProductPriceZero
         }
 
+        if (isPriceValid(productOvercharge))
+            isProductOverchargeAboveLimit = productOvercharge.toFloat() > MAX_PRICE
+
         if (productName.isBlank())
             isProductNameEmpty = true
-
-        if (productOvercharge.startsWithDigit())
-            isProductOverchargeAboveLimit = productOvercharge.toFloat() > MAX_PRICE
 
         button_add_product.isEnabled = !(anyFieldEmpty
                 || isBarcodeDuplicated
                 || isProductPriceIncorrect
                 || isProductOverchargeAboveLimit
-                || isProductNameEmpty)
+                || isProductNameEmpty
+                || !isPriceValid(productPrice)
+                || !isPriceValid(productOvercharge))
 
         if (isBarcodeDuplicated) product_barcode.error = MESSAGE_BARCODE
         if (isProductPriceAboveLimit) product_price.error = MESSAGE_PRICE
@@ -239,7 +260,11 @@ class CreateProductFragment : Fragment() {
         if (isProductNameEmpty) product_name.error = MESSAGE_EMPTY_NAME
     }
 
-    private fun String.startsWithDigit() : Boolean =
+    private fun isPriceValid(price: String):Boolean {
+        return priceRegex.containsMatchIn(price)
+    }
+
+    private fun String.startsWithDigit(): Boolean =
         !this.isEmpty() && Character.isDigit(this.first())
 
     private fun isAnyFieldEmpty(

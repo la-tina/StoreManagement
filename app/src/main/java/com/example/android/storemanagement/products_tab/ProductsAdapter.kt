@@ -44,10 +44,6 @@ class ProductsAdapter(private val context: Context) :
         this.products.addAll(products)
         notifyDataSetChanged()
     }
-
-    fun getProductAtPosition(position: Int): Product {
-        return products[position]
-    }
 }
 
 class ProductsHolder(textView: View) : RecyclerView.ViewHolder(textView) {
