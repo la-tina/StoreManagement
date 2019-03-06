@@ -11,10 +11,10 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import com.example.android.storemanagement.MainActivity
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
@@ -29,7 +29,9 @@ class CreateProductFragment : Fragment() {
         const val CAMERA_PERMISSION_CODE = 0
         const val MESSAGE_BARCODE = "A product with the same barcode already exists or the barcode is empty."
         const val MESSAGE_PRICE = "Тhe maximum allowed price is 100лв."
+        const val MESSAGE_INVALID_PRICE = "Invalid price."
         const val MESSAGE_OVERCHARGE = "Тhe maximum allowed overcharge is 100лв."
+        const val MESSAGE_INVALID_OVERCHARGE = "Invalid overcharge."
         const val MESSAGE_PRICE_ZERO = "Тhe price can't be 0лв."
         const val MESSAGE_EMPTY_NAME = "Product name can't be empty."
         const val MAX_PRICE = 100
@@ -62,10 +64,10 @@ class CreateProductFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_create_product, container, false)
 
         if (savedInstanceState != null) {
-            savedProductName = savedInstanceState.getCharSequence(KEY_PRODUCT_NAME_VALUE).toString()
-            savedProductPrice = savedInstanceState.getCharSequence(KEY_PRODUCT_PRICE_VALUE).toString()
-            savedProductOvercharge = savedInstanceState.getCharSequence(KEY_PRODUCT_OVERCHARGE_VALUE).toString()
-            savedProductBarcode = savedInstanceState.getCharSequence(KEY_PRODUCT_BARCODE_VALUE).toString()
+            savedProductName = savedInstanceState.getCharSequence(KEY_PRODUCT_NAME_VALUE)?.toString() ?: ""
+            savedProductPrice = savedInstanceState.getCharSequence(KEY_PRODUCT_PRICE_VALUE)?.toString() ?: ""
+            savedProductOvercharge = savedInstanceState.getCharSequence(KEY_PRODUCT_OVERCHARGE_VALUE)?.toString() ?: ""
+            savedProductBarcode = savedInstanceState.getCharSequence(KEY_PRODUCT_BARCODE_VALUE)?.toString() ?: ""
         }
         return view
     }
@@ -131,8 +133,9 @@ class CreateProductFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val barcode = data?.getStringExtra(MainActivity.BARCODE_KEY)
-        product_barcode.setText(barcode)
+        data?.getStringExtra(MainActivity.BARCODE_KEY)?.let {
+            savedProductBarcode = it
+        }
     }
 
     private fun onBarcodeButtonPressed() {
@@ -258,14 +261,13 @@ class CreateProductFragment : Fragment() {
         if (isProductOverchargeAboveLimit) product_overcharge.error = MESSAGE_OVERCHARGE
         if (isProductPriceZero) product_price.error = MESSAGE_PRICE_ZERO
         if (isProductNameEmpty) product_name.error = MESSAGE_EMPTY_NAME
+        if (!isPriceValid(productPrice)) product_price.error = MESSAGE_INVALID_PRICE
+        if (!isPriceValid(productOvercharge)) product_overcharge.error = MESSAGE_INVALID_OVERCHARGE
     }
 
-    private fun isPriceValid(price: String):Boolean {
+    private fun isPriceValid(price: String): Boolean {
         return priceRegex.containsMatchIn(price)
     }
-
-    private fun String.startsWithDigit(): Boolean =
-        !this.isEmpty() && Character.isDigit(this.first())
 
     private fun isAnyFieldEmpty(
         productName: String, productPrice: String, productOvercharge: String,
