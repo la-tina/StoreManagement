@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">Store Management</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="store_navigation">Store</string>
     <string name="products_navigation">Products</string>
     <string name="orders_navigation">Orders</string>
@@ -25,4 +22,6 @@
     <string name="_0">0</string>
     <string name="save_button">Save</string>
     <string name="store_management">Store Management</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
 </resources>

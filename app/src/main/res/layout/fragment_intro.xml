@@ -124,5 +124,16 @@
         app:layout_constraintStart_toEndOf="@id/imageViewAvocado"
         app:layout_constraintTop_toBottomOf="@id/imageViewApple" />
 
+    <ImageView
+        android:id="@+id/imageArrow"
+        android:layout_width="65dp"
+        android:layout_height="57dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:padding="5dp"
+        android:src="@drawable/arrow_right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
 

@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.orders_tab.OrdersAdapter
+import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_products_in_stock.*
 import kotlinx.android.synthetic.main.fragment_title.*
@@ -35,10 +36,14 @@ class ProductsInStockFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_products_in_stock, container, false)
     }
 
+    private fun deleteProduct(product: Product){
+        productViewModel.deleteProduct(product)
+    }
+
     private fun setupRecyclerView() {
         products_in_stock_recycler_view?.let { recyclerView ->
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            val productsInStockAdapter = ProductsInStockAdapter(requireContext())
+            val productsInStockAdapter = ProductsInStockAdapter(requireContext(), ::deleteProduct)
             recyclerView.adapter = productsInStockAdapter
 
             // Observer on the LiveData

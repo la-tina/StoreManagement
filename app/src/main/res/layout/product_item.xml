@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginEnd="76dp"
         android:layout_marginBottom="8dp"
         android:text="123"
         android:textColor="@color/buttonFadeText"
@@ -55,15 +55,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="55dp"
         android:text="@string/leva"
         android:textAlignment="textStart"
         android:textColor="@color/buttonFadeText"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/product_item_price"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/product_item_price"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="@+id/product_item_price" />
 
     <TextView
         android:id="@+id/product_item_quantity"
@@ -86,15 +85,23 @@
         android:id="@+id/quantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="72dp"
+        android:layout_marginEnd="95dp"
         android:background="@drawable/custom_text_view"
         android:text="@string/quantity"
         android:textColor="@color/buttonFadeText"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@id/product_item_quantity"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/product_item_quantity"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="@id/product_item_quantity" />
+
+    <ImageView
+        android:id="@+id/context_menu_image"
+        android:layout_width="36dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/vertical_dots"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:layout_width="match_parent"

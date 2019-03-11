@@ -11,7 +11,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +21,9 @@ import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_create_product.*
 import me.dm7.barcodescanner.zbar.ZBarScannerView
 
+open class CreateProductFragment : Fragment() {
 
-class CreateProductFragment : Fragment() {
+    open val fragmentTitle: String = "Create Product"
 
     companion object {
         const val CAMERA_PERMISSION_CODE = 0
@@ -46,6 +46,7 @@ class CreateProductFragment : Fragment() {
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
     }
+
 
     private var savedProductName: String = ""
     private var savedProductPrice: String = ""
@@ -74,6 +75,8 @@ class CreateProductFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
+        toolbarTop.title = fragmentTitle
 
         clean()
 

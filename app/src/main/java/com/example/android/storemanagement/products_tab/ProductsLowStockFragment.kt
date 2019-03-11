@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_products_low_stock.*
 
@@ -34,10 +35,14 @@ class ProductsLowStockFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_products_low_stock, container, false)
     }
 
+    private fun deleteProduct(product: Product){
+        productViewModel.deleteProduct(product)
+    }
+
     private fun setupRecyclerView() {
         products_low_stock_recycler_view?.let { recyclerView ->
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            val productsLowStockAdapter = ProductsLowStockAdapter(requireContext())
+            val productsLowStockAdapter = ProductsLowStockAdapter(requireContext(), ::deleteProduct)
             recyclerView.adapter = productsLowStockAdapter
 
             // Observer on the LiveData

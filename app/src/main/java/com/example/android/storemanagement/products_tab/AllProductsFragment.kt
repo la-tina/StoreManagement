@@ -5,15 +5,19 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import android.support.v7.widget.PopupMenu
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.Toast
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.orders_database.Order
+import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_all_products.*
-import kotlinx.android.synthetic.main.fragment_products_in_stock.*
+import kotlinx.android.synthetic.main.product_item.*
 
 
 class AllProductsFragment : Fragment() {
@@ -36,10 +40,14 @@ class AllProductsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_all_products, container, false)
     }
 
+    private fun deleteProduct(product: Product) {
+        productViewModel.deleteProduct(product)
+    }
+
     private fun setupRecyclerView() {
         products_recycler_view?.let {recyclerView ->
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val productsAdapter = ProductsAdapter(requireContext())
+        val productsAdapter = ProductsAdapter(requireContext(), ::deleteProduct)
             recyclerView.adapter = productsAdapter
 
         // Observer on the LiveData

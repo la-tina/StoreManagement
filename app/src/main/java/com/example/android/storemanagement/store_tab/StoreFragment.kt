@@ -36,16 +36,17 @@ class StoreFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_store, container, false)
 
         if (savedInstanceState != null) {
-            savedProductQuantity = savedInstanceState.getCharSequence(StoreFragment.KEY_QUANTITY_VALUE).toString()
+            savedProductQuantity = savedInstanceState.getCharSequence(KEY_QUANTITY_VALUE)!!.toString()
         }
         return view
     }
 
     override fun onStart() {
         super.onStart()
-        product_name.setText(savedProductQuantity)
-
         setupRecyclerView()
+
+        if(store_item_quantity != null && !savedProductQuantity.isBlank())
+            store_item_quantity.setText(savedProductQuantity)
 
         button_save_quantity.setOnClickListener {
 
