@@ -6,28 +6,18 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import com.example.android.storemanagement.create_product.CreateProductFragment.Companion.CAMERA_PERMISSION_CODE
 import com.example.android.storemanagement.create_order.CreateOrderFragment
 import com.example.android.storemanagement.create_product.BarcodeScanningActivity
 import com.example.android.storemanagement.create_product.CreateProductFragment
+import com.example.android.storemanagement.create_product.EditProductFragment
+import com.example.android.storemanagement.create_product.InfoProductFragment.Companion.CAMERA_PERMISSION_CODE
 import com.example.android.storemanagement.orders_tab.OrdersFragment
+import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsFragment
 import com.example.android.storemanagement.store_tab.StoreFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
-
-    companion object {
-        const val titleTag = "titleFragment"
-        const val productTag = "productFragment"
-        const val storeTag = "storeFragment"
-        const val createOrderTag = "createOrderFragment"
-        const val createProductTag = "createProductFragment"
-
-        const val BARCODE_KEY = "Barcode"
-
-        const val BARCODE_ACTIVITY_REQUEST_CODE = 0
-    }
 
     private var currentFragment: Fragment? = null
 
@@ -40,15 +30,9 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
 
         if (savedInstanceState != null) {
             currentFragment = supportFragmentManager.getFragment(savedInstanceState, "FragmentName")
-            if (currentFragment is ProductsFragment)
-                (currentFragment as ProductsFragment).onNavigationChangedListener = this
-
-            if (currentFragment is OrdersFragment)
-                (currentFragment as OrdersFragment).onNavigationChangedListener = this
+            restoreCurrentFragmentState()
         } else {
-            val fragment = OrdersFragment()
-            currentFragment = fragment
-            fragment.onNavigationChangedListener = this
+            setDefaultCurrentFragment()
         }
 
         if (currentFragment?.isAdded == false) {
@@ -94,12 +78,18 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == CAMERA_PERMISSION_CODE && grantResults.isNotEmpty() &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
             val intent = Intent(this, BarcodeScanningActivity()::class.java)
             startActivityForResult(intent, BARCODE_ACTIVITY_REQUEST_CODE)
         } else {
             Toast.makeText(this, "Permission Denied!", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        restoreCurrentFragmentState()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -109,11 +99,26 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         }
     }
 
-    override fun onNavigationChanged(tabNumber: Int) {
+    override fun onNavigationChanged(tabNumber: Int, product: Product?) {
         when (tabNumber) {
-            0 -> openCreateOrderTab()
-            1 -> openCreateProductTab()
+            CREATE_ORDER_TAB -> openCreateOrderTab()
+            CREATE_PRODUCT_TAB -> openCreateProductTab()
+            EDIT_PRODUCT_TAB -> openEditProductTab(product)
         }
+    }
+
+    private fun setDefaultCurrentFragment() {
+        val fragment = OrdersFragment()
+        currentFragment = fragment
+        fragment.onNavigationChangedListener = this
+    }
+
+    private fun restoreCurrentFragmentState() {
+        if (currentFragment is ProductsFragment)
+            (currentFragment as ProductsFragment).onNavigationChangedListener = this
+
+        if (currentFragment is OrdersFragment)
+            (currentFragment as OrdersFragment).onNavigationChangedListener = this
     }
 
     private fun getFragmentTag(fragment: Fragment): String =
@@ -123,6 +128,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
             is StoreFragment -> storeTag
             is CreateOrderFragment -> createOrderTag
             is CreateProductFragment -> createProductTag
+            is EditProductFragment -> editProductTag
             else -> throw IllegalStateException()
         }
 
@@ -138,6 +144,14 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         val fragment = (previouslyAddedCreateProductFragment as? CreateProductFragment) ?: CreateProductFragment()
 
         openCreateTab(fragment, createProductTag)
+    }
+
+    private fun openEditProductTab(product: Product?) {
+        val previouslyAddedEditProductFragment = supportFragmentManager.findFragmentByTag(editProductTag)
+        val fragment = (previouslyAddedEditProductFragment as? EditProductFragment) ?: EditProductFragment()
+        val bundle = Bundle().apply { putSerializable(PRODUCT_KEY, product) }
+        fragment.arguments = bundle
+        openCreateTab(fragment, editProductTag)
     }
 
     private fun openStoreTab() {
@@ -172,7 +186,8 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
             .beginTransaction()
             .setCustomAnimations(
                 android.R.anim.fade_in,
-                android.R.anim.fade_out)
+                android.R.anim.fade_out
+            )
             .replace(R.id.fragment_container, fragment, tag)
             .addToBackStack("a")
             .commit()
@@ -185,13 +200,14 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
             .beginTransaction()
             .setCustomAnimations(
                 android.R.anim.fade_in,
-                android.R.anim.fade_out)
+                android.R.anim.fade_out
+            )
             .replace(R.id.fragment_container, fragment, tag)
             .commit()
     }
 }
 
 interface OnNavigationChangedListener {
-    fun onNavigationChanged(tabNumber: Int)
+    fun onNavigationChanged(tabNumber: Int, product: Product? = null)
 }
 

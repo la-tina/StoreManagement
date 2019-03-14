@@ -14,7 +14,8 @@ import com.example.android.storemanagement.products_database.Product
 
 class ProductsLowStockAdapter(
     private val context: Context,
-    private val deleteProductAction: (Product) -> Unit
+    private val deleteProductAction: (Product) -> Unit,
+    private val openEditProductTab: (Product) -> Unit
 ) :
     RecyclerView.Adapter<ProductsHolder>() {
 
@@ -51,8 +52,10 @@ class ProductsLowStockAdapter(
                 when (item!!.itemId) {
                     R.id.edit -> {
                         Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+                        openEditProductTab(product)
                     }
                     R.id.delete -> {
+                        Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
                         deleteProductAction(product)
                     }
                 }

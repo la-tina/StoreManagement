@@ -49,7 +49,8 @@ class OrdersAdapter(
                         Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
                     }
                     R.id.delete -> {
-                        deleteOrderAction(order)
+                        Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+//                        deleteOrderAction(order)
                     }
                 }
                 true

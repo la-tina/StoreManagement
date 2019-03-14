@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.android.storemanagement.CREATE_PRODUCT_TAB
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
 import kotlinx.android.synthetic.main.fragment_products.*
@@ -21,25 +22,34 @@ class ProductsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        activity?.products_add_button?.setOnClickListener {
+        products_add_button?.setOnClickListener {
             if (::onNavigationChangedListener.isInitialized)
-                onNavigationChangedListener.onNavigationChanged(1)
+                onNavigationChangedListener.onNavigationChanged(CREATE_PRODUCT_TAB)
         }
         setupViewPager()
     }
 
+    override fun onPause() {
+        super.onPause()
+        childFragmentManager.fragments.forEach { fragment ->
+            childFragmentManager.beginTransaction().remove(fragment).commit()
+        }
+    }
+
     private fun setupViewPager() {
         // Create an adapter that knows which fragment should be shown on each page
-        val allProductsFragment: Fragment = AllProductsFragment()
-        val productsInStockFragment: Fragment =
-            ProductsInStockFragment()
-        val productsLowStockFragment: Fragment =
-            ProductsLowStockFragment()
+        val allProductsFragment = AllProductsFragment()
+        allProductsFragment.setOnNavigationChangedListener(onNavigationChangedListener)
+
+        val productsInStockFragment = ProductsInStockFragment()
+        productsInStockFragment.setOnNavigationChangedListener(onNavigationChangedListener)
+
+        val productsLowStockFragment = ProductsLowStockFragment()
+        productsLowStockFragment.setOnNavigationChangedListener(onNavigationChangedListener)
 
         val fragments = listOf(allProductsFragment, productsInStockFragment, productsLowStockFragment)
 
-        val adapter =
-            ProductsTabAdapter(childFragmentManager, fragments)
+        val adapter = ProductsTabAdapter(childFragmentManager, fragments)
         // Set the adapter onto the view pager
         products_viewpager.adapter = adapter
 

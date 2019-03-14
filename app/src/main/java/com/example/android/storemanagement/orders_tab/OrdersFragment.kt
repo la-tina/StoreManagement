@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.android.storemanagement.CREATE_ORDER_TAB
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
@@ -36,7 +37,7 @@ class OrdersFragment : Fragment() {
         super.onResume()
         orders_add_button?.setOnClickListener {
             if (::onNavigationChangedListener.isInitialized)
-                onNavigationChangedListener.onNavigationChanged(0)
+                onNavigationChangedListener.onNavigationChanged(CREATE_ORDER_TAB)
         }
     }
 

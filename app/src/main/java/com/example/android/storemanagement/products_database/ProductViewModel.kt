@@ -15,6 +15,9 @@ import kotlin.coroutines.CoroutineContext
  class ProductViewModel(application: Application) : AndroidViewModel(application)
 {
     var quantities = mutableMapOf<String, Int>()
+    var names = mutableMapOf<String, String>()
+    var prices = mutableMapOf<String, Float>()
+    var overcharges = mutableMapOf<String, Float>()
 
     //Define a parentJob, and a coroutineContext.
     //The coroutineContext, by default, uses the parentJob and the main dispatcher
@@ -59,6 +62,21 @@ import kotlin.coroutines.CoroutineContext
     fun updateQuantity(product: String, quantity: Int) = scope.launch(Dispatchers.IO) {
         repository.updateQuantity(product, quantity)
         quantities[product] = quantity
+    }
+
+    fun updateName(barcode: String, name: String) = scope.launch(Dispatchers.IO) {
+        repository.updateName(barcode, name)
+        names[barcode] = name
+    }
+
+    fun updatePrice(product: String, price: Float) = scope.launch(Dispatchers.IO) {
+        repository.updatePrice(product, price)
+        prices[product] = price
+    }
+
+    fun updateOvercharge(product: String, overcharge: Float) = scope.launch(Dispatchers.IO) {
+        repository.updateOvercharge(product, overcharge)
+        overcharges[product] = overcharge
     }
 
     //when the ViewModel is no longer used

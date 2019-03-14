@@ -3,7 +3,6 @@ package com.example.android.storemanagement.products_database
 import android.arch.lifecycle.LiveData
 import android.support.annotation.WorkerThread
 
-
 //A Repository class abstracts access to multiple data sources
 //A Repository manages queries and allows you to use multiple backends.
 class ProductRepository (private val productDao: ProductDao) {
@@ -26,6 +25,21 @@ class ProductRepository (private val productDao: ProductDao) {
     @WorkerThread
     suspend fun updateQuantity(product: String, quantity: Int) {
         productDao.updateQuantity(product, quantity)
+    }
+
+    @WorkerThread
+    suspend fun updateName(barcode: String, name: String) {
+        productDao.updateName(barcode, name)
+    }
+
+    @WorkerThread
+    suspend fun updatePrice(product: String, price: Float) {
+        productDao.updatePrice(product, price)
+    }
+
+    @WorkerThread
+    suspend fun updateOvercharge(product: String, overcharge: Float) {
+        productDao.updateOvercharge(product, overcharge)
     }
 
     @WorkerThread

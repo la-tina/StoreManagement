@@ -10,19 +10,18 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.product_item.view.*
 
 
 class ProductsAdapter(
     private val context: Context,
-    private val deleteProductAction: (Product) -> Unit
+    private val deleteProductAction: (Product) -> Unit,
+    private val openEditProductTab: (Product) -> Unit
 ) :
     RecyclerView.Adapter<ProductsHolder>() {
 
     private var products: MutableList<Product> = mutableListOf()
-
 
     // Gets the number of items in the list
     override fun getItemCount(): Int {
@@ -57,8 +56,10 @@ class ProductsAdapter(
                 when (item!!.itemId) {
                     R.id.edit -> {
                         Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+                        openEditProductTab(product)
                     }
                     R.id.delete -> {
+                        Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
                         deleteProductAction(product)
                     }
                 }

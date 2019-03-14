@@ -8,7 +8,8 @@
     android:id="@+id/scrollView2"
     android:background="#ffffff">
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -29,7 +30,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/barColor"
-                app:title="Create Product"
                 app:titleTextAppearance="@style/Toolbar.TitleText"
                 app:titleTextColor="@color/titleColor" />
 
@@ -43,7 +43,6 @@
             android:gravity="center"
             android:src="@drawable/banana"
             app:layout_constraintEnd_toStartOf="@+id/image_view_pineapple"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
@@ -55,7 +54,6 @@
             android:layout_marginTop="8dp"
             android:src="@drawable/pineapple"
             app:layout_constraintEnd_toStartOf="@+id/image_view_avocado"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/image_view_banana"
             app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
@@ -66,7 +64,6 @@
             android:layout_marginTop="8dp"
             android:src="@drawable/avocado"
             app:layout_constraintEnd_toStartOf="@+id/image_view_raspberry"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/image_view_pineapple"
             app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
@@ -76,7 +73,6 @@
             android:layout_height="107dp"
             android:src="@drawable/blueberry"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/image_view_raspberry"
             app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
@@ -88,7 +84,6 @@
             android:layout_marginTop="28dp"
             android:src="@drawable/raspberry"
             app:layout_constraintEnd_toStartOf="@+id/image_view_blueberry"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/image_view_avocado"
             app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
@@ -114,6 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
+            android:hint="@string/name"
             app:layout_constraintBottom_toTopOf="@+id/price_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -125,7 +121,6 @@
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
                 android:textSize="25sp"
-                android:hint="@string/name"
                 android:inputType="textPersonName"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
@@ -137,6 +132,7 @@
             android:id="@+id/price_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/price"
             app:layout_constraintBottom_toTopOf="@+id/overcharge_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -148,7 +144,6 @@
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
                 android:textSize="25sp"
-                android:hint="@string/price"
                 android:inputType="number|numberDecimal"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
@@ -160,6 +155,7 @@
             android:id="@+id/overcharge_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/overcharge"
             app:layout_constraintBottom_toTopOf="@+id/barcode_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -171,7 +167,6 @@
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
                 android:textSize="25sp"
-                android:hint="@string/overcharge"
                 android:inputType="number|numberDecimal"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
@@ -184,6 +179,7 @@
             android:id="@+id/barcode_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/barcode"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/overcharge_text">
@@ -195,7 +191,6 @@
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
                 android:textSize="25sp"
-                android:hint="@string/barcode"
                 android:inputType="number"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
@@ -213,7 +208,6 @@
             android:background="@drawable/custom_button"
             android:enabled="false"
             android:gravity="center"
-            android:text="@string/add_product"
             android:textSize="20sp"
             android:textColor="@color/colorAccent"
             android:textStyle="bold"

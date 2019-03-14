@@ -7,7 +7,7 @@ import android.widget.Toast
 import me.dm7.barcodescanner.zbar.Result
 import me.dm7.barcodescanner.zbar.ZBarScannerView
 import android.content.Intent
-import com.example.android.storemanagement.MainActivity.Companion.BARCODE_KEY
+import com.example.android.storemanagement.BARCODE_KEY
 
 
 //Implementing the ResultHandler interface and overriding handleResult function
