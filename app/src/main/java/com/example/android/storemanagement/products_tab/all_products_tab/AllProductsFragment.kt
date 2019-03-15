@@ -19,10 +19,8 @@ class AllProductsFragment : ProductsTabFragment() {
     private lateinit var viewModel: AllProductsViewModel
 
     override fun setupViewModel() {
-        viewModel = ViewModelProviders.of(this).get(
-            AllProductsViewModel(
-                requireActivity().application
-            )::class.java)
+        viewModel =
+            ViewModelProviders.of(this).get(AllProductsViewModel(requireActivity().application)::class.java)
     }
 
     override fun setOnNavigationChangedListener(onNavigationChangedListener: OnNavigationChangedListener) {

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.create_order_item.view.*
 
@@ -16,11 +17,6 @@ class CreateOrderAdapter(
     private val updateFinalPriceAction: (Float) -> Unit,
     private val setOrderButtonEnabled: (Boolean) -> Unit
 ) : RecyclerView.Adapter<CreateOrderHolder>() {
-
-    companion object {
-        const val MESSAGE_QUANTITY_ABOVE_MAX_SIZE = "Тhe maximum allowed quantity is 500лв."
-        const val MESSAGE_ZERO_QUANTITY = "You can't make an order if the quantity is empty."
-    }
 
     private var products = emptyList<Product>() // Cached copy of products
 
@@ -62,25 +58,16 @@ class CreateOrderAdapter(
             override fun afterTextChanged(s: Editable?) {
                 val quantity = holder.productQuantity.text.toString()
 
-                if (quantity.isEmpty() || quantity == "0") {
-                    setOrderButtonEnabled(false)
-                    holder.productQuantity.error = MESSAGE_ZERO_QUANTITY
-                } else if (quantity.toInt() > 500) {
-                    setOrderButtonEnabled(false)
-                    holder.productQuantity.error = MESSAGE_QUANTITY_ABOVE_MAX_SIZE
-                } else {
-                    setOrderButtonEnabled(enabledProducts.values.any { it })
+                val shouldOrderButtonBeEnabled =
+                    isQuantityCorrect(holder.productQuantity) && enabledProducts.isNotEmpty()
+                setOrderButtonEnabled(shouldOrderButtonBeEnabled)
 
-                    updateQuantityForProduct(holder.productName.text.toString(), quantity.toInt())
-                    updateFinalPriceAction(getPrice(holder))
-                }
+                updateQuantityForProduct(holder.productName.text.toString(), quantity.toInt())
+                updateFinalPriceAction(getPrice(holder))
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                val quantity = holder.productQuantity.text.toString()
-
-                if (quantity.isEmpty()) return
-                if (quantity.toInt() <= 500)
+                if (isQuantityCorrect(holder.productQuantity))
                     updateFinalPriceAction(getPrice(holder) * -1)
             }
 
