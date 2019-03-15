@@ -12,10 +12,11 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import com.example.android.storemanagement.BARCODE_ACTIVITY_REQUEST_CODE
 import com.example.android.storemanagement.BARCODE_KEY
-import com.example.android.storemanagement.MainActivity
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.create_product.CreateProductFieldValidator.validate
 import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_create_product.*
 import me.dm7.barcodescanner.zbar.ZBarScannerView
@@ -27,13 +28,6 @@ abstract class InfoProductFragment : Fragment() {
 
     companion object {
         const val CAMERA_PERMISSION_CODE = 0
-        const val MESSAGE_BARCODE = "A product with the same barcode already exists or the barcode is empty."
-        const val MESSAGE_PRICE = "Тhe maximum allowed price is 100лв."
-        const val MESSAGE_INVALID_PRICE = "Invalid price."
-        const val MESSAGE_OVERCHARGE = "Тhe maximum allowed overcharge is 100лв."
-        const val MESSAGE_INVALID_OVERCHARGE = "Invalid overcharge."
-        const val MESSAGE_PRICE_ZERO = "Тhe price can't be 0лв."
-        const val MESSAGE_EMPTY_NAME = "Product name can't be empty."
         const val MAX_PRICE = 100
         const val KEY_PRODUCT_NAME_VALUE = "productNameValue"
         const val KEY_PRODUCT_PRICE_VALUE = "productPriceValue"
@@ -52,9 +46,9 @@ abstract class InfoProductFragment : Fragment() {
     private var savedProductOvercharge: String = ""
     private var savedProductBarcode: String = ""
 
-    private val priceRegex = Regex(pattern = "^((?=.)(?=[0-9]+))|([0-9]+)|((?=[0-9]+)(?=.)(?=[0-9]+))\$")
-
     abstract fun isBarcodeDuplicated(barcode: String): Boolean
+
+    abstract fun onButtonClicked(name: Editable, price: Editable, overcharge: Editable, barcode: Editable)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -92,9 +86,11 @@ abstract class InfoProductFragment : Fragment() {
         val overcharge = product_overcharge.text
         val barcode = product_barcode.text
 
-        onProductTextChanged(price, overcharge, barcode)
-        onPriceTextChanged(name, overcharge, barcode)
-        onOverchargeTextChanged(name, price, barcode)
+        val textWatcher = getTextWatcher(product_name, product_price, product_overcharge, product_barcode)
+
+        product_name.addTextChangedListener(textWatcher)
+        product_price.addTextChangedListener(textWatcher)
+        product_overcharge.addTextChangedListener(textWatcher)
 
         button_add_product.setOnClickListener { onButtonClicked(name, price, overcharge, barcode) }
 
@@ -108,13 +104,6 @@ abstract class InfoProductFragment : Fragment() {
         outState.putCharSequence(KEY_PRODUCT_OVERCHARGE_VALUE, product_overcharge.text)
         outState.putCharSequence(KEY_PRODUCT_BARCODE_VALUE, product_barcode.text)
     }
-
-    abstract fun onButtonClicked(
-        name: Editable,
-        price: Editable,
-        overcharge: Editable,
-        barcode: Editable
-    )
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -142,108 +131,20 @@ abstract class InfoProductFragment : Fragment() {
         }
     }
 
-    private fun onProductTextChanged(productPrice: Editable, productOvercharge: Editable, productBarcode: Editable) {
-        product_name.addTextChangedListener(object : TextWatcher {
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+    protected fun getTextWatcher(name: EditText, price: EditText, overcharge: EditText, barcode: EditText) =
+        object : TextWatcher by TextChangedWatcher {
+            override fun afterTextChanged(editable: Editable) {
+                button_add_product.isEnabled = validate(name, price, overcharge, barcode, ::isBarcodeDuplicated)
             }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            }
-
-            override fun afterTextChanged(name: Editable) {
-                setupButton(name, productPrice, productOvercharge, productBarcode)
-            }
-        })
-    }
-
-    private fun onPriceTextChanged(productName: Editable, productOvercharge: Editable, productBarcode: Editable) {
-        product_price.addTextChangedListener(object : TextWatcher {
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            }
-
-            override fun afterTextChanged(price: Editable) {
-                setupButton(productName, price, productOvercharge, productBarcode)
-            }
-        })
-    }
-
-    private fun onOverchargeTextChanged(productName: Editable, productPrice: Editable, productBarcode: Editable) {
-        product_overcharge.addTextChangedListener(object : TextWatcher {
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            }
-
-            override fun afterTextChanged(overcharge: Editable) {
-                setupButton(productName, productPrice, overcharge, productBarcode)
-            }
-        })
-    }
-
-    protected fun setupButton(
-        productNameView: Editable, productPriceView: Editable, productOverchargeView: Editable,
-        barcodeView: Editable
-    ) {
-        val productName = productNameView.toString()
-        val productPrice = productPriceView.toString()
-        val productOvercharge = productOverchargeView.toString()
-        val barcode = barcodeView.toString()
-
-        var isProductPriceIncorrect = false
-        var isProductPriceAboveLimit = false
-        var isProductOverchargeAboveLimit = false
-        var isProductPriceZero = false
-        var isProductNameEmpty = false
-
-        val anyFieldEmpty = isAnyFieldEmpty(productName, productPrice, productOvercharge, barcode)
-
-        val isBarcodeDuplicated = isBarcodeDuplicated(barcode)
-
-        if (isPriceValid(productPrice)) {
-            isProductPriceAboveLimit = productPrice.toFloat() > MAX_PRICE
-            isProductPriceZero = productPrice.toFloat() <= 0
-            isProductPriceIncorrect = isProductPriceAboveLimit || isProductPriceZero
         }
 
-        if (isPriceValid(productOvercharge))
-            isProductOverchargeAboveLimit = productOvercharge.toFloat() > MAX_PRICE
+    object TextChangedWatcher : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {}
 
-        if (productName.isBlank())
-            isProductNameEmpty = true
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-        button_add_product.isEnabled = !(anyFieldEmpty
-                || isBarcodeDuplicated
-                || isProductPriceIncorrect
-                || isProductOverchargeAboveLimit
-                || isProductNameEmpty
-                || !isPriceValid(productPrice)
-                || !isPriceValid(productOvercharge))
-
-        if (isBarcodeDuplicated) product_barcode.error = MESSAGE_BARCODE
-        if (isProductPriceAboveLimit) product_price.error = MESSAGE_PRICE
-        if (isProductOverchargeAboveLimit) product_overcharge.error = MESSAGE_OVERCHARGE
-        if (isProductPriceZero) product_price.error = MESSAGE_PRICE_ZERO
-        if (isProductNameEmpty) product_name.error = MESSAGE_EMPTY_NAME
-        if (!isPriceValid(productPrice)) product_price.error = MESSAGE_INVALID_PRICE
-        if (!isPriceValid(productOvercharge)) product_overcharge.error = MESSAGE_INVALID_OVERCHARGE
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     }
-
-    private fun isPriceValid(price: String): Boolean {
-        return priceRegex.containsMatchIn(price)
-    }
-
-    private fun isAnyFieldEmpty(
-        productName: String, productPrice: String, productOvercharge: String,
-        productBarcode: String
-    ): Boolean =
-        productName.isEmpty() || productPrice.isEmpty() || productOvercharge.isEmpty() || productBarcode.isEmpty()
 
     private fun clean() {
         product_barcode.setText("")

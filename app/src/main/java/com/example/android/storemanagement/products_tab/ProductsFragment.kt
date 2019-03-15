@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import com.example.android.storemanagement.CREATE_PRODUCT_TAB
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.products_tab.all_products_tab.AllProductsFragment
+import com.example.android.storemanagement.products_tab.in_stock_products_tab.ProductsInStockFragment
+import com.example.android.storemanagement.products_tab.low_stock_products_tab.ProductsLowStockFragment
 import kotlinx.android.synthetic.main.fragment_products.*
 
 
@@ -38,13 +41,16 @@ class ProductsFragment : Fragment() {
 
     private fun setupViewPager() {
         // Create an adapter that knows which fragment should be shown on each page
-        val allProductsFragment = AllProductsFragment()
+        val allProductsFragment =
+            AllProductsFragment()
         allProductsFragment.setOnNavigationChangedListener(onNavigationChangedListener)
 
-        val productsInStockFragment = ProductsInStockFragment()
+        val productsInStockFragment =
+            ProductsInStockFragment()
         productsInStockFragment.setOnNavigationChangedListener(onNavigationChangedListener)
 
-        val productsLowStockFragment = ProductsLowStockFragment()
+        val productsLowStockFragment =
+            ProductsLowStockFragment()
         productsLowStockFragment.setOnNavigationChangedListener(onNavigationChangedListener)
 
         val fragments = listOf(allProductsFragment, productsInStockFragment, productsLowStockFragment)

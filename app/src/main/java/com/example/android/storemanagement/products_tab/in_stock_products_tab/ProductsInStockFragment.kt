@@ -1,4 +1,4 @@
-package com.example.android.storemanagement.products_tab
+package com.example.android.storemanagement.products_tab.in_stock_products_tab
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -11,14 +11,15 @@ import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
+import com.example.android.storemanagement.products_tab.ProductsTabFragment
 import kotlinx.android.synthetic.main.fragment_products_in_stock.*
 
 class ProductsInStockFragment : ProductsTabFragment() {
 
-    private lateinit var viewModel: ProductViewModel
+    private lateinit var viewModel: ProductsInStockViewModel
 
     override fun setupViewModel() {
-        viewModel = ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
+        viewModel = ViewModelProviders.of(this).get(ProductsInStockViewModel(requireActivity().application)::class.java)
     }
 
     override fun setOnNavigationChangedListener(onNavigationChangedListener: OnNavigationChangedListener) {
@@ -35,7 +36,12 @@ class ProductsInStockFragment : ProductsTabFragment() {
     override fun setupRecyclerView() {
         products_in_stock_recycler_view?.let { recyclerView ->
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            val productsInStockAdapter = ProductsInStockAdapter(requireContext(), ::deleteProduct, ::openEditProductTab)
+            val productsInStockAdapter =
+                ProductsInStockAdapter(
+                    requireContext(),
+                    ::deleteProduct,
+                    ::openEditProductTab
+                )
             recyclerView.adapter = productsInStockAdapter
 
             // Observer on the LiveData

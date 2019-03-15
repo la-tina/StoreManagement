@@ -3,38 +3,23 @@ package com.example.android.storemanagement.products_tab
 import android.content.Context
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
 
 
-class ProductsLowStockAdapter(
+abstract class ProductsAdapter(
     private val context: Context,
     private val deleteProductAction: (Product) -> Unit,
     private val openEditProductTab: (Product) -> Unit
-) :
-    RecyclerView.Adapter<ProductsHolder>() {
+) : RecyclerView.Adapter<ProductsHolder>() {
 
-    private var products: MutableList<Product> = mutableListOf()
+    protected var products: MutableList<Product> = mutableListOf()
 
     // Gets the number of items in the list
-    override fun getItemCount(): Int =
-        products.size
-
-    // Inflates the item views
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductsHolder {
-        return ProductsHolder(
-            LayoutInflater.from(context).inflate(
-                R.layout.product_low_stock_item,
-                parent,
-                false
-            )
-        )
-    }
+    override fun getItemCount(): Int = products.size
 
     // Binds each product in the list to a view
     override fun onBindViewHolder(holder: ProductsHolder, position: Int) {
