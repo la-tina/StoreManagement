@@ -1,34 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <CheckBox
-        android:id="@+id/order_check_box"
-        android:layout_width="32dp"
-        android:layout_height="45dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
-        android:id="@+id/order_item_text"
+        android:id="@+id/product_item_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:padding="20dp"
-        android:textAlignment="textStart"
+        android:fontFamily="sans-serif"
+        android:padding="8dp"
+        android:text="Name"
+        android:textAlignment="viewStart"
         android:textColor="@color/checkBoxColor"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -38,47 +26,39 @@
         android:id="@+id/order_item_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:text="123"
         android:textColor="@color/buttonFadeText"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/order_item_quantity" />
+        app:layout_constraintBottom_toBottomOf="@+id/leva"
+        app:layout_constraintEnd_toStartOf="@+id/leva" />
 
     <TextView
         android:id="@+id/leva"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:text="@string/leva"
         android:textAlignment="textStart"
         android:textColor="@color/buttonFadeText"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/order_item_price"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/order_item_price"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintBottom_toTopOf="@+id/view"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <EditText
         android:id="@+id/order_item_quantity"
         android:layout_width="73dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/custom_edit_text"
         android:ems="10"
-        android:enabled="false"
         android:hint="@string/quantity"
         android:inputType="number"
         android:theme="@style/MyEditText"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.767"
         app:layout_constraintStart_toStartOf="@+id/order_item_price"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -86,20 +66,20 @@
         android:id="@+id/imageView"
         android:layout_width="74dp"
         android:layout_height="81dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/orange"
+        android:src="@drawable/blueberry"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
+        android:id="@+id/view"
         android:layout_width="match_parent"
-        android:layout_height="5dp"
+        android:layout_height="2dp"
         android:background="@color/dividingStrip"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-    </View>
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

@@ -5,13 +5,13 @@ import android.arch.persistence.room.*
 import java.io.Serializable
 
 @Entity(tableName = "Products")
-data class Product (
-    @ColumnInfo(name = "Product") val name: String,
-    @ColumnInfo(name = "Price") val price: Float,
-    @ColumnInfo(name = "Overcharge") val overcharge: Float,
+data class Product(
+    val name: String,
+    val price: Float,
+    val overcharge: Float,
     @PrimaryKey
-    @ColumnInfo(name = "Barcode") val barcode: String,
-    @ColumnInfo(name = "Quantity") val quantity: Int
+    val barcode: String,
+    val quantity: Int
 ) : Serializable
 
 @Dao
@@ -26,25 +26,28 @@ interface ProductDao {
     @Delete
     fun deleteProduct(product: Product)
 
-    @Query("SELECT * FROM Products ORDER BY Product ASC")
+    @Query("SELECT * FROM Products ORDER BY name ASC")
     fun getAllProducts(): LiveData<List<Product>>
 
-    @Query("UPDATE Products SET Quantity = :quantity WHERE Product = :product")
+    @Query("UPDATE Products SET Quantity = :quantity WHERE name = :product")
     fun updateQuantity(product: String, quantity: Int)
 
-    @Query("UPDATE Products SET Product = :name WHERE Barcode = :barcode")
+    @Query("UPDATE Products SET name = :name WHERE Barcode = :barcode")
     fun updateName(barcode: String, name: String)
 
-    @Query("UPDATE Products SET Price = :price WHERE Product = :product")
+    @Query("UPDATE Products SET Price = :price WHERE name = :product")
     fun updatePrice(product: String, price: Float)
 
-    @Query("UPDATE Products SET Overcharge = :overcharge WHERE Product = :product")
+    @Query("UPDATE Products SET Overcharge = :overcharge WHERE name = :product")
     fun updateOvercharge(product: String, overcharge: Float)
 
-    @Query("SELECT * FROM Products WHERE Quantity > 0 ORDER BY Product ASC")
+    @Query("SELECT * FROM Products WHERE Quantity > 0 ORDER BY name ASC")
     fun getInStockProducts(): LiveData<List<Product>>
 
-    @Query("SELECT * FROM Products WHERE Quantity < 5 ORDER BY Product ASC")
+    @Query("SELECT * FROM Products WHERE Quantity < 5 ORDER BY name ASC")
     fun getLowStockProducts(): LiveData<List<Product>>
+
+    @Query("UPDATE Products  SET quantity = :quantity WHERE barcode = :barcode")
+    fun updateProductQuantity(barcode: String, quantity: Int)
 }
 

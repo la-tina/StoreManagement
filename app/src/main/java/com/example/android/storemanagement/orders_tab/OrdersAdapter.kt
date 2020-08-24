@@ -12,10 +12,13 @@ import android.widget.Toast
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.orders_database.Order
 import kotlinx.android.synthetic.main.order_item.view.*
+import kotlin.reflect.KSuspendFunction1
 
 class OrdersAdapter(
     private val context: Context,
-    private val deleteOrderAction: (Order) -> Unit
+    private val deleteOrderAction: (Order) -> Unit,
+    private val openEditOrderTab: (Order) -> Unit
+    //private val updateQuantitiesOnDelete: (Order) -> Unit
 ) :
     RecyclerView.Adapter<OrdersHolder>() {
 
@@ -47,10 +50,12 @@ class OrdersAdapter(
                 when (item!!.itemId) {
                     R.id.edit -> {
                         Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+                        openEditOrderTab(order)
                     }
                     R.id.delete -> {
                         Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
-//                        deleteOrderAction(order)
+                        deleteOrderAction(order)
+                        //updateQuantitiesOnDelete(order)
                     }
                 }
                 true
@@ -70,7 +75,7 @@ class OrdersAdapter(
 
 class OrdersHolder(view: View) : RecyclerView.ViewHolder(view) {
     // Holds the OrderTextView that will add each product to
-    val finalPrice = view.product_item_price!!
+    val finalPrice = view.order_item_price!!
     val date = view.order_date!!
     val imageContextMenu: ImageView = view.context_menu_image!!
 }

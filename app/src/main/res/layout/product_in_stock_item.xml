@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="88dp"
-        android:layout_height="76dp"
+        android:layout_width="81dp"
+        android:layout_height="74dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:src="@drawable/lemon"
@@ -24,11 +24,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:padding="20dp"
+        android:fontFamily="sans-serif"
+        android:padding="8dp"
+        android:text="Name"
         android:textAlignment="viewStart"
         android:textColor="@color/checkBoxColor"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -38,60 +39,52 @@
         android:id="@+id/product_item_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="76dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:text="123"
         android:textColor="@color/buttonFadeText"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/order_item_quantity" />
+        app:layout_constraintBottom_toBottomOf="@+id/leva"
+        app:layout_constraintEnd_toStartOf="@+id/leva" />
 
     <TextView
         android:id="@+id/leva"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="55dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/leva"
         android:textAlignment="textStart"
         android:textColor="@color/buttonFadeText"
         android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/product_item_price"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/product_item_price" />
+        app:layout_constraintBottom_toTopOf="@+id/view"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/product_item_quantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="123"
+        android:text="499"
         android:textAlignment="textStart"
         android:textColor="@color/textColor"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.227"
+        app:layout_constraintBottom_toBottomOf="@+id/quantity"
         app:layout_constraintStart_toEndOf="@+id/quantity"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/quantity"
         tools:ignore="RtlHardcoded" />
 
     <TextView
         android:id="@+id/quantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="95dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="70dp"
         android:background="@drawable/custom_text_view"
         android:text="@string/quantity"
         android:textColor="@color/buttonFadeText"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@id/product_item_quantity"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/product_item_quantity" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/context_menu_image"
@@ -102,13 +95,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <View
+        android:id="@+id/view"
         android:layout_width="match_parent"
-        android:layout_height="5dp"
+        android:layout_height="2dp"
         android:background="@color/dividingStrip"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-    </LinearLayout>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
 </android.support.constraint.ConstraintLayout>

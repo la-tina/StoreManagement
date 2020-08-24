@@ -17,8 +17,8 @@
 
     <ImageView
         android:id="@+id/empty_view_products_in_stock"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:src="@drawable/empty_view"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

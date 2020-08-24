@@ -3,81 +3,74 @@ package com.example.android.storemanagement.create_order
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import com.example.android.storemanagement.R
+import android.util.Log
+import android.widget.Toast
+import com.example.android.storemanagement.order_content_database.OrderContent
+import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
-import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_create_order.*
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class CreateOrderFragment : Fragment() {
+open class CreateOrderFragment : InfoOrderFragment() {
 
-    private val productViewModel: ProductViewModel by lazy {
-        ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
-    }
+    override val fragmentTitle: String = "Create Order"
+    override val buttonText: String = "Add Order"
 
-    lateinit var ordersViewModel: OrderViewModel
-
-    var finalPrice: Float = 0F
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_create_order, container, false)
+    private lateinit var orderContentViewModel: OrderContentViewModel
 
     override fun onStart() {
         super.onStart()
         setupRecyclerView()
 
+        Toast.makeText(context, "You must enter at least 1 quantity!", Toast.LENGTH_LONG).show()
+
         button_add_order.setOnClickListener {
 
-            val quantities = (create_order_recycler_view.adapter as CreateOrderAdapter).quantities
-            quantities.forEach { productName, quantity ->
-                updateQuantity(productName, quantity)
-            }
-
-            val current = LocalDate.now()
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd ")
+            val current = LocalDateTime.now()
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val formattedDate = current.format(formatter)
 
             val order = Order(finalPrice, formattedDate)
-            ordersViewModel.insert(order)
-
-            fragmentManager?.popBackStackImmediate()
+            ordersViewModel.insert(order, ::updateQuantities)
         }
     }
 
-    private fun updateFinalPrice(price: Float) {
-        finalPrice += price // finalPrice + string
-        final_price.text = String.format("%.1f", finalPrice).toFloat().toString()
+    private fun updateQuantities(orderId: Long) {
+        val quantities = (create_order_recycler_view.adapter as CreateOrderAdapter).quantities
+        quantities.forEach { (productName, quantity) ->
+            updateQuantity(productName, quantity)
+            createOrderContent(productName, orderId, quantity)
+        }
+        fragmentManager?.popBackStackImmediate()
+    }
+
+    private fun createOrderContent(productName: String, orderId: Long, currentQuantity: Int) {
+
+        val currentBarcode = productViewModel.allProducts.value
+            ?.first { product -> product.name == productName }!!.barcode
+
+        val orderContent = OrderContent(currentBarcode, orderId, currentQuantity)
+        orderContentViewModel.insert(orderContent)
+//        orderContentViewModel.getProductsInOrder(orderId)
     }
 
     private fun updateQuantity(productName: String, quantity: Int) {
         val currentQuantity = productViewModel.allProducts.value
             ?.first { product -> product.name == productName }?.quantity
 
+        Log.v("Room", "Updating current quantity for $productName $currentQuantity")
+
         val finalQuantity = if (currentQuantity != null) quantity + currentQuantity else quantity
+
+        Log.v("Room", "Updating final quantity for $productName $finalQuantity")
 
         productViewModel.updateQuantity(productName, finalQuantity)
     }
 
-    private fun setupEmptyView() {
-        val createOrder = create_order_recycler_view.adapter!!
-        if (createOrder.itemCount == 0) {
-            create_order_recycler_view.visibility = View.GONE
-            empty_view_create_order.visibility = View.VISIBLE
-        } else {
-            create_order_recycler_view.visibility = View.VISIBLE
-            empty_view_create_order.visibility = View.GONE
-        }
-    }
-
-    private fun setupRecyclerView() {
+    override fun setupRecyclerView() {
         create_order_recycler_view.layoutManager = LinearLayoutManager(requireContext())
 
         val createOrdersAdapter = CreateOrderAdapter(
@@ -87,8 +80,9 @@ class CreateOrderFragment : Fragment() {
         )
         create_order_recycler_view.adapter = createOrdersAdapter
 
-        ordersViewModel = ViewModelProviders.of(this).get(OrderViewModel::class.java)
+        //ordersViewModel = ViewModelProviders.of(this).get(OrderViewModel::class.java)
 
+        orderContentViewModel = ViewModelProviders.of(this).get(OrderContentViewModel::class.java)
         // Observer on the LiveData
         // The onChanged() method fires when the observed data changes and the activity is
         // in the foreground.
@@ -97,12 +91,8 @@ class CreateOrderFragment : Fragment() {
             // Update the cached copy of the products in the adapter.
             products?.let {
                 createOrdersAdapter.setProducts(it)
-                setupEmptyView()
+                setupEmptyView(empty_view_create_order, create_order_recycler_view)
             }
         })
-    }
-
-    private fun setOrderButtonEnabled(enabled: Boolean) {
-        button_add_order.isEnabled = enabled
     }
 }

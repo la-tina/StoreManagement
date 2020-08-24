@@ -19,7 +19,7 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbarTop"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
+            android:layout_height="80dp"
             android:background="@color/barColor"
             app:title="Orders"
             app:titleTextAppearance="@style/Toolbar.TitleText"
@@ -39,8 +39,8 @@
 
     <ImageView
         android:id="@+id/empty_view_orders"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"

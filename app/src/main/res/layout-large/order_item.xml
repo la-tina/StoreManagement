@@ -31,12 +31,12 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/product_item_text"
+        android:id="@+id/order_item_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginBottom="8dp"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="sans-serif"
         android:text="@string/ordered"
         android:textAlignment="textStart"
         android:textColor="@color/colorPrimary"
@@ -90,14 +90,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <View
         android:layout_width="match_parent"
-        android:layout_height="5dp"
+        android:layout_height="3dp"
         android:background="@color/dividingStrip"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-    </LinearLayout>
-
-
+    </View>
 </android.support.constraint.ConstraintLayout>

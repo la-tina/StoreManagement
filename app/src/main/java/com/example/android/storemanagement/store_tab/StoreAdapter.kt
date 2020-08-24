@@ -51,7 +51,7 @@ class StoreAdapter(
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
 
-                if (!holder.productQuantity.text.toString().isEmpty()
+                if (holder.productQuantity.text.toString().isNotEmpty()
                     && holder.productQuantity.text.toString().toInt() > 500
                 ) {
                     holder.productQuantity.error = MESSAGE_QUANTITY_ABOVE_MAX_SIZE

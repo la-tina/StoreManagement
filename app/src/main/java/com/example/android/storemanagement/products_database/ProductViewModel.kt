@@ -3,18 +3,14 @@ package com.example.android.storemanagement.products_database
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import android.util.Log
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 
 //The ViewModel's role is to provide data to the UI and survive configuration changes.
 
- class ProductViewModel(application: Application) : AndroidViewModel(application)
-{
-    var quantities = mutableMapOf<String, Int>()
+class ProductViewModel(application: Application) : AndroidViewModel(application) {
     var names = mutableMapOf<String, String>()
     var prices = mutableMapOf<String, Float>()
     var overcharges = mutableMapOf<String, Float>()
@@ -59,9 +55,11 @@ import kotlin.coroutines.CoroutineContext
         repository.deleteProduct(product)
     }
 
-    fun updateQuantity(product: String, quantity: Int) = scope.launch(Dispatchers.IO) {
-        repository.updateQuantity(product, quantity)
-        quantities[product] = quantity
+    fun updateQuantity(productName: String, quantity: Int) = runBlocking {
+        launch(Dispatchers.IO) {
+            Log.v("Room", "UPDATE QUANTITY")
+            repository.updateQuantity(productName, quantity)
+        }
     }
 
     fun updateName(barcode: String, name: String) = scope.launch(Dispatchers.IO) {
@@ -78,6 +76,14 @@ import kotlin.coroutines.CoroutineContext
         repository.updateOvercharge(product, overcharge)
         overcharges[product] = overcharge
     }
+
+    fun updateProductQuantity(barcode: String, quantity: Int) = runBlocking {
+        launch(Dispatchers.IO) {
+            Log.v("Room", "UPDATE QUANTITY $barcode $quantity")
+            repository.updateProductQuantity(barcode, quantity)
+        }
+    }
+
 
     //when the ViewModel is no longer used
     override fun onCleared() {

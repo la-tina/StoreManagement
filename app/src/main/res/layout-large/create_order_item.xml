@@ -7,24 +7,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <CheckBox
-        android:id="@+id/order_check_box"
-        android:layout_width="32dp"
-        android:layout_height="45dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/order_item_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="sans-serif"
         android:padding="20dp"
         android:textAlignment="textStart"
         android:textColor="@color/checkBoxColor"
@@ -73,7 +62,6 @@
         android:layout_marginEnd="8dp"
         android:background="@drawable/custom_edit_text"
         android:ems="10"
-        android:enabled="false"
         android:hint="@string/quantity"
         android:inputType="number"
         android:textSize="25sp"
@@ -88,7 +76,7 @@
         android:id="@+id/imageView"
         android:layout_width="120dp"
         android:layout_height="110dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:src="@drawable/orange"
@@ -98,7 +86,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="5dp"
+        android:layout_height="3dp"
         android:background="@color/dividingStrip"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">

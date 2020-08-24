@@ -16,11 +16,10 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbarTop"
+            android:id="@+id/toolbarTopOrder"
             android:layout_width="match_parent"
             android:layout_height="140dp"
             android:background="@color/barColor"
-            app:title="Create Order"
             app:titleTextAppearance="@style/Toolbar.TitleText"
             app:titleTextColor="@color/titleColor" />
 
@@ -68,7 +67,6 @@
             android:layout_marginEnd="8dp"
             android:background="@drawable/custom_button"
             android:enabled="false"
-            android:text="@string/add_order_button"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

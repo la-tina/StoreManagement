@@ -9,7 +9,6 @@ import kotlinx.android.synthetic.main.fragment_create_product.*
 
 class EditProductFragment : InfoProductFragment() {
 
-
     override val fragmentTitle: String = "Edit product"
     override val buttonText: String = "Save product"
 

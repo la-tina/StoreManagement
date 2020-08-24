@@ -21,7 +21,7 @@
     <item android:state_enabled="false" >
         <shape>
             <gradient
-                android:startColor="@color/buttonFadeBackground"
+                android:startColor="@color/buttonFadeBackgroundGray"
                 android:endColor="@color/buttonFadeBackgroundGray"
                 android:angle="270"/>
             <corners

@@ -11,6 +11,7 @@ import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.create_order_item.view.*
+import kotlinx.android.synthetic.main.fragment_create_order.*
 
 class CreateOrderAdapter(
     private val context: Context,
@@ -36,8 +37,8 @@ class CreateOrderAdapter(
         return CreateOrderHolder(view)
     }
 
-    private fun onCheckChangedAction(productName: String, isChecked: Boolean) {
-        enabledProducts[productName] = isChecked
+    private fun onCheckChangedAction(productName: String, isQuantityCorrect: Boolean) {
+        enabledProducts[productName] = isQuantityCorrect
     }
 
     // Binds each product in the list to a view
@@ -48,22 +49,32 @@ class CreateOrderAdapter(
         holder.productPrice.text = currentProduct.price.toString()
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
 
-        holder.orderCheckBox.setOnCheckedChangeListener { _, isChecked ->
-            onCheckChanged(isChecked, holder)
+        if (isQuantityCorrect(holder.productQuantity)){
+            setOrderButtonEnabled(true)
+//            onQuantityChanged(true, holder)
         }
     }
 
     private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher =
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                val quantity = holder.productQuantity.text.toString()
+                holder.productQuantity.text?.toString()?.let { quantity ->
 
-                val shouldOrderButtonBeEnabled =
-                    isQuantityCorrect(holder.productQuantity) && enabledProducts.isNotEmpty()
-                setOrderButtonEnabled(shouldOrderButtonBeEnabled)
+                    if (isQuantityCorrect(holder.productQuantity))
+                        onQuantityChanged(true, holder)
 
-                updateQuantityForProduct(holder.productName.text.toString(), quantity.toInt())
-                updateFinalPriceAction(getPrice(holder))
+                    val isOrderButtonEnabled =
+                        isQuantityCorrect(holder.productQuantity) && enabledProducts.isNotEmpty()
+
+                    if (isQuantityCorrect(holder.productQuantity)) {
+
+                        onQuantityChanged(isOrderButtonEnabled, holder)
+                        setOrderButtonEnabled(isOrderButtonEnabled)
+
+                        updateQuantityForProduct(holder.productName.text.toString(), quantity.toInt())
+                        updateFinalPriceAction(getPrice(holder))
+                    }
+                }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -81,9 +92,8 @@ class CreateOrderAdapter(
         return quantity * productPriceInt
     }
 
-    private fun onCheckChanged(isChecked: Boolean, holder: CreateOrderHolder) {
-        holder.productQuantity.isEnabled = isChecked
-        onCheckChangedAction(holder.productName.text.toString(), isChecked)
+    private fun onQuantityChanged(isQuantityCorrect: Boolean, holder: CreateOrderHolder) {
+        onCheckChangedAction(holder.productName.text.toString(), isQuantityCorrect)
     }
 
     private fun updateQuantityForProduct(productName: String, quantity: Int) {
@@ -98,8 +108,7 @@ class CreateOrderAdapter(
 
 class CreateOrderHolder(view: View) : RecyclerView.ViewHolder(view) {
     // Holds the ProductTextView that will add each product to
-    val productName = view.order_item_text!!
+    val productName = view.product_item_text!!
     val productPrice = view.order_item_price!!
     val productQuantity = view.order_item_quantity!!
-    val orderCheckBox = view.order_check_box!!
 }

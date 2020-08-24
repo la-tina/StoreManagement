@@ -28,4 +28,10 @@ class IntroActivity: AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
+    private fun openLoginActivity() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
 }

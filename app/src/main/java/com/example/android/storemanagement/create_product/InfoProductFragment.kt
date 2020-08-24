@@ -68,7 +68,7 @@ abstract class InfoProductFragment : Fragment() {
 
         clean()
 
-        toolbarTop.title = fragmentTitle
+        toolbarTopProduct.title = fragmentTitle
         button_add_product.text = buttonText
 
         mScannerView = ZBarScannerView(context)
@@ -93,7 +93,6 @@ abstract class InfoProductFragment : Fragment() {
         product_overcharge.addTextChangedListener(textWatcher)
 
         button_add_product.setOnClickListener { onButtonClicked(name, price, overcharge, barcode) }
-
         button_scan_barcode.setOnClickListener { onBarcodeButtonPressed() }
     }
 
@@ -134,6 +133,10 @@ abstract class InfoProductFragment : Fragment() {
     protected fun getTextWatcher(name: EditText, price: EditText, overcharge: EditText, barcode: EditText) =
         object : TextWatcher by TextChangedWatcher {
             override fun afterTextChanged(editable: Editable) {
+                button_add_product.isEnabled = validate(name, price, overcharge, barcode, ::isBarcodeDuplicated)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 button_add_product.isEnabled = validate(name, price, overcharge, barcode, ::isBarcodeDuplicated)
             }
         }

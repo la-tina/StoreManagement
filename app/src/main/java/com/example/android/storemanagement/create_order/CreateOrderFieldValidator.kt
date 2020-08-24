@@ -2,6 +2,7 @@ package com.example.android.storemanagement.create_order
 
 import android.widget.EditText
 
+
 object CreateOrderFieldValidator {
 
     private const val MESSAGE_QUANTITY_ABOVE_MAX_SIZE = "Тhe maximum allowed quantity is 500лв."
@@ -13,10 +14,7 @@ object CreateOrderFieldValidator {
     }
 
     private fun isQuantityEmpty(quantity: EditText): Boolean {
-        val isQuantityEmpty = quantity.text.toString().isBlank() || quantity.text.toString() == "0"
-        if (isQuantityEmpty)
-            quantity.error = MESSAGE_ZERO_QUANTITY
-        return isQuantityEmpty
+        return quantity.text.toString().isBlank() || quantity.text.toString() == "0"
     }
 
     private fun isQuantityAboveLimit(quantity: EditText): Boolean {

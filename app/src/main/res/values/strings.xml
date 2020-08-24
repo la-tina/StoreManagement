@@ -16,7 +16,7 @@
     <string name="empty_not_saved">Not saved</string>
     <string name="leva">лв</string>
     <string name="ordered">Ordered</string>
-    <string name="quantity">Quantity</string>
+    <string name="quantity"> Quantity: </string>
     <string name="add_order_button">Add Order</string>
     <string name="final_price">Final Price:</string>
     <string name="_0">0</string>
@@ -24,4 +24,10 @@
     <string name="store_management">Store Management</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="login_button_forgotPass"><u>Forgot your password?</u></string>
+    <string name="login_button_register">Register</string>
+    <string name="login_progress_loading">Logging in…</string>
+    <string name="login_buttons_separator_or">- or -</string>
+    <string name="login_button_login">Log in</string>
+    <string name="vectorworks_nomad_app_name">STORE MANAGEMENT</string>
 </resources>

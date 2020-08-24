@@ -1,5 +1,7 @@
 package com.example.android.storemanagement
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -7,26 +9,42 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.example.android.storemanagement.create_order.CreateOrderFragment
+import com.example.android.storemanagement.edit_order.EditOrderFragment
+import com.example.android.storemanagement.edit_order.ViewOrderFragment
 import com.example.android.storemanagement.create_product.BarcodeScanningActivity
 import com.example.android.storemanagement.create_product.CreateProductFragment
 import com.example.android.storemanagement.create_product.EditProductFragment
 import com.example.android.storemanagement.create_product.InfoProductFragment.Companion.CAMERA_PERMISSION_CODE
+import com.example.android.storemanagement.orders_database.Order
+import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.orders_tab.OrdersFragment
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsFragment
 import com.example.android.storemanagement.store_tab.StoreFragment
+import com.facebook.stetho.Stetho
+import com.facebook.stetho.okhttp3.StethoInterceptor
 import kotlinx.android.synthetic.main.activity_main.*
+import okhttp3.OkHttpClient
 
-class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
+class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer<List<Order>>{
 
     private var currentFragment: Fragment? = null
+
+    private val orderViewModel : OrderViewModel by lazy {
+        ViewModelProviders.of(this).get(OrderViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
 //        deleteDatabase("Product_database")
-//        deleteDatabase("Order_database")
+
+        Stetho.initializeWithDefaults(applicationContext)
+
+        OkHttpClient.Builder()
+            .addNetworkInterceptor(StethoInterceptor())
+            .build()
 
         if (savedInstanceState != null) {
             currentFragment = supportFragmentManager.getFragment(savedInstanceState, "FragmentName")
@@ -43,14 +61,21 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
                 .add(R.id.fragment_container, currentFragment!!, getFragmentTag)
                 .commit()
         }
+        orderViewModel.allOrders.observe(this, this)
+
+    }
+
+    override fun onChanged(allOrders: List<Order>?) {
+        
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        //Save the fragment's instance
-        if (currentFragment!!.isAdded)
-            supportFragmentManager.putFragment(outState, "FragmentName", currentFragment as Fragment)
+        val firstFragment = supportFragmentManager?.fragments?.first()
+        if (firstFragment != null) {
+            supportFragmentManager.putFragment(outState, "FragmentName", firstFragment)
+        }
     }
 
     override fun onStart() {
@@ -99,11 +124,13 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         }
     }
 
-    override fun onNavigationChanged(tabNumber: Int, product: Product?) {
+    override fun onNavigationChanged(tabNumber: Int, product: Product?, order: Order?) {
         when (tabNumber) {
             CREATE_ORDER_TAB -> openCreateOrderTab()
             CREATE_PRODUCT_TAB -> openCreateProductTab()
             EDIT_PRODUCT_TAB -> openEditProductTab(product)
+            EDIT_ORDER_TAB -> openEditOrderTab(order)
+            VIEW_ORDER_TAB -> openViewOrderTab()
         }
     }
 
@@ -129,6 +156,8 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
             is CreateOrderFragment -> createOrderTag
             is CreateProductFragment -> createProductTag
             is EditProductFragment -> editProductTag
+            is EditOrderFragment -> editOrderTag
+            is ViewOrderFragment -> viewOrderTag
             else -> throw IllegalStateException()
         }
 
@@ -151,7 +180,24 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
         val fragment = (previouslyAddedEditProductFragment as? EditProductFragment) ?: EditProductFragment()
         val bundle = Bundle().apply { putSerializable(PRODUCT_KEY, product) }
         fragment.arguments = bundle
+
         openCreateTab(fragment, editProductTag)
+    }
+
+    private fun openEditOrderTab(order: Order?) {
+        val previouslyAddedEditOrderFragment = supportFragmentManager.findFragmentByTag(editOrderTag)
+        val fragment = (previouslyAddedEditOrderFragment as? EditOrderFragment) ?: EditOrderFragment()
+        val bundle = Bundle().apply { putSerializable(ORDER_KEY, order) }
+        fragment.arguments = bundle
+
+        openCreateTab(fragment, editOrderTag)
+    }
+
+    private fun openViewOrderTab() {
+        val previouslyAddedViewOrderFragment = supportFragmentManager.findFragmentByTag(viewOrderTag)
+        val fragment = (previouslyAddedViewOrderFragment as? ViewOrderFragment) ?: ViewOrderFragment()
+
+        openCreateTab(fragment, viewOrderTag)
     }
 
     private fun openStoreTab() {
@@ -208,6 +254,8 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener {
 }
 
 interface OnNavigationChangedListener {
-    fun onNavigationChanged(tabNumber: Int, product: Product? = null)
+    fun onNavigationChanged(tabNumber: Int, product: Product? = null, order: Order? = null)
 }
+
+
 

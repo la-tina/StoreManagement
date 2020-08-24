@@ -6,20 +6,36 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.CREATE_ORDER_TAB
+import com.example.android.storemanagement.EDIT_ORDER_TAB
 import com.example.android.storemanagement.OnNavigationChangedListener
+import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
+import com.example.android.storemanagement.products_database.Product
+import com.example.android.storemanagement.products_database.ProductViewModel
+import com.example.android.storemanagement.toSingleEvent
 import kotlinx.android.synthetic.main.fragment_title.*
 
 
-class OrdersFragment : Fragment() {
+open class OrdersFragment : Fragment() {
+
+    var listener: OnNavigationChangedListener? = null
 
     private val viewModel: OrderViewModel by lazy {
         ViewModelProviders.of(this).get(OrderViewModel::class.java)
+    }
+
+    private val orderContentViewModel: OrderContentViewModel by lazy {
+        ViewModelProviders.of(this).get(OrderContentViewModel::class.java)
+    }
+
+    private val productViewModel: ProductViewModel by lazy {
+        ViewModelProviders.of(this).get(ProductViewModel::class.java)
     }
 
     lateinit var onNavigationChangedListener: OnNavigationChangedListener
@@ -42,7 +58,48 @@ class OrdersFragment : Fragment() {
     }
 
     private fun deleteOrder(order: Order) {
-        viewModel.deleteOrder(order)
+//        orderContentViewModel.allOrderContents.toSingleEvent().observe(this, Observer { allContents ->
+//            productViewModel.allProducts.toSingleEvent().observe(this, Observer<List<Product>> { allProducts ->
+//
+//                allContents?.filter { it.orderId == order.id }?.forEach { currentProduct ->
+//
+//                    val previousQuantity =
+//                        allProducts?.firstOrNull { it.barcode == currentProduct.productBarcode }?.quantity
+//
+//                    val newQuantity =
+//                        if (previousQuantity != null)
+//                            previousQuantity - currentProduct.quantity
+//                        else
+//                            currentProduct.quantity
+//
+//                    productViewModel.updateProductQuantity(currentProduct.productBarcode, newQuantity)
+//                }
+//
+//            })
+            viewModel.deleteOrder(order)
+//        })
+    }
+
+//    private fun updateEditedQuantities(orderContent: OrderContent) {
+//        productViewModel.allProducts.observe(this, Observer { allProducts ->
+//            allProducts?.forEach { product ->
+//
+//                if (orderContent.productBarcode == product.barcode) {
+//                    productViewModel.updateProductQuantity(
+//                        product.barcode, product.quantity - orderContent.quantity
+//                    )
+//                }
+//            }
+//        })
+//    }
+
+    private fun openEditOrderTab(order: Order) {
+        if (::onNavigationChangedListener.isInitialized) {
+            //onNavigationChangedListener.onNavigationChanged(EDIT_ORDER_TAB)
+            listener = onNavigationChangedListener
+        }
+
+        listener?.onNavigationChanged(tabNumber = EDIT_ORDER_TAB, order = order)
     }
 
     private fun setupEmptyView() {
@@ -58,7 +115,7 @@ class OrdersFragment : Fragment() {
 
     private fun setupRecyclerView() {
         orders_recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        val ordersAdapter = OrdersAdapter(requireContext(), ::deleteOrder)
+        val ordersAdapter = OrdersAdapter(requireContext(), ::deleteOrder, ::openEditOrderTab)
         orders_recycler_view.adapter = ordersAdapter
 
         // Observer on the LiveData

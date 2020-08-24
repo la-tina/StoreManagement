@@ -16,11 +16,10 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbarTop"
+            android:id="@+id/toolbarTopOrder"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
+            android:layout_height="80dp"
             android:background="@color/barColor"
-            app:title="Create Order"
             app:titleTextAppearance="@style/Toolbar.TitleText"
             app:titleTextColor="@color/titleColor" />
 
@@ -38,8 +37,8 @@
 
     <ImageView
         android:id="@+id/empty_view_create_order"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:layout_gravity="center|center_vertical"
         android:src="@drawable/empty_view"
         android:visibility="gone"
@@ -60,34 +59,31 @@
         <Button
             android:id="@+id/button_add_order"
             style="@style/buttonStyle"
-            android:layout_width="138dp"
-            android:layout_height="55dp"
+            android:layout_width="116dp"
+            android:layout_height="39dp"
             android:layout_gravity="center|bottom"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/custom_button"
             android:enabled="false"
-            android:text="@string/add_order_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.863" />
+            app:layout_constraintTop_toBottomOf="@id/text_final_price" />
 
         <TextView
             android:id="@+id/final_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="72dp"
             android:text="@string/_0"
             android:textAlignment="center"
             android:textColor="@color/colorAccent"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text_leva"
+            app:layout_constraintBottom_toBottomOf="@+id/text_leva"
             app:layout_constraintEnd_toStartOf="@+id/text_leva" />
 
         <TextView
@@ -95,19 +91,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="80dp"
+            android:padding="15dp"
             android:text="@string/final_price"
             android:textAlignment="textEnd"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/final_price"
             app:layout_constraintEnd_toStartOf="@+id/final_price"
-            app:layout_constraintHorizontal_bias="0.845"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/final_price"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="@+id/final_price" />
 
         <TextView
             android:id="@+id/text_leva"
@@ -118,9 +109,9 @@
             android:layout_marginEnd="16dp"
             android:text="@string/leva"
             android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@+id/final_price"
+            app:layout_constraintBottom_toTopOf="@+id/button_add_order"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/final_price" />
+            app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

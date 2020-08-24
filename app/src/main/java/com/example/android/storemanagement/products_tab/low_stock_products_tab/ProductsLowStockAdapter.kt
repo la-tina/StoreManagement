@@ -12,9 +12,11 @@ import com.example.android.storemanagement.products_tab.ProductsHolder
 class ProductsLowStockAdapter(
     private val context: Context,
     deleteProductAction: (Product) -> Unit,
-    openEditProductTab: (Product) -> Unit
-) : ProductsAdapter(context, deleteProductAction, openEditProductTab) {
+    openEditProductTab: (Product) -> Unit,
+    getProductQuantity: (Product) -> Int
+) : ProductsAdapter(context, deleteProductAction, openEditProductTab, getProductQuantity) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductsHolder =
         ProductsHolder(LayoutInflater.from(context).inflate(R.layout.product_low_stock_item, parent, false))
+
 }

@@ -18,7 +18,7 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbarTop"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
+            android:layout_height="80dp"
             android:background="@color/barColor"
             app:title="Products"
             app:titleTextAppearance="@style/Toolbar.TitleText"
@@ -30,10 +30,11 @@
         android:id="@+id/tab_layout_products"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/products_app_bar"
         android:background="@color/lightBarColor"
-        app:tabSelectedTextColor="@color/colorPrimary"
-        app:tabTextColor="@android:color/white">
+        app:layout_constraintTop_toBottomOf="@id/products_app_bar"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabTextColor="#ede7f6"
+        app:tabTextAppearance="@style/TabLayoutTextStyle">
 
         <android.support.design.widget.TabItem
             android:id="@+id/all_products"

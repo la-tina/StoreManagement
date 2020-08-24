@@ -41,7 +41,8 @@ class AllProductsFragment : ProductsTabFragment() {
             val productsAdapter = AllProductsAdapter(
                 requireContext(),
                 ::deleteProduct,
-                ::openEditProductTab
+                ::openEditProductTab,
+                ::getProductQuantity
             )
             recyclerView.adapter = productsAdapter
 
@@ -50,7 +51,7 @@ class AllProductsFragment : ProductsTabFragment() {
             // in the foreground.
 
             viewModel.allProducts.observe(this, Observer { products ->
-                // Update the cached copy of the words in the adapter.
+                // Update the cached copy of the products in the adapter.
                 products?.let {
                     productsAdapter.setProducts(it)
                     setupEmptyView(empty_view_products, products_recycler_view)

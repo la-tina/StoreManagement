@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
-import com.example.android.storemanagement.products_database.ProductViewModel
 import com.example.android.storemanagement.products_tab.ProductsTabFragment
 import kotlinx.android.synthetic.main.fragment_products_low_stock.*
 
@@ -41,7 +40,8 @@ class ProductsLowStockFragment : ProductsTabFragment() {
                 ProductsLowStockAdapter(
                     requireContext(),
                     ::deleteProduct,
-                    ::openEditProductTab
+                    ::openEditProductTab,
+                    ::getProductQuantity
                 )
             recyclerView.adapter = productsLowStockAdapter
 
@@ -52,7 +52,7 @@ class ProductsLowStockFragment : ProductsTabFragment() {
             viewModel.lowStockProducts.observe(this, Observer { products ->
                 // Update the cached copy of the words in the adapter.
                 products?.let {
-                    productsLowStockAdapter.setProducts(it)
+                    productsLowStockAdapter.setProducts(it, false, true)
                     setupEmptyView(empty_view_products_low_stock, products_low_stock_recycler_view)
                     //quantity < 5
                 }

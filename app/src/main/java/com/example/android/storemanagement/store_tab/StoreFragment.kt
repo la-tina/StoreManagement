@@ -10,13 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.create_product.CreateProductFragment
 import com.example.android.storemanagement.products_database.ProductViewModel
-import kotlinx.android.synthetic.main.fragment_create_order.*
-import kotlinx.android.synthetic.main.fragment_create_product.*
 import kotlinx.android.synthetic.main.fragment_store.*
 import kotlinx.android.synthetic.main.store_item.*
-import timber.log.Timber
 
 class StoreFragment : Fragment() {
     companion object {
@@ -45,13 +41,13 @@ class StoreFragment : Fragment() {
         super.onStart()
         setupRecyclerView()
 
-        if(store_item_quantity != null && !savedProductQuantity.isBlank())
+        if (store_item_quantity != null && !savedProductQuantity.isBlank())
             store_item_quantity.setText(savedProductQuantity)
 
         button_save_quantity.setOnClickListener {
 
             val quantities: MutableMap<String, Int> = (store_recycler_view.adapter as StoreAdapter).quantities
-            quantities.forEach { productName, quantity ->
+            quantities.forEach { (productName, quantity) ->
                 updateQuantity(productName, quantity)
                 Toast.makeText(requireContext(), "Quantity saved!", Toast.LENGTH_SHORT).show()
             }
@@ -60,7 +56,7 @@ class StoreFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putCharSequence(StoreFragment.KEY_QUANTITY_VALUE, store_item_quantity.text)
+        outState.putCharSequence(KEY_QUANTITY_VALUE, store_item_quantity.text)
     }
 
     private fun updateQuantity(productName: String, quantity: Int) {

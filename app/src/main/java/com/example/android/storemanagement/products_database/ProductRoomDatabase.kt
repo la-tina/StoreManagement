@@ -4,12 +4,20 @@ import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
+import com.example.android.storemanagement.order_content_database.OrderContent
+import com.example.android.storemanagement.order_content_database.OrderContentDao
+import com.example.android.storemanagement.orders_database.Order
+import com.example.android.storemanagement.orders_database.OrderDao
 
 //Room is a database layer on top of an SQLite database.
-@Database(entities = [Product::class], version = 1)
+@Database(entities = [Product::class, Order::class, OrderContent::class], version = 1)
 abstract class ProductRoomDatabase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao
+
+    abstract fun orderDao(): OrderDao
+
+    abstract fun orderContentDao(): OrderContentDao
 
     //ProductRoomDatabase is singleton to prevent having multiple instances of the database opened at the same time.
     companion object {
