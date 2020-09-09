@@ -40,7 +40,12 @@ class OrderContentViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun updateQuantity(barcode: String, quantity: Int) = scope.launch(Dispatchers.IO) {
-        repository.updateQuantity(barcode, quantity)
+//        repository.updateQuantity(barcode, quantity)
+        repository.updateQuantityOrderContent(barcode, quantity)
         quantities[barcode] = quantity
+    }
+
+    fun updateOrderFinalPrice(id: Long, finalPrice: Float) = scope.launch(Dispatchers.IO) {
+        repository.updateOrderFinalPrice(id, finalPrice)
     }
  }

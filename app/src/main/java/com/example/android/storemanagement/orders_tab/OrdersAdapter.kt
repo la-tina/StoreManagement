@@ -22,7 +22,7 @@ class OrdersAdapter(
 ) :
     RecyclerView.Adapter<OrdersHolder>() {
 
-    private var orders = emptyList<Order>() // Cached copy of products
+    private var orders = emptyList<Order>() // Cached copy of orders
 
     // Gets the number of items in the list
     override fun getItemCount(): Int =
@@ -32,7 +32,7 @@ class OrdersAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrdersHolder =
         OrdersHolder(LayoutInflater.from(context).inflate(R.layout.order_item, parent, false))
 
-    //Binds each product in the list to a view
+    //Binds each order in the list to a view
     override fun onBindViewHolder(holder: OrdersHolder, position: Int) {
         val currentOrder = orders[position]
         val orderPrice = String.format("%.1f", currentOrder.finalPrice).toFloat().toString()

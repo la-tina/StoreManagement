@@ -55,11 +55,11 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         repository.deleteProduct(product)
     }
 
-    fun updateQuantity(productName: String, quantity: Int) = runBlocking {
-        launch(Dispatchers.IO) {
-            Log.v("Room", "UPDATE QUANTITY")
+    fun updateQuantity(productName: String, quantity: Int) =
+        scope.launch(Dispatchers.IO) {
+//            Log.v("Room", "UPDATE QUANTITY")
             repository.updateQuantity(productName, quantity)
-        }
+
     }
 
     fun updateName(barcode: String, name: String) = scope.launch(Dispatchers.IO) {

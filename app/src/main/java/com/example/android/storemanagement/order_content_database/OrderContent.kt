@@ -43,6 +43,12 @@ interface OrderContentDao {
     @Query("UPDATE Products SET Quantity = :quantity WHERE barcode = :barcode")
     fun updateQuantity(barcode: String, quantity: Int)
 
+    @Query("UPDATE OrderContent SET Quantity = :quantity WHERE productBarcode = :barcode")
+    fun updateQuantityOrderContent(barcode: String, quantity: Int)
+
+    @Query("UPDATE Orders SET finalPrice = :finalPrice WHERE id = :id")
+    fun updateOrderFinalPrice(id: Long, finalPrice: Float)
+
     @Delete
     fun deleteOrderContent(order: OrderContent)
 }

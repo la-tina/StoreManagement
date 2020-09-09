@@ -50,6 +50,7 @@ open class EditOrderFragment : InfoOrderFragment() {
         quantities.forEach { (productName, quantity) ->
             updateQuantity(productName, quantity)
         }
+        orderContentViewModel.updateOrderFinalPrice(order.id, finalPrice)
 
 //        updateFinalPrice()
         ordersViewModel.updateFinalPrice(finalPrice, order.id)
@@ -75,7 +76,6 @@ open class EditOrderFragment : InfoOrderFragment() {
         else currentQuantity + (editedQuantity - orderedQuantity)
 
         productViewModel.updateQuantity(productName, finalQuantity)
-
         orderContentViewModel.updateQuantity(currentBarcode, editedQuantity)
     }
 
