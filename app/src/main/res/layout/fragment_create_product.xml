@@ -8,9 +8,6 @@
     android:background="#ffffff">
 
     <android.support.constraint.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ffffff"
@@ -95,8 +92,11 @@
             android:id="@+id/name_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginTop="60dp"
             android:hint="@string/name"
+            app:errorEnabled="true"
             app:layout_constraintBottom_toTopOf="@+id/price_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -104,9 +104,7 @@
             <EditText
                 android:id="@+id/product_name"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="35dp"
-                android:layout_marginRight="35dp"
+                android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
@@ -118,7 +116,10 @@
             android:id="@+id/price_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:hint="@string/price"
+            app:errorEnabled="true"
             app:layout_constraintBottom_toTopOf="@+id/overcharge_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -126,9 +127,7 @@
             <EditText
                 android:id="@+id/product_price"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="35dp"
-                android:layout_marginRight="35dp"
+                android:layout_height="wrap_content"
                 android:inputType="number|numberDecimal"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
@@ -140,7 +139,10 @@
             android:id="@+id/overcharge_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:hint="@string/overcharge"
+            app:errorEnabled="true"
             app:layout_constraintBottom_toTopOf="@+id/barcode_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -148,9 +150,7 @@
             <EditText
                 android:id="@+id/product_overcharge"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="35dp"
-                android:layout_marginRight="35dp"
+                android:layout_height="wrap_content"
                 android:inputType="number|numberDecimal"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"
@@ -163,7 +163,10 @@
             android:id="@+id/barcode_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:hint="@string/barcode"
+            app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/overcharge_text">
@@ -171,9 +174,7 @@
             <EditText
                 android:id="@+id/product_barcode"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="35dp"
-                android:layout_marginRight="35dp"
+                android:layout_height="wrap_content"
                 android:inputType="number"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"

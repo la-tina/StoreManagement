@@ -1,79 +1,122 @@
 package com.example.android.storemanagement.create_product
 
+import android.support.design.widget.TextInputLayout
 import android.widget.EditText
 
 object CreateProductFieldValidator {
 
-    private const val MESSAGE_BARCODE = "A product with the same barcode already exists or the barcode is empty."
-    private const val MESSAGE_PRICE = "Тhe maximum allowed price is 100лв."
+    private var MESSAGE_BARCODE = "A product with the same barcode already exists."
+    private const val MESSAGE_EMPTY_BARCODE = "The barcode cannot be empty."
+    private const val MESSAGE_PRICE_MAX_VALUE = "Тhe maximum allowed price is 100lv."
     private const val MESSAGE_INVALID_PRICE = "Invalid price."
-    private const val MESSAGE_OVERCHARGE = "Тhe maximum allowed overcharge is 100лв."
+    private const val MESSAGE_OVERCHARGE_MAX_VALUE = "Тhe maximum allowed overcharge is 100lv."
     private const val MESSAGE_INVALID_OVERCHARGE = "Invalid overcharge."
-    private const val MESSAGE_PRICE_ZERO = "Тhe price can't be 0лв."
-    private const val MESSAGE_EMPTY_NAME = "Product name can't be empty."
+    private const val MESSAGE_EMPTY_PRICE = "Тhe price cannot be empty."
+    private const val MESSAGE_EMPTY_OVERCHARGE = "Тhe overcharge cannot be empty."
+    private const val MESSAGE_EMPTY_NAME = "Product name cannot be empty."
     private const val REGEX = "^((?=.)(?=[0-9]+))|([0-9]+)|((?=[0-9]+)(?=.)(?=[0-9]+))\$"
 
-    fun validate(
-        nameView: EditText, priceView: EditText, overchargeView: EditText, barcodeView: EditText,
+    enum class ProductFieldElements {
+        NAME,
+        BARCODE,
+        PRICE,
+        OVERCHARGE
+    }
+
+    //, isBarcodeDuplicatedAction: (String) -> Boolean
+    fun isFieldValid(
+        editTextView: EditText,
+        inputLayoutView: TextInputLayout,
+        fieldType: ProductFieldElements,
         isBarcodeDuplicatedAction: (String) -> Boolean
     ): Boolean {
-        val anyFieldEmpty = isAnyFieldEmpty(nameView, priceView, overchargeView, barcodeView)
-
-        val isOverchargeCorrect = validateOvercharge(overchargeView)
-        val isNameCorrect = validateName(nameView)
-        val isBarcodeCorrect = validateBarcode(isBarcodeDuplicatedAction, barcodeView)
-        val isPriceCorrect = validatePrice(priceView)
-
-        return !anyFieldEmpty && isBarcodeCorrect && isPriceCorrect && isOverchargeCorrect && isNameCorrect
+        return when (fieldType) {
+            ProductFieldElements.NAME -> validateName(editTextView, inputLayoutView)
+            ProductFieldElements.BARCODE -> validateBarcode(
+                isBarcodeDuplicatedAction,
+                editTextView,
+                inputLayoutView
+            )
+            ProductFieldElements.PRICE -> validatePrice(editTextView, inputLayoutView)
+            ProductFieldElements.OVERCHARGE -> validateOvercharge(editTextView, inputLayoutView)
+        }
     }
 
-    private fun validateName(nameView: EditText): Boolean {
+    fun areAllFieldsValid(
+        nameLayout: TextInputLayout,
+        priceLayout: TextInputLayout,
+        overchargeLayout: TextInputLayout,
+        barcodeLayout: TextInputLayout
+    ): Boolean {
+        return nameLayout.error == null && priceLayout.error == null && overchargeLayout.error == null && barcodeLayout.error == null
+    }
+
+    private fun validateName(nameView: EditText, nameLayout: TextInputLayout): Boolean {
         val name = nameView.text.toString()
-
+        nameLayout.error = null
+        nameLayout.isErrorEnabled = false
         if (name.isBlank())
-            nameView.error = MESSAGE_EMPTY_NAME
+            nameLayout.error = MESSAGE_EMPTY_NAME
 
-        return nameView.error == null
+        return nameLayout.error == null
     }
 
-    private fun validateOvercharge(overchargeView: EditText): Boolean {
+    private fun validateOvercharge(
+        overchargeView: EditText,
+        overchargeLayout: TextInputLayout
+    ): Boolean {
         val overcharge = overchargeView.text.toString()
-
-        if (isPriceValid(overcharge)) {
-            if (overcharge.toFloat() > InfoProductFragment.MAX_PRICE) overchargeView.error =
-                MESSAGE_OVERCHARGE
-        }
-        else
-            overchargeView.error = MESSAGE_INVALID_OVERCHARGE
-
-        return overchargeView.error == null
-    }
-
-    private fun validatePrice(priceView: EditText): Boolean {
-        val price = priceView.text.toString()
-
-        if (isPriceValid(price)) {
-            if (price.toFloat() > InfoProductFragment.MAX_PRICE) priceView.error = MESSAGE_PRICE
-            if (price.toFloat() <= 0) priceView.error = MESSAGE_PRICE_ZERO
+        overchargeLayout.error = null
+        overchargeLayout.isErrorEnabled = false
+        if (isValidPrice(overcharge)) {
+            if (overcharge.toFloat() > InfoProductFragment.MAX_PRICE) overchargeLayout.error =
+                MESSAGE_OVERCHARGE_MAX_VALUE
+        } else if (overcharge.isBlank()) {
+            overchargeLayout.error = MESSAGE_EMPTY_OVERCHARGE
         } else {
-            priceView.error = MESSAGE_INVALID_PRICE
+            overchargeLayout.error = MESSAGE_INVALID_OVERCHARGE
         }
 
-        return priceView.error == null
+        return overchargeLayout.error == null
     }
 
-    private fun validateBarcode(isBarcodeDuplicatedAction: (String) -> Boolean, barcodeView: EditText): Boolean {
+    private fun validatePrice(priceView: EditText, priceLayout: TextInputLayout): Boolean {
+        val price = priceView.text.toString()
+        priceLayout.error = null
+        priceLayout.isErrorEnabled = false
+        if (isValidPrice(price)) {
+            if (price.toFloat() > InfoProductFragment.MAX_PRICE) priceLayout.error =
+                MESSAGE_PRICE_MAX_VALUE
+        } else if (price.isBlank()) {
+            priceLayout.error = MESSAGE_EMPTY_PRICE
+        } else {
+            priceLayout.error = MESSAGE_INVALID_PRICE
+        }
+
+        return priceLayout.error == null
+    }
+
+
+    private fun validateBarcode(
+        isBarcodeDuplicatedAction: (String) -> Boolean,
+        barcodeView: EditText,
+        barcodeLayout: TextInputLayout
+    ): Boolean {
+        barcodeLayout.error = null
+        barcodeLayout.isErrorEnabled = false
         val barcode = barcodeView.text.toString()
 
-        if (isBarcodeDuplicatedAction(barcode) || barcode.isBlank())
-            barcodeView.error = MESSAGE_BARCODE
+        if (barcode.isBlank()) {
+            barcodeLayout.error = MESSAGE_EMPTY_BARCODE
+        }
+        if (isBarcodeDuplicatedAction(barcode)) {
+            barcodeLayout.error = MESSAGE_BARCODE
+        }
 
-        return barcodeView.error == null
+        return barcodeLayout.error == null
     }
 
-    private fun isPriceValid(price: String): Boolean =
+    private fun isValidPrice(price: String): Boolean =
         Regex(pattern = REGEX).containsMatchIn(price)
 
-    private fun isAnyFieldEmpty(name: EditText, price: EditText, overcharge: EditText, barcode: EditText): Boolean =
-        name.text.isBlank() || price.text.isBlank() || overcharge.text.isBlank() || barcode.text.isBlank()
 }

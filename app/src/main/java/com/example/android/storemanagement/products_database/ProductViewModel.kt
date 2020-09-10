@@ -59,7 +59,6 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         scope.launch(Dispatchers.IO) {
 //            Log.v("Room", "UPDATE QUANTITY")
             repository.updateQuantity(productName, quantity)
-
     }
 
     fun updateName(barcode: String, name: String) = scope.launch(Dispatchers.IO) {

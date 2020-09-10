@@ -8,5 +8,4 @@ import com.example.android.storemanagement.products_tab.ProductsTabViewModel
 class ProductsInStockViewModel(application: Application) : ProductsTabViewModel(application) {
 
     val inStockProducts: LiveData<List<Product>> = repository.inStockProducts
-
 }

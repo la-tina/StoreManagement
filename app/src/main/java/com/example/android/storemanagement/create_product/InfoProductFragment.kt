@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.TextInputLayout
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.text.Editable
@@ -16,7 +17,8 @@ import android.widget.EditText
 import com.example.android.storemanagement.BARCODE_ACTIVITY_REQUEST_CODE
 import com.example.android.storemanagement.BARCODE_KEY
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.create_product.CreateProductFieldValidator.validate
+import com.example.android.storemanagement.create_product.CreateProductFieldValidator.areAllFieldsValid
+import com.example.android.storemanagement.create_product.CreateProductFieldValidator.isFieldValid
 import com.example.android.storemanagement.products_database.ProductViewModel
 import kotlinx.android.synthetic.main.fragment_create_product.*
 import me.dm7.barcodescanner.zbar.ZBarScannerView
@@ -25,6 +27,7 @@ abstract class InfoProductFragment : Fragment() {
 
     abstract val fragmentTitle: String
     abstract val buttonText: String
+    var fieldType: CreateProductFieldValidator.ProductFieldElements = CreateProductFieldValidator.ProductFieldElements.NAME
 
     companion object {
         const val CAMERA_PERMISSION_CODE = 0
@@ -85,15 +88,33 @@ abstract class InfoProductFragment : Fragment() {
         val price = product_price.text
         val overcharge = product_overcharge.text
         val barcode = product_barcode.text
-
-        val textWatcher = getTextWatcher(product_name, product_price, product_overcharge, product_barcode)
-
-        product_name.addTextChangedListener(textWatcher)
-        product_price.addTextChangedListener(textWatcher)
-        product_overcharge.addTextChangedListener(textWatcher)
+        removeEditFieldsErrors()
+        setFieldsTextWatcher()
 
         button_add_product.setOnClickListener { onButtonClicked(name, price, overcharge, barcode) }
         button_scan_barcode.setOnClickListener { onBarcodeButtonPressed() }
+    }
+
+    private fun setFieldsTextWatcher() {
+        val textWatcherName = getTextWatcher(product_name, name_text)
+        product_name.addTextChangedListener(textWatcherName)
+        val textWatcherPrice = getTextWatcher(product_price, price_text)
+        product_price.addTextChangedListener(textWatcherPrice)
+        val textWatcherOvercharge = getTextWatcher(product_overcharge, overcharge_text)
+        product_overcharge.addTextChangedListener(textWatcherOvercharge)
+        val textWatcherBarcode = getTextWatcher(product_barcode, barcode_text)
+        product_barcode.addTextChangedListener(textWatcherBarcode)
+    }
+
+    private fun removeEditFieldsErrors() {
+        name_text.error = null
+        price_text.error = null
+        overcharge_text.error = null
+        barcode_text.error = null
+        name_text.isErrorEnabled = false
+        price_text.isErrorEnabled = false
+        overcharge_text.isErrorEnabled = false
+        barcode_text.isErrorEnabled = false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -106,8 +127,8 @@ abstract class InfoProductFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        data?.getStringExtra(BARCODE_KEY)?.let {
-            savedProductBarcode = it
+        data?.getStringExtra(BARCODE_KEY)?.let { scannedBarcode ->
+            savedProductBarcode = scannedBarcode
         }
     }
 
@@ -130,14 +151,22 @@ abstract class InfoProductFragment : Fragment() {
         }
     }
 
-    protected fun getTextWatcher(name: EditText, price: EditText, overcharge: EditText, barcode: EditText) =
+    protected fun getTextWatcher(editTextView: EditText, inputLayoutView: TextInputLayout) =
         object : TextWatcher by TextChangedWatcher {
             override fun afterTextChanged(editable: Editable) {
-                button_add_product.isEnabled = validate(name, price, overcharge, barcode, ::isBarcodeDuplicated)
+                when (editTextView) {
+                    product_name -> fieldType = CreateProductFieldValidator.ProductFieldElements.NAME
+                    product_price -> fieldType = CreateProductFieldValidator.ProductFieldElements.PRICE
+                    product_overcharge -> fieldType = CreateProductFieldValidator.ProductFieldElements.OVERCHARGE
+                    product_barcode -> fieldType = CreateProductFieldValidator.ProductFieldElements.BARCODE
+                }
+                isFieldValid(editTextView, inputLayoutView, fieldType, ::isBarcodeDuplicated)
+                button_add_product.isEnabled = areAllFieldsValid(name_text, price_text, overcharge_text, barcode_text)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                button_add_product.isEnabled = validate(name, price, overcharge, barcode, ::isBarcodeDuplicated)
+                inputLayoutView.error = null
+                inputLayoutView.isErrorEnabled = false
             }
         }
 

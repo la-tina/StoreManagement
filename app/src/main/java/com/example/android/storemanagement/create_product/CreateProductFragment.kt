@@ -13,15 +13,8 @@ open class CreateProductFragment : InfoProductFragment() {
 
     private val barcodes: MutableList<String> = mutableListOf()
 
-    override fun onStart() {
-        super.onStart()
-        val textWatcher = getTextWatcher(product_name, product_price, product_overcharge, product_barcode)
-        product_barcode.addTextChangedListener(textWatcher)
-    }
-
     override fun onResume() {
         super.onResume()
-
         productViewModel.allProducts.observe(this, Observer { products ->
             // Update the cached copy of the products in the adapter.
             products?.let {

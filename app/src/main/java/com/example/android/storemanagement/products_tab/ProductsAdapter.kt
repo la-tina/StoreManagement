@@ -3,6 +3,7 @@ package com.example.android.storemanagement.products_tab
 import android.content.Context
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -18,30 +19,16 @@ abstract class ProductsAdapter(
 ) : RecyclerView.Adapter<ProductsHolder>() {
 
     protected var products: MutableList<Product> = mutableListOf()
-    var inStockIndicator: Boolean = false
-    var lowStockIndicator: Boolean = false
 
     // Gets the number of items in the list
     override fun getItemCount(): Int = products.size
 
     // Binds each product in the list to a view
     override fun onBindViewHolder(holder: ProductsHolder, position: Int) {
-//        products.forEach { product ->
-//            if (product.quantity == 0 && inStockIndicator){
-//                products.removeAt(position)
-//            }
-//        }
-//
-//        products.forEach { product ->
-//            if (product.quantity > 5 && lowStockIndicator){
-//                products.removeAt(position)
-//            }
-//        }
-
         val currentProduct = products[position]
         holder.productType.text = currentProduct.name
         holder.productPrice.text = currentProduct.price.toString()
-        holder.productQuantity.text = getProductQuantity(currentProduct).toString()
+        holder.productQuantity.text = currentProduct.quantity.toString()
         holder.imageContextMenu.setOnClickListener { view -> showPopup(view, currentProduct) }
     }
 
@@ -65,11 +52,9 @@ abstract class ProductsAdapter(
         }
     }
 
-    internal fun setProducts(products: List<Product>, inStockIndicator: Boolean = false, lowStockIndicator: Boolean = false) {
+    internal fun setProducts(products: List<Product>) {
         this.products.clear()
         this.products.addAll(products)
-        this.inStockIndicator = inStockIndicator
-        this.lowStockIndicator = inStockIndicator
         notifyDataSetChanged()
     }
 }

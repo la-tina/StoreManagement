@@ -10,11 +10,13 @@ import android.view.ViewGroup
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.store_item.view.*
+import kotlin.reflect.KFunction1
 
 
 class StoreAdapter(
     private val context: Context,
-    private val setOrderButtonEnabled: (Boolean) -> Unit
+    private val setOrderButtonEnabled: (Boolean) -> Unit,
+    private val getProductQuantity: KFunction1<@ParameterName(name = "product") Product, Int>
 ) :
     RecyclerView.Adapter<StoreProductsHolder>() {
 
@@ -32,18 +34,18 @@ class StoreAdapter(
         products.size
 
     // Inflates the item views
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreProductsHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.store_item, parent, false)
-        return StoreProductsHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreProductsHolder =
+        StoreProductsHolder(
+            LayoutInflater.from(context).inflate(R.layout.store_item, parent, false)
+        )
 
     // Binds each product in the list to a view
     override fun onBindViewHolder(holder: StoreProductsHolder, position: Int) {
-        val current = products[position]
+        val currentProduct = products[position]
 
-        holder.productName.text = current.name
-        holder.productPrice.text = current.price.toString()
-        holder.productQuantity.setText(current.quantity.toString())
+        holder.productName.text = currentProduct.name
+        holder.productPrice.text = currentProduct.price.toString()
+        holder.productQuantity.setText(currentProduct.quantity.toString())
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
     }
 

@@ -52,7 +52,7 @@ class ProductsLowStockFragment : ProductsTabFragment() {
             viewModel.lowStockProducts.observe(this, Observer { products ->
                 // Update the cached copy of the words in the adapter.
                 products?.let {
-                    productsLowStockAdapter.setProducts(it, false, true)
+                    productsLowStockAdapter.setProducts(it)
                     setupEmptyView(empty_view_products_low_stock, products_low_stock_recycler_view)
                     //quantity < 5
                 }

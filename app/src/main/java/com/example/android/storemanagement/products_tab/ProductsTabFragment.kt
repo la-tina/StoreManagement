@@ -14,6 +14,7 @@ import com.example.android.storemanagement.R
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.products_database.Product
+import com.example.android.storemanagement.products_database.ProductViewModel
 
 abstract class ProductsTabFragment : Fragment() {
 
@@ -21,6 +22,10 @@ abstract class ProductsTabFragment : Fragment() {
 
     private val orderContentViewModel: OrderContentViewModel by lazy {
         ViewModelProviders.of(this).get(OrderContentViewModel::class.java)
+    }
+
+    private val productsViewModel: ProductViewModel by lazy {
+        ViewModelProviders.of(this).get(ProductViewModel::class.java)
     }
 
     private val allOrderContents = mutableListOf<OrderContent>()
@@ -67,7 +72,9 @@ abstract class ProductsTabFragment : Fragment() {
         }
     }
 
-    protected fun getProductQuantity(product: Product): Int =
-        allOrderContents.filter { it.productBarcode == product.barcode }.map { it.quantity }.sum()
-
+    protected fun getProductQuantity(product: Product): Int {
+        val productQuantity = allOrderContents.filter { it.productBarcode == product.barcode }.map { it.quantity }.sum()
+        productsViewModel.updateQuantity(product.name, productQuantity)
+        return productQuantity
+    }
 }

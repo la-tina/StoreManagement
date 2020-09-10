@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +52,7 @@ class ProductsInStockFragment : ProductsTabFragment() {
             viewModel.inStockProducts.observe(this, Observer { inStockProducts ->
                 // Update the cached copy of the words in the adapter.
                 inStockProducts?.let {
-                    productsInStockAdapter.setProducts(it, true)
+                    productsInStockAdapter.setProducts(it)
                     setupEmptyView(empty_view_products_in_stock, products_in_stock_recycler_view)
                     //quantity > 0
                 }

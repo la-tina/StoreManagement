@@ -16,10 +16,6 @@ class LoginActivity : AppCompatActivity(), OnNavigationChangedListener {
 
     private var currentFragment: Fragment? = null
 
-//    private val loginViewModel: LoginViewModel by lazy {
-//        ViewModelProviders.of(this).get(LoginViewModel::class.java)
-//    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
