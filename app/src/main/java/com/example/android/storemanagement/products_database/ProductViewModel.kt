@@ -55,10 +55,9 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         repository.deleteProduct(product)
     }
 
-    fun updateQuantity(productName: String, quantity: Int) =
-        scope.launch(Dispatchers.IO) {
+    fun updateQuantity(productName: String, quantity: Int) = scope.launch(Dispatchers.IO) {
 //            Log.v("Room", "UPDATE QUANTITY")
-            repository.updateQuantity(productName, quantity)
+        repository.updateQuantity(productName, quantity)
     }
 
     fun updateName(barcode: String, name: String) = scope.launch(Dispatchers.IO) {
@@ -76,12 +75,11 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         overcharges[product] = overcharge
     }
 
-    fun updateProductQuantity(barcode: String, quantity: Int) = runBlocking {
-        launch(Dispatchers.IO) {
+    fun updateProductQuantity(barcode: String, quantity: Int) =
+        scope.launch(Dispatchers.IO) {
             Log.v("Room", "UPDATE QUANTITY $barcode $quantity")
             repository.updateProductQuantity(barcode, quantity)
         }
-    }
 
 
     //when the ViewModel is no longer used

@@ -48,7 +48,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/order_item_quantity" />
+        app:layout_constraintTop_toBottomOf="@id/product_item_quantity" />
 
     <TextView
         android:id="@+id/leva"

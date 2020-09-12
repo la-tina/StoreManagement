@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,8 +46,10 @@ abstract class InfoOrderFragment: Fragment()  {
     protected var finalPrice: Float = 0F
 
     protected fun updateFinalPrice(price: Float) {
+        Log.d("Tina", "final price before $finalPrice")
         finalPrice += price
         final_price.text = String.format("%.1f", finalPrice).toFloat().toString()
+        Log.d("Tina", "final price after $finalPrice")
     }
 
     protected fun setupEmptyView(emptyView: View, recyclerView: RecyclerView) {

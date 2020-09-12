@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,6 @@ import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.create_order_item.view.*
-import kotlinx.android.synthetic.main.fragment_create_order.*
 
 class CreateOrderAdapter(
     private val context: Context,
@@ -49,27 +49,28 @@ class CreateOrderAdapter(
         holder.productPrice.text = currentProduct.price.toString()
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
 
-        if (isQuantityCorrect(holder.productQuantity)){
-            setOrderButtonEnabled(true)
+        setOrderButtonEnabled(isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout))
 //            onQuantityChanged(true, holder)
-        }
+
     }
 
     private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher =
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 holder.productQuantity.text?.toString()?.let { quantity ->
+//                    holder.productQuantityLayout.error = null
+//                    holder.productQuantityLayout.isErrorEnabled = false
 
-                    if (isQuantityCorrect(holder.productQuantity))
+                    if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout))
                         onQuantityChanged(true, holder)
 
-                    val isOrderButtonEnabled =
-                        isQuantityCorrect(holder.productQuantity) && enabledProducts.isNotEmpty()
+                    val shouldEnableOrderButton =
+                        isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout) && enabledProducts.isNotEmpty()
 
-                    if (isQuantityCorrect(holder.productQuantity)) {
+                    if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout)) {
 
-                        onQuantityChanged(isOrderButtonEnabled, holder)
-                        setOrderButtonEnabled(isOrderButtonEnabled)
+                        onQuantityChanged(shouldEnableOrderButton, holder)
+                        setOrderButtonEnabled(shouldEnableOrderButton)
 
                         updateQuantityForProduct(holder.productName.text.toString(), quantity.toInt())
                         updateFinalPriceAction(getPrice(holder))
@@ -78,11 +79,17 @@ class CreateOrderAdapter(
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                if (isQuantityCorrect(holder.productQuantity))
+                if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout))
                     updateFinalPriceAction(getPrice(holder) * -1)
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                holder.productQuantity.text?.toString()?.let { quantity ->
+//                    val quantityEdited: Int = if (quantity.isEmpty()) 0 else quantity.toInt()
+//                    updateQuantityForProduct(holder.productName.text.toString(), quantityEdited)
+//                    Log.d("Tina", "quantity onTextChanged$quantityEdited")
+//                }
+                setOrderButtonEnabled(isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout))
             }
         }
 
@@ -110,5 +117,6 @@ class CreateOrderHolder(view: View) : RecyclerView.ViewHolder(view) {
     // Holds the ProductTextView that will add each product to
     val productName = view.product_item_text!!
     val productPrice = view.order_item_price!!
+    val productQuantityLayout = view.order_item_quantity_layout!!
     val productQuantity = view.order_item_quantity!!
 }

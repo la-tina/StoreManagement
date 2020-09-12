@@ -90,7 +90,6 @@
             android:layout_marginBottom="8dp"
             android:textSize="25sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/order_item_quantity"
             app:layout_constraintVertical_bias="1.0" />
 
         <TextView

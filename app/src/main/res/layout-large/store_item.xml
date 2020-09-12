@@ -42,13 +42,13 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="44dp"
         android:layout_marginBottom="8dp"
-        android:text="123"
+        tools:text="123"
         android:textColor="@color/buttonFadeText"
         android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/order_item_quantity" />
+        app:layout_constraintTop_toBottomOf="@id/store_item_quantity" />
 
     <TextView
         android:id="@+id/leva"

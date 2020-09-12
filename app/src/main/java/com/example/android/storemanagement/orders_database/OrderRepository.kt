@@ -35,6 +35,12 @@ class OrderRepository(private val orderDao: OrderDao) {
         return orderDao.getCurrentOrderContents(orderId)
     }
 
+    @WorkerThread
+    fun updateOrderStatus(id: Long, isOrdered: Boolean) {
+        Log.v("Room", "Updating isOrdered status : $isOrdered for id : $id")
+        orderDao.updateOrderStatus(id, isOrdered)
+    }
+
 //    @WorkerThread
 //    fun getCurrentProducts(orderId: Long){
 //        orderDao.getCurrentProducts(orderId)

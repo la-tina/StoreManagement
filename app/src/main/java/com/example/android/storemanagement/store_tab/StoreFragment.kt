@@ -57,7 +57,7 @@ class StoreFragment : Fragment() {
             val quantities: MutableMap<String, Int> = (store_recycler_view.adapter as StoreAdapter).quantities
             quantities.forEach { (productName, quantity) ->
                 updateQuantity(productName, quantity)
-                Toast.makeText(requireContext(), "Quantity saved!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Quantity updated.", Toast.LENGTH_SHORT).show()
             }
         }
     }

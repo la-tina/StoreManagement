@@ -3,6 +3,7 @@ package com.example.android.storemanagement.edit_order
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import com.example.android.storemanagement.ORDER_KEY
 import com.example.android.storemanagement.create_order.InfoOrderFragment
 import com.example.android.storemanagement.order_content_database.OrderContent
@@ -36,6 +37,11 @@ open class EditOrderFragment : InfoOrderFragment() {
         setupRecyclerView()
 
         currentOrder = order
+//        if (finalPrice == 0F){
+//            finalPrice = currentOrder.finalPrice
+//        }
+        Log.d("Tina", "final price edit order " + currentOrder.finalPrice)
+        final_price.text = currentOrder.finalPrice.toString()
 
         currentOrderContents = viewState?.filter { it.orderId == order.id }
 
@@ -54,7 +60,6 @@ open class EditOrderFragment : InfoOrderFragment() {
 
 //        updateFinalPrice()
         ordersViewModel.updateFinalPrice(finalPrice, order.id)
-
         fragmentManager?.popBackStackImmediate()
     }
 

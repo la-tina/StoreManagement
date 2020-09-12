@@ -10,7 +10,8 @@ import java.io.Serializable
 @Entity(tableName = "Orders")
 data class Order(
     val finalPrice: Float,
-    val date: String
+    val date: String,
+    val isOrdered: Boolean
 ) : Serializable {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
@@ -37,6 +38,8 @@ interface OrderDao {
     @Query("SELECT * FROM OrderContent WHERE orderId = :orderId ")
     fun getCurrentOrderContents(orderId: Long): LiveData<List<OrderContent>>
 
+    @Query("UPDATE Orders SET isOrdered = :isOrdered WHERE id = :id")
+    fun updateOrderStatus(id: Long, isOrdered: Boolean)
 
 //    @Query("SELECT orderId, barcode, productBarcode FROM Products, OrderContent WHERE orderId = :orderId & productBarcode = barcode")
 //    fun getCurrentProducts(orderId: Long): LiveData<List<Product>>

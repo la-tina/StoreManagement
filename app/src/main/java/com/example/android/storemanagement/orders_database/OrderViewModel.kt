@@ -56,6 +56,10 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         currentOrderContent = repository.getCurrentOrderContents(orderId)
     }
 
+    fun updateOrderStatus(id: Long, isOrdered: Boolean) = scope.launch(Dispatchers.IO) {
+        repository.updateOrderStatus(id, isOrdered)
+    }
+
     //when the ViewModel is no longer used
     override fun onCleared() {
         super.onCleared()

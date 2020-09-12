@@ -9,7 +9,6 @@ import android.widget.Toast
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
-import com.example.android.storemanagement.orders_database.OrderViewModel
 import kotlinx.android.synthetic.main.fragment_create_order.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -25,7 +24,10 @@ open class CreateOrderFragment : InfoOrderFragment() {
         super.onStart()
         setupRecyclerView()
 
-        Toast.makeText(context, "You must enter at least 1 quantity!", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Enter at least 1 quantity to make an order.", Toast.LENGTH_LONG)
+            .show()
+        finalPrice = 0F
+        final_price.text = "0"
 
         button_add_order.setOnClickListener {
 
@@ -33,7 +35,9 @@ open class CreateOrderFragment : InfoOrderFragment() {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val formattedDate = current.format(formatter)
 
-            val order = Order(finalPrice, formattedDate)
+            val order = Order(finalPrice, formattedDate, false)
+            Log.d("Tina", "final price created order $finalPrice")
+            ordersViewModel.updateFinalPrice(finalPrice, order.id)
             ordersViewModel.insert(order, ::updateQuantities)
         }
     }
@@ -41,8 +45,11 @@ open class CreateOrderFragment : InfoOrderFragment() {
     private fun updateQuantities(orderId: Long) {
         val quantities = (create_order_recycler_view.adapter as CreateOrderAdapter).quantities
         quantities.forEach { (productName, quantity) ->
-            updateQuantity(productName, quantity)
-            createOrderContent(productName, orderId, quantity)
+//            if (quantity != 0) {
+                updateQuantity(productName, quantity)
+            Log.d("Tina", "updated qunatity for " + productName + "is " + quantity)
+                createOrderContent(productName, orderId, quantity)
+//            }
         }
         fragmentManager?.popBackStackImmediate()
     }
@@ -68,6 +75,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
         Log.v("Room", "Updating final quantity for $productName $finalQuantity")
 
         productViewModel.updateQuantity(productName, finalQuantity)
+        Log.d("Tina", "updated qunatity for " + productName + "is " + quantity)
     }
 
     override fun setupRecyclerView() {

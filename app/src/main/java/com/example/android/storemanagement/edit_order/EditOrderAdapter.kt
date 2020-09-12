@@ -4,10 +4,12 @@ import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderHolder
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.products_database.Product
@@ -27,6 +29,8 @@ class EditOrderAdapter(
     var enabledProducts = mutableMapOf<String, Boolean>()
     var beforeElementIndicator: Boolean = false
     var afterElementIndicator: Boolean = false
+    var initialStart = true
+    var lastEditedProduct: String? = null
 
     // Gets the number of items in the list
     override fun getItemCount(): Int {
@@ -55,37 +59,48 @@ class EditOrderAdapter(
             }
         }
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
+        Log.d("Watcher", "quantity addWatcher " +  holder.productQuantity.text)
 
     }
 
     private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher =
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                val quantity = holder.productQuantity.text.toString()
+                val shouldEnableOrderButton = isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout) && enabledProducts.isNotEmpty()
+                setOrderButtonEnabled(shouldEnableOrderButton)
 
-                val shouldOrderButtonBeEnabled =
-                    CreateOrderFieldValidator.isQuantityCorrect(holder.productQuantity) && enabledProducts.isNotEmpty()
-                setOrderButtonEnabled(shouldOrderButtonBeEnabled)
-
-                if (CreateOrderFieldValidator.isQuantityCorrect(holder.productQuantity) && !afterElementIndicator) {
-                    onQuantityChanged(true, holder)
-                    setOrderButtonEnabled(shouldOrderButtonBeEnabled)
-                    updateFinalPriceAction(getPrice(holder))
-                    beforeElementIndicator = false
-                    afterElementIndicator = true
-                    updateQuantityForProduct(holder.productName.text.toString(), quantity.toInt())
+                    if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout) && !afterElementIndicator) {
+                        Log.d("Watcher", "quantity " + quantities[holder.productName.text.toString()] + " current quantity " + holder.productQuantity.text.toString().toInt() + " productname " + holder.productName.text.toString() + " lastEditedProduct " + lastEditedProduct)
+                        if (quantities[holder.productName.text.toString()] == holder.productQuantity.text.toString().toInt() && holder.productName.text.toString() == lastEditedProduct && !beforeElementIndicator) {
+                            Log.d("Watcher", "afterElementIndicator")
+                            afterElementIndicator = true
+                        } else {
+                            beforeElementIndicator = false
+                            lastEditedProduct = holder.productName.text.toString()
+                            onQuantityChanged(shouldEnableOrderButton, holder)
+                            afterElementIndicator = false
+                            updateFinalPriceAction(getPrice(holder))
+                            updateQuantityForProduct(
+                            holder.productName.text.toString(),
+                            holder.productQuantity.text.toString().toInt()
+                        )
+                        Log.d("Watcher", "quantity after " + holder.productQuantity.text.toString().toInt() + " for product " + holder.productName.text.toString())
+                        Log.d("Watcher", "watcher price after " + getPrice(holder) + " for product " + holder.productName.text.toString())
+                    }
                 }
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                setOrderButtonEnabled(true)
-                if (CreateOrderFieldValidator.isQuantityCorrect(holder.productQuantity) && !beforeElementIndicator){
+                if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout) && !beforeElementIndicator) {
                     beforeElementIndicator = true
                     afterElementIndicator = false
                     updateFinalPriceAction(getPrice(holder) * -1)
+                    Log.d("Watcher", "watcher price before " + getPrice(holder) * -1 + " for product " + holder.productName.text.toString())
                 }
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                setOrderButtonEnabled(isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout))
             }
         }
 
