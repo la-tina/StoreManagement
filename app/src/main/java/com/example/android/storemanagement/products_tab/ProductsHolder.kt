@@ -1,6 +1,6 @@
 package com.example.android.storemanagement.products_tab
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import kotlinx.android.synthetic.main.product_item.view.*

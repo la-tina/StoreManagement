@@ -2,7 +2,7 @@ package com.example.android.storemanagement.create_product
 
 import android.app.Activity
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
 import me.dm7.barcodescanner.zbar.Result
 import me.dm7.barcodescanner.zbar.ZBarScannerView

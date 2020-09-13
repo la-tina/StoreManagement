@@ -1,8 +1,8 @@
 package com.example.android.storemanagement.edit_order
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
-import android.support.v7.widget.LinearLayoutManager
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.Log
 import com.example.android.storemanagement.ORDER_KEY
 import com.example.android.storemanagement.create_order.InfoOrderFragment
@@ -60,7 +60,7 @@ open class EditOrderFragment : InfoOrderFragment() {
 
 //        updateFinalPrice()
         ordersViewModel.updateFinalPrice(finalPrice, order.id)
-        fragmentManager?.popBackStackImmediate()
+        parentFragmentManager.popBackStackImmediate()
     }
 
 
@@ -85,7 +85,8 @@ open class EditOrderFragment : InfoOrderFragment() {
     }
 
     override fun setupRecyclerView() {
-        create_order_recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        create_order_recycler_view.layoutManager =
+            LinearLayoutManager(requireContext())
 
         val editOrdersAdapter = EditOrderAdapter(
             requireContext(),

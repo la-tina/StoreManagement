@@ -1,7 +1,7 @@
 package com.example.android.storemanagement.order_content_database
 
-import android.arch.lifecycle.LiveData
-import android.support.annotation.WorkerThread
+import androidx.lifecycle.LiveData
+import androidx.annotation.WorkerThread
 import android.util.Log
 
 class OrderContentRepository(private val orderContentDao: OrderContentDao) {

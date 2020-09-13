@@ -34,6 +34,12 @@
     <string name="login_buttons_separator_or">- or -</string>
     <string name="login_button_login">Log in</string>
 
+    <string name="action_about">About Store Management</string>
+    <string name="action_export">Export to CSV file</string>
+    <string name="action_log_out">Log out</string>
+    <string name="csv_file_generated_text">The CSV file is generated.</string>
+    <string name="csv_file_not_generated_text">The CSV file cannot be generated.</string>
+
     <string name="barcode_duplicate_error_message">A product with the same barcode already exists.</string>
     <string name="barcode_empty_error_message">The barcode cannot be empty.</string>
     <string name="price_max_value_error_message">Тhe maximum allowed price is 100lv.</string>
@@ -43,4 +49,5 @@
     <string name="price_empty_error_message">Тhe price cannot be empty.</string>
     <string name="overcharge_empty_error_message">Тhe overcharge cannot be empty.</string>
     <string name="name_empty_error_message">Product name cannot be empty.</string>
+    <string name="drawer">drawer</string>
 </resources>

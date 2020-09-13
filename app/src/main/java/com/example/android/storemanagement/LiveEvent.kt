@@ -1,9 +1,10 @@
 package com.example.android.storemanagement
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MediatorLiveData
-import android.support.annotation.MainThread
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.annotation.MainThread
+import androidx.lifecycle.Observer
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -13,14 +14,14 @@ class LiveEvent<T> : MediatorLiveData<T>() {
     private val observers = ConcurrentHashMap<LifecycleOwner, MutableSet<ObserverWrapper<T>>>()
 
     @MainThread
-    override fun observe(owner: LifecycleOwner, observer: android.arch.lifecycle.Observer<T>) {
+    override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
         val wrapper = ObserverWrapper(observer)
         val set = observers[owner]
         set?.apply {
-            add(wrapper)
+            add(wrapper as ObserverWrapper<T>)
         } ?: run {
             val newSet = Collections.newSetFromMap(ConcurrentHashMap<ObserverWrapper<T>, Boolean>())
-            newSet.add(wrapper)
+            newSet.add(wrapper as ObserverWrapper<T>?)
             observers[owner] = newSet
         }
         super.observe(owner, wrapper)
@@ -31,7 +32,7 @@ class LiveEvent<T> : MediatorLiveData<T>() {
         super.removeObservers(owner)
     }
 
-    override fun removeObserver(observer: android.arch.lifecycle.Observer<T>) {
+    override fun removeObserver(observer: Observer<in T>) {
         observers.forEach {
             if (it.value.remove(observer)) {
                 if (it.value.isEmpty()) {
@@ -57,8 +58,8 @@ class LiveEvent<T> : MediatorLiveData<T>() {
         value = null
     }
 
-    private class ObserverWrapper<T>(private val observer: android.arch.lifecycle.Observer<T>) :
-        android.arch.lifecycle.Observer<T> {
+    private class ObserverWrapper<T>(private val observer: androidx.lifecycle.Observer<T>) :
+        androidx.lifecycle.Observer<T> {
 
         private val pending = AtomicBoolean(false)
 

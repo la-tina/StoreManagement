@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/action_about"
+            android:icon="@drawable/ic_outline_info"
+            android:title="@string/action_about" />
+        <item
+            android:id="@+id/action_export"
+            android:icon="@drawable/ic_baseline_import_export"
+            android:title="@string/action_export" />
+        <item
+            android:id="@+id/action_log_out"
+            android:icon="@drawable/ic_baseline_exit_to_app"
+            android:title="@string/action_log_out" />
+    </group>
+</menu>

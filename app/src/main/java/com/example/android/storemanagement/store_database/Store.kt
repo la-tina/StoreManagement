@@ -1,6 +1,6 @@
 package com.example.android.storemanagement.store_database
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import java.io.Serializable
 
 

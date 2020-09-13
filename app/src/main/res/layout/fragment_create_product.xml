@@ -7,13 +7,13 @@
     android:layout_height="match_parent"
     android:background="#ffffff">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ffffff"
         tools:context=".store_tab.StoreFragment">
 
-        <android.support.design.widget.AppBarLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbarTopProduct"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -29,7 +29,7 @@
                 app:titleTextAppearance="@style/Toolbar.TitleText"
                 app:titleTextColor="@color/titleColor" />
 
-        </android.support.design.widget.AppBarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
         <ImageView
             android:id="@+id/image_view_1"
@@ -88,7 +88,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/image_view_4" />
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/name_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -110,9 +110,9 @@
                 android:textColorHint="@color/colorAccent"
                 android:visibility="visible" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/price_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -133,9 +133,9 @@
                 android:textColorHint="@color/colorAccent"
                 android:visibility="visible" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/overcharge_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -156,10 +156,10 @@
                 android:textColorHint="@color/colorAccent"
                 android:visibility="visible" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/barcode_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -180,7 +180,7 @@
                 android:textColorHint="@color/colorAccent"
                 android:visibility="visible" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/button_add_product"
@@ -199,5 +199,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/barcode_text" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

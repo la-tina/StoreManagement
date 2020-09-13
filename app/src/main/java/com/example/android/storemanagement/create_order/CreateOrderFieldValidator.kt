@@ -1,6 +1,6 @@
 package com.example.android.storemanagement.create_order
 
-import android.support.design.widget.TextInputLayout
+import com.google.android.material.textfield.TextInputLayout
 import android.widget.EditText
 import android.widget.TextView
 

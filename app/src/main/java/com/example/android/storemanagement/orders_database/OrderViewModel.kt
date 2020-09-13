@@ -1,8 +1,8 @@
 package com.example.android.storemanagement.orders_database
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.products_database.ProductRoomDatabase
 import kotlinx.coroutines.*
@@ -49,6 +49,10 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateFinalPrice(finalPrice: Float, id: Long) = scope.launch(Dispatchers.IO) {
         repository.updateFinalPrice(finalPrice, id)
+    }
+
+    fun updateDate(date: String, id: Long) = scope.launch(Dispatchers.IO) {
+        repository.updateDate(date, id)
     }
 
     fun getCurrentOrderContents(orderId: Long) = scope.launch(Dispatchers.IO) {

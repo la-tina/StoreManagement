@@ -1,6 +1,6 @@
 package com.example.android.storemanagement.edit_order
 
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.view.View
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import kotlinx.android.synthetic.main.fragment_create_order.*

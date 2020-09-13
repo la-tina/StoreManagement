@@ -1,30 +1,38 @@
 package com.example.android.storemanagement.orders_tab
 
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.android.storemanagement.CREATE_ORDER_TAB
-import com.example.android.storemanagement.EDIT_ORDER_TAB
-import com.example.android.storemanagement.OnNavigationChangedListener
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.android.storemanagement.*
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
-import com.example.android.storemanagement.toSingleEvent
-import kotlinx.android.synthetic.main.fragment_title.*
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
+import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.fragment_orders.*
+import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 open class OrdersFragment : Fragment() {
 
     var listener: OnNavigationChangedListener? = null
+    private lateinit var topToolbar: Toolbar
+
+    lateinit var ordersList: List<Order>
+    lateinit var productsInOrderList: List<OrderContent>
+    lateinit var productsList: List<Product>
 
     private val orderViewModel: OrderViewModel by lazy {
         ViewModelProviders.of(this).get(OrderViewModel::class.java)
@@ -40,16 +48,73 @@ open class OrdersFragment : Fragment() {
 
     lateinit var onNavigationChangedListener: OnNavigationChangedListener
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(
-            com.example.android.storemanagement.R.layout.fragment_title,
+            R.layout.fragment_orders,
             container,
             false
         )
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initData()
+    }
+
+    private fun initData() {
+        orderViewModel.allOrders.toSingleEvent().observe(this,
+            Observer<List<Order>> { orders ->
+                ordersList = orders
+            }
+        )
+        orderContentViewModel.allOrderContents.toSingleEvent().observe(this,
+            Observer<List<OrderContent>> { productsInOrder ->
+                productsInOrderList = productsInOrder
+            }
+        )
+        productViewModel.allProducts.toSingleEvent().observe(this,
+            Observer<List<Product>> { products ->
+                productsList = products
+            }
+        )
+    }
+
+    open fun addRowOrders(writeRow: (List<Any?>) -> Unit) {
+        ordersList.forEach { order ->
+            val orderContents = productsInOrderList.filter { it.orderId == order.id }
+            orderContents.forEach { orderContent ->
+                val products = productsList.filter { it.barcode == orderContent.productBarcode }
+                products.forEach { product ->
+                    writeRow(
+                        listOf(
+                            "",
+                            order.id,
+                            order.isOrdered,
+                            order.date,
+                            product.name,
+                            orderContent.quantity,
+                            product.price * orderContent.quantity
+                        )
+                    )
+                }
+            }
+            writeRow(listOf("Final price"," - "," - "," - "," - "," - ", order.finalPrice))
+            writeRow(emptyList())
+        }
+    }
+
+    open fun addRowProducts(writeRow: (List<Any?>) -> Unit) {
+        productsList.forEach { product ->
+            writeRow(
+                listOf(
+                    product.barcode,
+                    product.name,
+                    product.price,
+                    product.overcharge,
+                    product.quantity
+                )
+            )
+        }
     }
 
     override fun onStart() {
@@ -65,8 +130,17 @@ open class OrdersFragment : Fragment() {
         }
     }
 
-    fun updateOrderStatus(id: Long, isOrdered: Boolean){
+    private fun updateDate(id: Long){
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val formattedDate = current.format(formatter)
+
+        orderViewModel.updateDate(formattedDate, id)
+    }
+
+    private fun updateOrderStatus(id: Long, isOrdered: Boolean){
         orderViewModel.updateOrderStatus(id, isOrdered)
+        updateDate(id)
     }
 
     private fun deleteOrder(order: Order) {
@@ -133,7 +207,8 @@ open class OrdersFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        orders_recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        orders_recycler_view.layoutManager =
+            LinearLayoutManager(requireContext())
         val ordersAdapter = OrdersAdapter(requireContext(), ::deleteOrder, ::openEditOrderTab, ::updateOrderStatus)
         orders_recycler_view.adapter = ordersAdapter
 

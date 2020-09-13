@@ -1,6 +1,6 @@
 package com.example.android.storemanagement.create_product
 
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.text.Editable
 import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.fragment_create_product.*
@@ -35,7 +35,7 @@ open class CreateProductFragment : InfoProductFragment() {
             quantity
         )
         productViewModel.insert(product)
-        fragmentManager?.popBackStackImmediate()
+        parentFragmentManager.popBackStackImmediate()
     }
 
     override fun isBarcodeDuplicated(barcode: String) =

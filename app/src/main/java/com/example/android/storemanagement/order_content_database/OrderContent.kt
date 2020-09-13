@@ -1,7 +1,7 @@
 package com.example.android.storemanagement.order_content_database
 
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.*
+import androidx.lifecycle.LiveData
+import androidx.room.*
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.products_database.Product
 import java.io.Serializable

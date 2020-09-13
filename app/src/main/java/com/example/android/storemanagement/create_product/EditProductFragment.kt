@@ -36,6 +36,6 @@ class EditProductFragment : InfoProductFragment() {
         productViewModel.updateName(barcode.toString(), name.toString())
         productViewModel.updatePrice(name.toString(), price.toString().toFloat())
         productViewModel.updateOvercharge(name.toString(), overcharge.toString().toFloat())
-        fragmentManager?.popBackStackImmediate()
+        parentFragmentManager.popBackStackImmediate()
     }
 }

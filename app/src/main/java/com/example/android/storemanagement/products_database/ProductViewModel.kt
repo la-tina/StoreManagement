@@ -1,8 +1,8 @@
 package com.example.android.storemanagement.products_database
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import android.util.Log
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext

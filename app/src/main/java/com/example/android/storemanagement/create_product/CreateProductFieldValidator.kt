@@ -1,6 +1,6 @@
 package com.example.android.storemanagement.create_product
 
-import android.support.design.widget.TextInputLayout
+import com.google.android.material.textfield.TextInputLayout
 import android.widget.EditText
 
 object CreateProductFieldValidator {

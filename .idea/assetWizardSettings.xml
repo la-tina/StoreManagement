@@ -136,7 +136,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_save_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/exit_to_app/baseline_exit_to_app_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -146,8 +146,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_save_pdf" />
+                            <entry key="color" value="33a79b" />
+                            <entry key="outputName" value="ic_baseline_exit_to_app" />
                             <entry key="sourceFile" value="C:\Users\Konstantina Rovelova" />
                           </map>
                         </option>

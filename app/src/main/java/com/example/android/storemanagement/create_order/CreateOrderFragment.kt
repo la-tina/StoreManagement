@@ -1,9 +1,9 @@
 package com.example.android.storemanagement.create_order
 
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
-import android.support.v7.widget.LinearLayoutManager
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.Log
 import android.widget.Toast
 import com.example.android.storemanagement.order_content_database.OrderContent
@@ -51,7 +51,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
                 createOrderContent(productName, orderId, quantity)
 //            }
         }
-        fragmentManager?.popBackStackImmediate()
+        parentFragmentManager.popBackStackImmediate()
     }
 
     private fun createOrderContent(productName: String, orderId: Long, currentQuantity: Int) {
@@ -79,7 +79,8 @@ open class CreateOrderFragment : InfoOrderFragment() {
     }
 
     override fun setupRecyclerView() {
-        create_order_recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        create_order_recycler_view.layoutManager =
+            LinearLayoutManager(requireContext())
 
         val createOrdersAdapter = CreateOrderAdapter(
             requireContext(),

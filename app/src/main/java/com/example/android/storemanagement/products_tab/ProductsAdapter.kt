@@ -1,8 +1,8 @@
 package com.example.android.storemanagement.products_tab
 
 import android.content.Context
-import android.support.v7.widget.PopupMenu
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.widget.PopupMenu
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -35,6 +35,7 @@ abstract class ProductsAdapter(
     protected fun showPopup(view: View, product: Product) {
         PopupMenu(context, view).apply {
             inflate(R.menu.context_menu)
+            menu.findItem(R.id.order).isVisible = false
             setOnMenuItemClickListener { item: MenuItem? ->
                 when (item!!.itemId) {
                     R.id.edit -> {

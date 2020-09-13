@@ -1,9 +1,9 @@
 package com.example.android.storemanagement.products_tab.in_stock_products_tab
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -35,7 +35,8 @@ class ProductsInStockFragment : ProductsTabFragment() {
 
     override fun setupRecyclerView() {
         products_in_stock_recycler_view?.let { recyclerView ->
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            recyclerView.layoutManager =
+                LinearLayoutManager(requireContext())
             val productsInStockAdapter =
                 ProductsInStockAdapter(
                     requireContext(),

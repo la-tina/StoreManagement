@@ -1,13 +1,13 @@
 package com.example.android.storemanagement.create_product
 
 import android.Manifest
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
+import com.google.android.material.textfield.TextInputLayout
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater

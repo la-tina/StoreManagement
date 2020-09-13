@@ -1,8 +1,8 @@
 package com.example.android.storemanagement.edit_order
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentRepository
 import com.example.android.storemanagement.products_database.ProductRoomDatabase

@@ -1,7 +1,7 @@
 package com.example.android.storemanagement.edit_order
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log

@@ -1,7 +1,7 @@
 package com.example.android.storemanagement.orders_database
 
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.*
+import androidx.lifecycle.LiveData
+import androidx.room.*
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.products_database.Product
 import java.io.Serializable
@@ -34,6 +34,9 @@ interface OrderDao {
 
     @Query("UPDATE Orders SET FinalPrice = :finalPrice WHERE Id = :id")
     fun updateFinalPrice(finalPrice: Float, id: Long)
+
+    @Query("UPDATE Orders SET date = :date WHERE Id = :id")
+    fun updateDate(date: String, id: Long)
 
     @Query("SELECT * FROM OrderContent WHERE orderId = :orderId ")
     fun getCurrentOrderContents(orderId: Long): LiveData<List<OrderContent>>

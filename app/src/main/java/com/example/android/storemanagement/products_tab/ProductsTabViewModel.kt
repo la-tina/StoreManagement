@@ -1,7 +1,7 @@
 package com.example.android.storemanagement.products_tab
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
+import androidx.lifecycle.AndroidViewModel
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductRepository
 import com.example.android.storemanagement.products_database.ProductRoomDatabase

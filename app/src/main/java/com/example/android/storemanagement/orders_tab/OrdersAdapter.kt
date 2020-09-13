@@ -1,8 +1,8 @@
 package com.example.android.storemanagement.orders_tab
 
 import android.content.Context
-import android.support.v7.widget.PopupMenu
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.widget.PopupMenu
+import androidx.recyclerview.widget.RecyclerView
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView

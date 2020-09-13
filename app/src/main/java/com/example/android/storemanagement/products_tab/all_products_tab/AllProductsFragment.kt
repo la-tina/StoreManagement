@@ -1,9 +1,9 @@
 package com.example.android.storemanagement.products_tab.all_products_tab
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,7 +37,8 @@ class AllProductsFragment : ProductsTabFragment() {
 
     override fun setupRecyclerView() {
         products_recycler_view?.let { recyclerView ->
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            recyclerView.layoutManager =
+                LinearLayoutManager(requireContext())
             val productsAdapter = AllProductsAdapter(
                 requireContext(),
                 ::deleteProduct,

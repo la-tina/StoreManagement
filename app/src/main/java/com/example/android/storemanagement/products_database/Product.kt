@@ -1,7 +1,7 @@
 package com.example.android.storemanagement.products_database
 
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.*
+import androidx.lifecycle.LiveData
+import androidx.room.*
 import java.io.Serializable
 
 @Entity(tableName = "Products")
