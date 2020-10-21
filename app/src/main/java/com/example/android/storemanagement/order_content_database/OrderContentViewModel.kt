@@ -3,6 +3,7 @@ package com.example.android.storemanagement.order_content_database
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductRoomDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,11 @@ class OrderContentViewModel(application: Application) : AndroidViewModel(applica
 //        repository.updateQuantity(barcode, quantity)
         repository.updateQuantityOrderContent(barcode, quantity)
         quantities[barcode] = quantity
+    }
+
+    fun deleteOrderContent(orderContent: OrderContent) = scope.launch(Dispatchers.IO) {
+//        repository.updateQuantity(barcode, quantity)
+        repository.deleteOrderContent(orderContent)
     }
 
     fun updateOrderFinalPrice(id: Long, finalPrice: Float) = scope.launch(Dispatchers.IO) {

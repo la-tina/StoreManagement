@@ -13,6 +13,7 @@ import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
+import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
 
@@ -20,11 +21,15 @@ abstract class ProductsTabFragment : Fragment() {
 
     protected var listener: OnNavigationChangedListener? = null
 
-    private val orderContentViewModel: OrderContentViewModel by lazy {
+    protected val orderContentViewModel: OrderContentViewModel by lazy {
         ViewModelProviders.of(this).get(OrderContentViewModel::class.java)
     }
 
-    private val productsViewModel: ProductViewModel by lazy {
+    protected val orderViewModel: OrderViewModel by lazy {
+        ViewModelProviders.of(this).get(OrderViewModel::class.java)
+    }
+
+    private val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel::class.java)
     }
 
@@ -37,6 +42,11 @@ abstract class ProductsTabFragment : Fragment() {
     abstract fun setupViewModel()
 
     abstract fun setupRecyclerView()
+
+    override fun onStart() {
+        super.onStart()
+
+    }
 
     override fun onResume() {
         super.onResume()
@@ -74,7 +84,7 @@ abstract class ProductsTabFragment : Fragment() {
 
     protected fun getProductQuantity(product: Product): Int {
         val productQuantity = allOrderContents.filter { it.productBarcode == product.barcode }.map { it.quantity }.sum()
-        productsViewModel.updateQuantity(product.name, productQuantity)
+        productViewModel.updateQuantity(product.name, productQuantity)
         return productQuantity
     }
 }

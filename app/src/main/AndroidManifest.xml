@@ -25,6 +25,12 @@
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan"/>
         <activity
+            android:name=".LoginActivity"
+            android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".AboutActivity"
+            android:windowSoftInputMode="adjustPan"/>
+        <activity
             android:name=".create_product.BarcodeScanningActivity"
             android:windowSoftInputMode="adjustPan"/>
 

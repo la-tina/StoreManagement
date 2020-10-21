@@ -25,14 +25,25 @@
     <string name="store_management">Store Management</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="view">View</string>
     <string name="order">Order</string>
     <string name="deleted">Deleted</string>
     <string name="status_ordered">Ordered</string>
+
+    <string name="register_text">Continue without login</string>
+    <string name="email_text">Google email</string>
+    <string name="password_text">Password</string>
     <string name="login_button_forgotPass"><u>Forgot your password?</u></string>
-    <string name="login_button_register">Register</string>
+    <string name="login_button_continue">Continue</string>
+    <string name="registration_text">Registration</string>
     <string name="login_progress_loading">Logging in…</string>
     <string name="login_buttons_separator_or">- or -</string>
     <string name="login_button_login">Log in</string>
+    <string name="cancel">Cancel</string>
+    <string name="create_account_button">Create account</string>
+    <string name="store_management_about">Store Management has been developed to help store owners with managing and ordering their stock.</string>
+    <string name="store_management_creator">Created by Konstantina Rovelova</string>
+
 
     <string name="action_about">About Store Management</string>
     <string name="action_export">Export to CSV file</string>

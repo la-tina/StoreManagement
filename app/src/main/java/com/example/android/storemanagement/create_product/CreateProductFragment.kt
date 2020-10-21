@@ -12,6 +12,7 @@ open class CreateProductFragment : InfoProductFragment() {
     override val buttonText: String = "Add Product"
 
     private val barcodes: MutableList<String> = mutableListOf()
+    private val names: MutableList<String> = mutableListOf()
 
     override fun onResume() {
         super.onResume()
@@ -19,8 +20,11 @@ open class CreateProductFragment : InfoProductFragment() {
             // Update the cached copy of the products in the adapter.
             products?.let {
                 barcodes.clear()
+                names.clear()
                 val productsBarcodes = it.map { product -> product.barcode }
                 barcodes.addAll(productsBarcodes)
+                val productsNames = it.map { product -> product.name }
+                names.addAll(productsNames)
             }
         })
     }
@@ -40,4 +44,7 @@ open class CreateProductFragment : InfoProductFragment() {
 
     override fun isBarcodeDuplicated(barcode: String) =
         barcodes.any { currentBarcode -> currentBarcode == barcode }
+
+    override fun isNameDuplicated(name: String) =
+        names.any { currentName -> currentName == name }
 }

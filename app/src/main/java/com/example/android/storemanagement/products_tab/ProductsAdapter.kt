@@ -36,6 +36,7 @@ abstract class ProductsAdapter(
         PopupMenu(context, view).apply {
             inflate(R.menu.context_menu)
             menu.findItem(R.id.order).isVisible = false
+            menu.findItem(R.id.view).isVisible = false
             setOnMenuItemClickListener { item: MenuItem? ->
                 when (item!!.itemId) {
                     R.id.edit -> {

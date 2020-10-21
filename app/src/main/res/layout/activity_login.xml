@@ -1,204 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center_horizontal"
     android:background="@color/barColor"
     android:fillViewport="true">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/appName"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:descendantFocusability="beforeDescendants"
-        android:focusable="true"
-        android:focusableInTouchMode="true">
+        android:fontFamily="cursive"
+        android:text="@string/store_management"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="52sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginTop="50dp"
+        android:minWidth="@dimen/login_app_name_width"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-<!--        <ImageView-->
-<!--            android:id="@+id/logo"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_alignEnd="@+id/appName"-->
-<!--            android:layout_alignParentTop="true"-->
-<!--            android:layout_alignStart="@+id/appName"-->
-<!--            android:adjustViewBounds="true"-->
-<!--            android:paddingTop="@dimen/login_logo_padding_top"-->
-<!--            android:src="@drawable/ic_shop_white"/>-->
 
-<!--        <TextView-->
-<!--            android:id="@+id/appName"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_below="@+id/logo"-->
-<!--            android:layout_centerHorizontal="true"-->
-<!--            android:gravity="center"-->
-<!--            android:minWidth="@dimen/login_app_name_width"-->
-<!--            android:text="@string/vectorworks_nomad_app_name"-->
-<!--            android:textColor="@android:color/white"-->
-<!--            android:textSize="@dimen/login_app_name_text_size"/>-->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/email_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="60dp"
+        android:hint="@string/email_text"
+        app:errorEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appName">
 
-<!--        <LinearLayout-->
-<!--            android:id="@+id/input_fields"-->
-<!--            android:layout_width="@dimen/login_fields_width"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_below="@+id/appName"-->
-<!--            android:layout_centerHorizontal="true"-->
-<!--            android:orientation="vertical">-->
+        <EditText
+            android:id="@+id/email_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/colorAccent"
+            android:textColorHint="@color/colorAccent"
+            android:visibility="visible" />
 
-<!--            <com.google.android.material.textfield.TextInputLayout-->
-<!--                android:id="@+id/input_username"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:contentDescription="@string/input_username"-->
-<!--                android:hint="@string/login_user_hint">-->
+    </com.google.android.material.textfield.TextInputLayout>
 
-<!--                <EditText-->
-<!--                    android:id="@+id/usernameEditText"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:contentDescription="@string/username"-->
-<!--                    android:ellipsize="end"-->
-<!--                    android:imeOptions="flagNoExtractUi"-->
-<!--                    android:inputType="text"-->
-<!--                    android:nextFocusDown="@+id/input_password"-->
-<!--                    android:singleLine="true"/>-->
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_layout" />
 
-<!--            </com.google.android.material.textfield.TextInputLayout>-->
+    <TextView
+        android:id="@+id/register_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/register_text"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="20dp"
+        android:textSize="20sp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginTop="50dp"
+        android:minWidth="@dimen/login_app_name_width"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/buttonContionue" />
 
-<!--            <com.google.android.material.textfield.TextInputLayout-->
-<!--                android:id="@+id/input_password"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:contentDescription="@string/input_password"-->
-<!--                android:hint="@string/login_user_password"-->
-<!--                tools:ignore="ContentDescription">-->
+    <Button
+        android:id="@+id/buttonContionue"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/login_button_height"
+        android:layout_marginBottom="@dimen/login_button_margin"
+        android:background="@drawable/button_shape"
+        android:text="@string/login_button_continue"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-<!--                <EditText-->
-<!--                    android:id="@+id/passwordEditText"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:contentDescription="@string/password"-->
-<!--                    android:ellipsize="end"-->
-<!--                    android:imeOptions="flagNoExtractUi"-->
-<!--                    android:inputType="textPassword"-->
-<!--                    android:nextFocusDown="@+id/buttonLogin"-->
-<!--                    android:singleLine="true"/>-->
+    <!--        <LinearLayout-->
+    <!--            android:id="@+id/progressBar"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_below="@+id/mainButtons"-->
+    <!--            android:layout_centerHorizontal="true"-->
+    <!--            android:layout_margin="@dimen/login_progress_bar_margin"-->
+    <!--            android:orientation="horizontal"-->
+    <!--            android:visibility="invisible">-->
 
-<!--            </com.google.android.material.textfield.TextInputLayout>-->
+    <!--            <ProgressBar-->
+    <!--                style="?android:attr/progressBarStyleSmall"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_gravity="center_horizontal"/>-->
 
-<!--        </LinearLayout>-->
+    <!--            <TextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:text="@string/login_progress_loading"-->
+    <!--                android:textAppearance="?android:attr/textAppearanceSmall"-->
+    <!--                android:textColor="@color/colorPrimary"/>-->
 
-<!--        <LinearLayout-->
-<!--            android:id="@+id/mainButtons"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_alignEnd="@+id/input_fields"-->
-<!--            android:layout_alignParentTop="false"-->
-<!--            android:layout_alignStart="@+id/input_fields"-->
-<!--            android:layout_below="@+id/input_fields"-->
-<!--            android:layout_marginTop="@dimen/login_buttons_group_margin_top"-->
-<!--            android:orientation="vertical">-->
+    <!--        </LinearLayout>-->
 
-<!--            <Button-->
-<!--                android:id="@+id/buttonLogin"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="@dimen/login_button_height"-->
-<!--                android:layout_margin="@dimen/login_button_margin"-->
-<!--                android:background="@drawable/button_shape"-->
-<!--                android:text="@string/login_button_login"/>-->
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:layout_below="@+id/progressBar"-->
+    <!--            android:gravity="center_horizontal|bottom"-->
+    <!--            android:orientation="vertical">-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:orientation="vertical">-->
+    <!--            <Button-->
+    <!--                android:id="@+id/registerButton"-->
+    <!--                style="?android:attr/borderlessButtonStyle"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="@dimen/login_bottom_btn_height"-->
+    <!--                android:text="@string/login_button_register"-->
+    <!--                android:textColor="@android:color/white"/>-->
+    <FrameLayout
+        android:id="@+id/login_fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_gravity="center_horizontal"-->
-<!--                    android:layout_marginBottom="@dimen/login_text_separator_vertical_margin"-->
-<!--                    android:layout_marginTop="@dimen/login_text_separator_vertical_margin"-->
-<!--                    android:text="@string/login_buttons_separator_or"-->
-<!--                    android:textStyle="italic"/>-->
 
-<!--                <FrameLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content">-->
 
-<!--                    <com.google.android.gms.common.SignInButton-->
-<!--                        android:id="@+id/google_sign_in_button"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="@dimen/login_google_btn_height"/>-->
-
-<!--                    <ImageView-->
-<!--                        android:id="@+id/google_sign_in_button_overlay"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="@dimen/login_google_btn_height"-->
-<!--                        android:alpha="0"-->
-<!--                        android:clickable="true"-->
-<!--                        android:focusable="true"-->
-<!--                        android:src="@color/colorPrimary"-->
-<!--                        android:visibility="gone"/>-->
-<!--                </FrameLayout>-->
-
-<!--                <com.facebook.login.widget.LoginButton-->
-<!--                    android:id="@+id/facebook_login_button"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_margin="@dimen/login_facebook_btn_margin"/>-->
-
-<!--            </LinearLayout>-->
-<!--        </LinearLayout>-->
-
-<!--        <LinearLayout-->
-<!--            android:id="@+id/progressBar"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_below="@+id/mainButtons"-->
-<!--            android:layout_centerHorizontal="true"-->
-<!--            android:layout_margin="@dimen/login_progress_bar_margin"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:visibility="invisible">-->
-
-<!--            <ProgressBar-->
-<!--                style="?android:attr/progressBarStyleSmall"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="center_horizontal"/>-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/login_progress_loading"-->
-<!--                android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--                android:textColor="@color/colorPrimary"/>-->
-
-<!--        </LinearLayout>-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_below="@+id/progressBar"-->
-<!--            android:gravity="center_horizontal|bottom"-->
-<!--            android:orientation="vertical">-->
-
-<!--            <Button-->
-<!--                android:id="@+id/registerButton"-->
-<!--                style="?android:attr/borderlessButtonStyle"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="@dimen/login_bottom_btn_height"-->
-<!--                android:text="@string/login_button_register"-->
-<!--                android:textColor="@android:color/white"/>-->
-
-<!--            <Button-->
-<!--                android:id="@+id/forgotAccountButton"-->
-<!--                style="?android:attr/borderlessButtonStyle"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="@dimen/login_bottom_btn_height"-->
-<!--                android:text="@string/login_button_forgotPass"-->
-<!--                android:textColor="@android:color/white"/>-->
-<!--        </LinearLayout>-->
-
-    </RelativeLayout>
-
-</ScrollView>

@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.OrderViewModel
@@ -34,8 +35,16 @@ abstract class InfoOrderFragment: Fragment()  {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_create_order, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val inflatedView = inflater.inflate(R.layout.fragment_create_order, container, false)
+        val toolbar: Toolbar = inflatedView.findViewById(R.id.toolbarTopOrder)
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back)
+        toolbar.setNavigationOnClickListener{
+            parentFragmentManager.popBackStackImmediate()
+        }
+        return inflatedView
+    }
+
 
     override fun onStart() {
         super.onStart()

@@ -20,6 +20,7 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
 
     //Add a private LiveData member variable to cache the list of products.
     val allOrders: LiveData<List<Order>>
+//    val deletedOrderContent: LiveData<List<OrderContent>>
 
     lateinit var currentOrderContent: LiveData<List<OrderContent>>
 
@@ -31,6 +32,7 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         ).orderDao()
         repository = OrderRepository(ordersDao)
         allOrders = repository.allOrders
+//        deletedOrderContent = repository.deletedOrderContent
     }
 
     //Because we're doing a database operation, we're using the IO Dispatcher.
@@ -63,6 +65,10 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     fun updateOrderStatus(id: Long, isOrdered: Boolean) = scope.launch(Dispatchers.IO) {
         repository.updateOrderStatus(id, isOrdered)
     }
+
+//    fun addDeletedProducts(id: Long, deletedOrderContent: List<OrderContent>) = scope.launch(Dispatchers.IO) {
+//        repository.addDeletedProducts(id, deletedOrderContent)
+//    }
 
     //when the ViewModel is no longer used
     override fun onCleared() {

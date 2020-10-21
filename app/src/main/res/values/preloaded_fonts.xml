@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="preloaded_fonts" translatable="false">
+        <item>@font/actor</item>
         <item>@font/amiri</item>
         <item>@font/annie_use_your_telescope</item>
+        <item>@font/boogaloo</item>
         <item>@font/cantarell</item>
+        <item>@font/catamaran_light</item>
+        <item>@font/catamaran_medium</item>
+        <item>@font/catamaran_thin</item>
         <item>@font/delius</item>
         <item>@font/elsie</item>
         <item>@font/kalam_light</item>

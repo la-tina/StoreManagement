@@ -32,6 +32,9 @@ interface OrderDao {
     @Query("SELECT * FROM Orders ORDER BY Date DESC")
     fun getAllOrders(): LiveData<List<Order>>
 
+//    @Query("SELECT deletedOrderContent FROM Orders ORDER BY Date DESC")
+//    fun getDeletedOrderContents(): LiveData<List<OrderContent>>
+
     @Query("UPDATE Orders SET FinalPrice = :finalPrice WHERE Id = :id")
     fun updateFinalPrice(finalPrice: Float, id: Long)
 
@@ -43,6 +46,9 @@ interface OrderDao {
 
     @Query("UPDATE Orders SET isOrdered = :isOrdered WHERE id = :id")
     fun updateOrderStatus(id: Long, isOrdered: Boolean)
+
+//    @Query("UPDATE Orders SET deletedOrderContent = :deletedOrderContent WHERE id = :id")
+//    fun addDeletedProducts(id: Long, deletedOrderContent: List<OrderContent>)
 
 //    @Query("SELECT orderId, barcode, productBarcode FROM Products, OrderContent WHERE orderId = :orderId & productBarcode = barcode")
 //    fun getCurrentProducts(orderId: Long): LiveData<List<Product>>

@@ -19,7 +19,7 @@ class IntroActivity: AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         findViewById<ViewGroup>(android.R.id.content)?.setOnClickListener {
-            openMainActivity()
+            openLoginActivity()
         }
     }
 

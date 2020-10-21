@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.appcompat.widget.Toolbar
 import com.example.android.storemanagement.BARCODE_ACTIVITY_REQUEST_CODE
 import com.example.android.storemanagement.BARCODE_KEY
 import com.example.android.storemanagement.R
@@ -51,12 +52,18 @@ abstract class InfoProductFragment : Fragment() {
 
     abstract fun isBarcodeDuplicated(barcode: String): Boolean
 
+    abstract fun isNameDuplicated(name: String): Boolean
+
     abstract fun onButtonClicked(name: Editable, price: Editable, overcharge: Editable, barcode: Editable)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_create_product, container, false)
-
+        val toolbar: Toolbar = view.findViewById(R.id.toolbarTopProduct)
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back)
+        toolbar.setNavigationOnClickListener{
+            parentFragmentManager.popBackStackImmediate()
+        }
         if (savedInstanceState != null) {
             savedProductName = savedInstanceState.getCharSequence(KEY_PRODUCT_NAME_VALUE)?.toString() ?: ""
             savedProductPrice = savedInstanceState.getCharSequence(KEY_PRODUCT_PRICE_VALUE)?.toString() ?: ""
@@ -160,7 +167,7 @@ abstract class InfoProductFragment : Fragment() {
                     product_overcharge -> fieldType = CreateProductFieldValidator.ProductFieldElements.OVERCHARGE
                     product_barcode -> fieldType = CreateProductFieldValidator.ProductFieldElements.BARCODE
                 }
-                isFieldValid(editTextView, inputLayoutView, fieldType, ::isBarcodeDuplicated)
+                isFieldValid(editTextView, inputLayoutView, fieldType, ::isBarcodeDuplicated, ::isNameDuplicated)
                 button_add_product.isEnabled = areAllFieldsValid(name_text, price_text, overcharge_text, barcode_text)
             }
 

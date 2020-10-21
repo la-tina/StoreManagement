@@ -5,7 +5,8 @@ import android.widget.EditText
 
 object CreateProductFieldValidator {
 
-    private var MESSAGE_BARCODE = "A product with the same barcode already exists."
+    private var MESSAGE_DUPLICATED_BARCODE = "A product with the same barcode already exists."
+    private var MESSAGE_DUPLICATED_NAME = "A product with the same name already exists."
     private const val MESSAGE_EMPTY_BARCODE = "The barcode cannot be empty."
     private const val MESSAGE_PRICE_MAX_VALUE = "Тhe maximum allowed price is 100lv."
     private const val MESSAGE_INVALID_PRICE = "Invalid price."
@@ -23,15 +24,15 @@ object CreateProductFieldValidator {
         OVERCHARGE
     }
 
-    //, isBarcodeDuplicatedAction: (String) -> Boolean
     fun isFieldValid(
         editTextView: EditText,
         inputLayoutView: TextInputLayout,
         fieldType: ProductFieldElements,
-        isBarcodeDuplicatedAction: (String) -> Boolean
+        isBarcodeDuplicatedAction: (String) -> Boolean,
+        isNameDuplicatedAction: (String) -> Boolean
     ): Boolean {
         return when (fieldType) {
-            ProductFieldElements.NAME -> validateName(editTextView, inputLayoutView)
+            ProductFieldElements.NAME -> validateName(editTextView, inputLayoutView, isNameDuplicatedAction)
             ProductFieldElements.BARCODE -> validateBarcode(
                 isBarcodeDuplicatedAction,
                 editTextView,
@@ -51,12 +52,14 @@ object CreateProductFieldValidator {
         return nameLayout.error == null && priceLayout.error == null && overchargeLayout.error == null && barcodeLayout.error == null
     }
 
-    private fun validateName(nameView: EditText, nameLayout: TextInputLayout): Boolean {
+    private fun validateName(nameView: EditText, nameLayout: TextInputLayout, isNameDuplicatedAction: (String) -> Boolean): Boolean {
         val name = nameView.text.toString()
         nameLayout.error = null
         nameLayout.isErrorEnabled = false
-        if (name.isBlank())
-            nameLayout.error = MESSAGE_EMPTY_NAME
+        if (name.isBlank()) nameLayout.error = MESSAGE_EMPTY_NAME
+        if (isNameDuplicatedAction(name)) {
+            nameLayout.error = MESSAGE_DUPLICATED_NAME
+        }
 
         return nameLayout.error == null
     }
@@ -110,7 +113,7 @@ object CreateProductFieldValidator {
             barcodeLayout.error = MESSAGE_EMPTY_BARCODE
         }
         if (isBarcodeDuplicatedAction(barcode)) {
-            barcodeLayout.error = MESSAGE_BARCODE
+            barcodeLayout.error = MESSAGE_DUPLICATED_BARCODE
         }
 
         return barcodeLayout.error == null

@@ -50,5 +50,5 @@ interface OrderContentDao {
     fun updateOrderFinalPrice(id: Long, finalPrice: Float)
 
     @Delete
-    fun deleteOrderContent(order: OrderContent)
+    fun deleteOrderContent(orderContent: OrderContent)
 }

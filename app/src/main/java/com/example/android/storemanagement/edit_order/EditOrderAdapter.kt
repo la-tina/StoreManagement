@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isEditOrderQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderHolder
 import com.example.android.storemanagement.order_content_database.OrderContent
@@ -60,13 +61,12 @@ class EditOrderAdapter(
         }
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
         Log.d("Watcher", "quantity addWatcher " +  holder.productQuantity.text)
-
     }
 
     private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher =
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                val shouldEnableOrderButton = isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout) && enabledProducts.isNotEmpty()
+                val shouldEnableOrderButton = isEditOrderQuantityCorrect(holder.productQuantity, holder.productQuantityLayout) && enabledProducts.isNotEmpty()
                 setOrderButtonEnabled(shouldEnableOrderButton)
 
                     if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout) && !afterElementIndicator) {
@@ -80,10 +80,8 @@ class EditOrderAdapter(
                             onQuantityChanged(shouldEnableOrderButton, holder)
                             afterElementIndicator = false
                             updateFinalPriceAction(getPrice(holder))
-                            updateQuantityForProduct(
-                            holder.productName.text.toString(),
-                            holder.productQuantity.text.toString().toInt()
-                        )
+                            val quantity: Int = if (holder.productQuantity.text.toString().isBlank()) 0 else holder.productQuantity.text.toString().toInt()
+                            updateQuantityForProduct(holder.productName.text.toString(), quantity)
                         Log.d("Watcher", "quantity after " + holder.productQuantity.text.toString().toInt() + " for product " + holder.productName.text.toString())
                         Log.d("Watcher", "watcher price after " + getPrice(holder) + " for product " + holder.productName.text.toString())
                     }

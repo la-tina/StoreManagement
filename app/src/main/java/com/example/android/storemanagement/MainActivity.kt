@@ -3,7 +3,6 @@ package com.example.android.storemanagement
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -29,7 +28,6 @@ import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_orders.*
 import okhttp3.OkHttpClient
 import java.io.File
 
@@ -47,6 +45,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         setContentView(R.layout.activity_main)
 
 //        deleteDatabase("Product_database")
+//        deleteDatabase("Order_database")
 
         Stetho.initializeWithDefaults(applicationContext)
 
@@ -111,10 +110,9 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
 
     override fun onResume() {
         super.onResume()
-        val navigationView = findViewById<NavigationView>(R.id.navigation_view)
-        navigationView.setNavigationItemSelectedListener(this)
+        navigation_view?.setNavigationItemSelectedListener(this)
 
-        ordersFragment?.toolbarTop?.setNavigationOnClickListener{
+        toolbarMain?.setNavigationOnClickListener{
             openCloseNavigationDrawer()
         }
     }
@@ -123,6 +121,9 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         when (menuItem.itemId) {
             R.id.action_about -> {
                 Toast.makeText(this, "About", Toast.LENGTH_SHORT).show()
+//                onNavigationChanged(ABOUT_TAB, null, null)
+                val intent = Intent(this, AboutActivity::class.java)
+                startActivity(intent)
             }
             R.id.action_export -> {
                 Toast.makeText(this, "Export", Toast.LENGTH_SHORT).show()
@@ -136,7 +137,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         return true
     }
 
-    private fun openCloseNavigationDrawer() {
+    fun openCloseNavigationDrawer() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
@@ -203,7 +204,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
             CREATE_PRODUCT_TAB -> openCreateProductTab()
             EDIT_PRODUCT_TAB -> openEditProductTab(product)
             EDIT_ORDER_TAB -> openEditOrderTab(order)
-            VIEW_ORDER_TAB -> openViewOrderTab()
+            VIEW_ORDER_TAB -> openViewOrderTab(order)
         }
     }
 
@@ -269,9 +270,11 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         openCreateTab(fragment, editOrderTag)
     }
 
-    private fun openViewOrderTab() {
+    private fun openViewOrderTab(order: Order?) {
         val previouslyAddedViewOrderFragment = supportFragmentManager.findFragmentByTag(viewOrderTag)
         val fragment = (previouslyAddedViewOrderFragment as? ViewOrderFragment) ?: ViewOrderFragment()
+        val bundle = Bundle().apply { putSerializable(VIEW_ORDER_KEY, order) }
+        fragment.arguments = bundle
 
         openCreateTab(fragment, viewOrderTag)
     }
@@ -282,6 +285,13 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
 
         openMainTab(fragment, storeTag)
     }
+
+//    private fun openAboutTab() {
+//        val previouslyAddedAboutFragment = supportFragmentManager.findFragmentByTag(aboutTag)
+//        val fragment = (previouslyAddedAboutFragment as? AboutFragment) ?: AboutFragment()
+//
+//        openMainTab(fragment, aboutTag)
+//    }
 
     private fun openOrdersTab() {
         val previouslyAddedTitleFragment = supportFragmentManager.findFragmentByTag(titleTag)

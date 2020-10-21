@@ -9,7 +9,7 @@ class OrderRepository(private val orderDao: OrderDao) {
 
     //Observed LiveData will notify the observer when the data has changed.
     val allOrders: LiveData<List<Order>> = orderDao.getAllOrders()
-
+//    val deletedOrderContent: LiveData<List<OrderContent>> = orderDao.getDeletedOrderContents()
 
     @WorkerThread
     suspend fun insert(order: Order): Long {
@@ -46,6 +46,12 @@ class OrderRepository(private val orderDao: OrderDao) {
         Log.v("Room", "Updating isOrdered status : $isOrdered for id : $id")
         orderDao.updateOrderStatus(id, isOrdered)
     }
+
+//    @WorkerThread
+//    fun addDeletedProducts(id: Long, deletedOrderContent: List<OrderContent>) {
+//        Log.v("Room", "Updating isOrdered status : $deletedOrderContent for id : $id")
+//        orderDao.addDeletedProducts(id, deletedOrderContent)
+//    }
 
 //    @WorkerThread
 //    fun getCurrentProducts(orderId: Long){

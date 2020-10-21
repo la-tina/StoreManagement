@@ -56,11 +56,21 @@ open class EditOrderFragment : InfoOrderFragment() {
         quantities.forEach { (productName, quantity) ->
             updateQuantity(productName, quantity)
         }
-        orderContentViewModel.updateOrderFinalPrice(order.id, finalPrice)
+//        orderContentViewModel.updateOrderFinalPrice(order.id, finalPrice)
 
 //        updateFinalPrice()
         ordersViewModel.updateFinalPrice(finalPrice, order.id)
         parentFragmentManager.popBackStackImmediate()
+    }
+
+    private fun deleteOrderContent() {
+
+//        currentOrderContents?.filter { it.quantity != 0 }?.forEach {newOrderContent ->
+//            newOrderContents?.add(newOrderContent)
+//        }
+        currentOrderContents?.filter { it.quantity == 0 }?.forEach { orderContent ->
+            orderContentViewModel.deleteOrderContent(orderContent)
+        }
     }
 
 
@@ -81,7 +91,11 @@ open class EditOrderFragment : InfoOrderFragment() {
         else currentQuantity + (editedQuantity - orderedQuantity)
 
         productViewModel.updateQuantity(productName, finalQuantity)
-        orderContentViewModel.updateQuantity(currentBarcode, editedQuantity)
+        if (editedQuantity == 0) {
+            deleteOrderContent()
+        } else {
+            orderContentViewModel.updateQuantity(currentBarcode, editedQuantity)
+        }
     }
 
     override fun setupRecyclerView() {

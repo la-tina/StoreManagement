@@ -9,8 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsTabFragment
+import com.example.android.storemanagement.toSingleEvent
 import kotlinx.android.synthetic.main.fragment_all_products.*
 
 
@@ -28,6 +30,26 @@ class AllProductsFragment : ProductsTabFragment() {
     }
 
     override fun deleteProduct(product: Product) {
+        orderContentViewModel.allOrderContents.toSingleEvent().observe(this, Observer { orderContents ->
+            orderContents.filter { it.productBarcode == product.barcode }.forEach { orderContent ->
+                orderViewModel.allOrders.toSingleEvent().observe(this, Observer { orders->
+                    orders.filter{it.id == orderContent.orderId}.forEach { order ->
+                        if (order.isOrdered){
+                            val deletedOrderContent: MutableList<OrderContent> = mutableListOf()
+//                            if (order.deletedOrderContent.isNotEmpty()){
+//                                order.deletedOrderContent.forEach { orderContent ->
+//                                    deletedOrderContent.add(orderContent)
+//                                }
+//                            }
+
+                            deletedOrderContent.add(orderContent)
+                            val deleteOrderContentList = deletedOrderContent.toList()
+//                            orderViewModel.addDeletedProducts(order.id, deleteOrderContentList)
+                        }
+                    }
+                })
+            }
+        })
         viewModel.deleteProduct(product)
     }
 

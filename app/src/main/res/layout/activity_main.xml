@@ -1,32 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarMain"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:background="@color/barColor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_baseline_menu"
+            app:titleTextAppearance="@style/Toolbar.TitleText"
+            app:titleTextColor="@color/titleColor" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/lightBarColor"
-        app:itemTextColor="@drawable/custom_color_navigation_view"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_navigation_menu"
-        app:itemIconTint="@color/titleColor"
-        app:itemTextAppearanceActive="@style/BottomNavigationView.Active"
-        app:itemTextAppearanceInactive="@style/BottomNavigationView">
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbarMain" />
 
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/lightBarColor"
+            app:itemIconTint="@color/titleColor"
+            app:itemTextAppearanceActive="@style/BottomNavigationView.Active"
+            app:itemTextAppearanceInactive="@style/BottomNavigationView"
+            app:itemTextColor="@drawable/custom_color_navigation_view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:menu="@menu/bottom_navigation_menu">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/header_navigation_layout"
+        app:itemIconTint="@color/lightBarColor"
+        app:menu="@menu/drawer_menu" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

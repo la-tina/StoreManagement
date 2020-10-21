@@ -75,7 +75,7 @@
         android:text="@string/quantity"
         android:textColor="@color/buttonFadeText"
         android:textSize="25sp"
-        app:layout_constraintBottom_toBottomOf="@id/product_item_quantity"
+        app:layout_constraintBottom_toBottomOf="@id/store_item_quantity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

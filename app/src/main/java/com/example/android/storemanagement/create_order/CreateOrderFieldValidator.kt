@@ -17,11 +17,18 @@ object CreateOrderFieldValidator {
         return !isQuantityEmpty(quantityView) && !isQuantityAboveLimit(quantityView, quantityLayout)
     }
 
+    fun isEditOrderQuantityCorrect(quantityView: EditText, quantityLayout: TextInputLayout): Boolean {
+        quantityLayout.error = null
+        quantityLayout.isErrorEnabled = false
+        return !isQuantityAboveLimit(quantityView, quantityLayout)
+    }
+
     private fun isQuantityEmpty(quantity: EditText): Boolean {
         return quantity.text.toString().isBlank() || quantity.text.toString() == "0"
     }
 
     private fun isQuantityAboveLimit(quantity: EditText, quantityLayout: TextInputLayout): Boolean {
+        if (quantity.text.toString().isBlank()) return false
         val isQuantityAboveLimit = quantity.text.toString().toInt() > 500
         if (isQuantityAboveLimit)
             quantity.error = MESSAGE_QUANTITY_ABOVE_MAX_SIZE

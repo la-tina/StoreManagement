@@ -1,20 +1,25 @@
 package com.example.android.storemanagement.orders_tab
 
 import android.content.Context
-import androidx.appcompat.widget.PopupMenu
-import androidx.recyclerview.widget.RecyclerView
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.PopupMenu
+import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.orders_database.Order
 import kotlinx.android.synthetic.main.order_item.view.*
+
 
 class OrdersAdapter(
     private val context: Context,
     private val deleteOrderAction: (Order) -> Unit,
     private val openEditOrderTab: (Order) -> Unit,
+    private val openViewOrderTab: (Order) -> Unit,
     private val updateOrderStatus: (Long, Boolean) -> Unit
     //private val updateQuantitiesOnDelete: (Order) -> Unit
 ) :
@@ -47,6 +52,14 @@ class OrdersAdapter(
             holder.status.setTextColor(context.getColor(R.color.orange))
         }
 
+        holder.itemView.setOnClickListener{
+            if (currentOrder.isOrdered){
+                openViewOrderTab(currentOrder)
+            } else {
+                openEditOrderTab(currentOrder)
+            }
+        }
+
         holder.imageContextMenu.setOnClickListener { view -> showPopup(view, currentOrder) }
     }
 
@@ -57,6 +70,9 @@ class OrdersAdapter(
             if (order.isOrdered) {
                 menu.findItem(R.id.order).isVisible = false
                 menu.findItem(R.id.edit).isVisible = false
+                menu.findItem(R.id.view).isVisible = true
+            } else {
+                menu.findItem(R.id.view).isVisible = false
             }
             setOnMenuItemClickListener { item: MenuItem? ->
                 when (item!!.itemId) {

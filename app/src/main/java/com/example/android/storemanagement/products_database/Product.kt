@@ -47,7 +47,7 @@ interface ProductDao {
     @Query("SELECT * FROM Products WHERE Quantity < 5 ORDER BY name ASC")
     fun getLowStockProducts(): LiveData<List<Product>>
 
-    @Query("UPDATE Products  SET quantity = :quantity WHERE barcode = :barcode")
+    @Query("UPDATE Products SET quantity = :quantity WHERE barcode = :barcode")
     fun updateProductQuantity(barcode: String, quantity: Int)
 }
 

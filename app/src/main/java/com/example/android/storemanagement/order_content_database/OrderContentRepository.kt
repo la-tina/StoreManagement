@@ -15,9 +15,9 @@ class OrderContentRepository(private val orderContentDao: OrderContentDao) {
     }
 
     @WorkerThread
-    suspend fun deleteOrderContent(product: OrderContent) {
-        Log.v("Room", "Deleting order content : $product")
-        orderContentDao.deleteOrderContent(product)
+    suspend fun deleteOrderContent(orderContent: OrderContent) {
+        Log.v("Room", "Deleting order content : $orderContent")
+        orderContentDao.deleteOrderContent(orderContent)
     }
 
     @WorkerThread
