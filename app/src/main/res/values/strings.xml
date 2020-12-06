@@ -27,8 +27,11 @@
     <string name="edit">Edit</string>
     <string name="view">View</string>
     <string name="order">Order</string>
+    <string name="delivered">Delivered</string>
     <string name="deleted">Deleted</string>
     <string name="status_ordered">Ordered</string>
+    <string name="status_delivered">Delivered</string>
+    <string name="status_confirmed">Confirmed</string>
 
     <string name="register_text">Continue without login</string>
     <string name="email_text">Google email</string>
@@ -48,6 +51,7 @@
     <string name="action_about">About Store Management</string>
     <string name="action_export">Export to CSV file</string>
     <string name="action_log_out">Log out</string>
+    <string name="action_log_in">Log in</string>
     <string name="csv_file_generated_text">The CSV file is generated.</string>
     <string name="csv_file_not_generated_text">The CSV file cannot be generated.</string>
 
@@ -61,4 +65,17 @@
     <string name="overcharge_empty_error_message">Тhe overcharge cannot be empty.</string>
     <string name="name_empty_error_message">Product name cannot be empty.</string>
     <string name="drawer">drawer</string>
+    <string name="pending_products">Pending</string>
+    <string name="ok">OK</string>
+    <string name="yay_text">Yaay!</string>
+    <string name="user">User</string>
+    <string name="all_products_info">All available products.</string>
+    <string name="in_stock_products_info">Products with a quantity over 5.</string>
+    <string name="low_stock_products_info">Products with a quantity below 5.</string>
+    <string name="pending_products_info">Products that haven\'t been delivered yet.</string>
+    <string name="store_info">Change the product quantities from here:</string>
+    <string name="create_order_info">Create an order by entering quantities and press \"Add Order\".</string>
+    <string name="edit_order_info">Edit the order by changing quantities and press \"Save\". \n The order can be edited because it is in Pending state.</string>
+    <string name="view_order_info">The order content for this order. \n It cannot be edited because the order is not in Pending state.</string>
+
 </resources>

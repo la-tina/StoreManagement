@@ -19,8 +19,7 @@ class OrdersAdapter(
     private val context: Context,
     private val deleteOrderAction: (Order) -> Unit,
     private val openEditOrderTab: (Order) -> Unit,
-    private val openViewOrderTab: (Order) -> Unit,
-    private val updateOrderStatus: (Long, Boolean) -> Unit
+    private val onOrderStatusChanged: (Order, OrderStatus) -> Unit
     //private val updateQuantitiesOnDelete: (Order) -> Unit
 ) :
     RecyclerView.Adapter<OrdersHolder>() {
@@ -44,22 +43,38 @@ class OrdersAdapter(
         //String.format("%.1f", finalPrice).toFloat().toString()
         holder.date.text = currentOrder.date
 
-        if (currentOrder.isOrdered){
-            holder.status.text = context.getString(R.string.status_ordered)
-            holder.status.setTextColor(context.getColor(R.color.colorPrimary))
-        } else {
-            holder.status.text = context.getString(R.string.status_pending)
-            holder.status.setTextColor(context.getColor(R.color.orange))
-        }
-
-        holder.itemView.setOnClickListener{
-            if (currentOrder.isOrdered){
-                openViewOrderTab(currentOrder)
-            } else {
-                openEditOrderTab(currentOrder)
+        when (currentOrder.orderStatus) {
+            OrderStatus.ORDERED.toString() -> {
+                holder.status.text = context.getString(R.string.status_ordered)
+                holder.status.setTextColor(context.getColor(R.color.yellow))
+                holder.view.setBackgroundColor(context.getColor(R.color.light_yellow))
+            }
+            OrderStatus.CONFIRMED.toString() -> {
+                holder.status.text = context.getString(R.string.status_confirmed)
+                holder.status.setTextColor(context.getColor(R.color.green))
+                holder.view.setBackgroundColor(context.getColor(R.color.light_green))
+            }
+            OrderStatus.DELIVERED.toString() -> {
+                holder.status.text = context.getString(R.string.status_delivered)
+                holder.status.setTextColor(context.getColor(R.color.colorPrimary))
+                holder.view.setBackgroundColor(context.getColor(R.color.light_primary))
+            }
+            else -> {
+                holder.status.text = context.getString(R.string.status_pending)
+                holder.status.setTextColor(context.getColor(R.color.orange))
+                holder.view.setBackgroundColor(context.getColor(R.color.light_orange))
             }
         }
 
+        holder.itemView.setOnClickListener {
+            openEditOrderTab(currentOrder)
+        }
+
+        if (currentOrder.orderStatus == OrderStatus.DELIVERED.toString()) {
+            holder.imageContextMenu.visibility = View.GONE
+        } else {
+            holder.imageContextMenu.visibility = View.VISIBLE
+        }
         holder.imageContextMenu.setOnClickListener { view -> showPopup(view, currentOrder) }
     }
 
@@ -67,26 +82,47 @@ class OrdersAdapter(
         PopupMenu(context, view).apply {
             inflate(R.menu.context_menu)
 
-            if (order.isOrdered) {
+            if (order.orderStatus == OrderStatus.ORDERED.toString()
+                || order.orderStatus == OrderStatus.CONFIRMED.toString()
+            ) {
                 menu.findItem(R.id.order).isVisible = false
                 menu.findItem(R.id.edit).isVisible = false
-                menu.findItem(R.id.view).isVisible = true
-            } else {
-                menu.findItem(R.id.view).isVisible = false
+                menu.findItem(R.id.delete).isVisible = true
             }
+
             setOnMenuItemClickListener { item: MenuItem? ->
                 when (item!!.itemId) {
                     R.id.order -> {
-                        Toast.makeText(context, context.getString(R.string.status_ordered), Toast.LENGTH_SHORT).show()
-                        updateOrderStatus(order.id, true)
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.status_ordered),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onOrderStatusChanged(order, OrderStatus.ORDERED)
+                    }
+                    R.id.delivered -> {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.status_delivered),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onOrderStatusChanged(order, OrderStatus.DELIVERED)
                     }
                     R.id.edit -> {
                         editItem = item
-                        Toast.makeText(context, context.getString(R.string.edit), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.edit),
+                            Toast.LENGTH_SHORT
+                        ).show()
                         openEditOrderTab(order)
                     }
                     R.id.delete -> {
-                        Toast.makeText(context, context.getString(R.string.deleted), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.deleted),
+                            Toast.LENGTH_SHORT
+                        ).show()
                         deleteOrderAction(order)
                         //updateQuantitiesOnDelete(order)
                     }
@@ -106,7 +142,7 @@ class OrdersAdapter(
         orders[position]
 }
 
-class OrdersHolder(view: View) : RecyclerView.ViewHolder(view) {
+class OrdersHolder(val view: View) : RecyclerView.ViewHolder(view) {
     // Holds the OrderTextView that will add each product to
     val finalPrice = view.order_item_price!!
     val date = view.order_date!!

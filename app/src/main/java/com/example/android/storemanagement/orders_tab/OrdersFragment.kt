@@ -4,13 +4,9 @@ package com.example.android.storemanagement.orders_tab
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -22,10 +18,7 @@ import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
-import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
-import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.fragment_orders.*
-import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -53,7 +46,11 @@ open class OrdersFragment : Fragment() {
 
     lateinit var onNavigationChangedListener: OnNavigationChangedListener
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(
             R.layout.fragment_orders,
             container,
@@ -94,7 +91,7 @@ open class OrdersFragment : Fragment() {
                         listOf(
                             "",
                             order.id,
-                            order.isOrdered,
+                            order.orderStatus,
                             order.date,
                             product.name,
                             orderContent.quantity,
@@ -103,7 +100,7 @@ open class OrdersFragment : Fragment() {
                     )
                 }
             }
-            writeRow(listOf("Final price"," - "," - "," - "," - "," - ", order.finalPrice))
+            writeRow(listOf("Final price", " - ", " - ", " - ", " - ", " - ", order.finalPrice))
             writeRow(emptyList())
         }
     }
@@ -135,7 +132,7 @@ open class OrdersFragment : Fragment() {
         }
     }
 
-    private fun updateDate(id: Long){
+    private fun updateDate(id: Long) {
         val current = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val formattedDate = current.format(formatter)
@@ -143,34 +140,70 @@ open class OrdersFragment : Fragment() {
         orderViewModel.updateDate(formattedDate, id)
     }
 
-    private fun updateOrderStatus(id: Long, isOrdered: Boolean){
-        orderViewModel.updateOrderStatus(id, isOrdered)
-        updateDate(id)
+    private fun onOrderStatusChanged(order: Order, orderStatus: OrderStatus) {
+        updateDate(order.id)
+        Log.d("Koni", " orderStatus.toString() $orderStatus")
+        orderViewModel.onOrderStatusChanged(order.id, orderStatus.toString())
+
+        when (orderStatus) {
+            OrderStatus.ORDERED -> {
+                Log.d("Koni", "onOrderOrdered")
+            }
+            OrderStatus.DELIVERED -> {
+                Log.d("Koni", "onOrderDelivered")
+                productsInOrderList.filter { it.orderId == order.id }.forEach { currentProduct ->
+                    Log.d(
+                        "Koni",
+                        "updated quantities " + currentProduct.productBarcode + " quantity " + currentProduct.quantity
+                    )
+                    updateProductQuantity(currentProduct)
+                }
+                updateDate(order.id)
+            }
+        }
     }
 
     private fun deleteOrder(order: Order) {
         Log.d("Koni", "deleteOrder invoked")
-        if (!order.isOrdered){
-            productsInOrderList.filter { it.orderId == order.id }.forEach { currentProduct ->
-                updateProductQuantity(currentProduct)
-                Log.d("T", "updated quantities")
-            }
-        }
+//        if (!order.isOrdered){
+//            productsInOrderList.filter { it.orderId == order.id }.forEach { currentProduct ->
+//                updateProductQuantity(currentProduct)
+//                Log.d("T", "updated quantities")
+//            }
+//        }
         orderViewModel.deleteOrder(order)
     }
+
+    //on Edit order
+//    private fun updateProductQuantity(orderContent: OrderContent) {
+//        Log.d("Koni", "updateProductQuantity invoked")
+//        productsList.forEach { product ->
+//            Log.d("Koni", "allProducts?.forEach invoked")
+//            if (orderContent.productBarcode == product.barcode) {
+//                val newQuantity = product.quantity - orderContent.quantity
+//                val productQuantity = if (newQuantity >= 0) newQuantity else 0
+//                //Log.d("Koni", "productViewModel.updateProductQuantity invoked")
+//                productViewModel.updateProductQuantity(product.barcode, productQuantity)
+//                Log.d("Koni", "updated quantity $productQuantity")
+//
+//            }
+//        }
+//    }
 
     private fun updateProductQuantity(orderContent: OrderContent) {
         Log.d("Koni", "updateProductQuantity invoked")
         productsList.forEach { product ->
             Log.d("Koni", "allProducts?.forEach invoked")
             if (orderContent.productBarcode == product.barcode) {
-                val newQuantity = product.quantity - orderContent.quantity
-                val productQuantity = if (newQuantity >= 0) newQuantity else 0
+                val newQuantity = product.quantity + orderContent.quantity
                 //Log.d("Koni", "productViewModel.updateProductQuantity invoked")
-                productViewModel.updateProductQuantity(product.barcode, productQuantity)
+                productViewModel.updateProductQuantity(product.barcode, newQuantity)
+                Log.d("Koni", "updated quantity $newQuantity")
+
             }
         }
     }
+
 
     private fun openViewOrderTab(order: Order) {
         if (::onNavigationChangedListener.isInitialized) {
@@ -182,12 +215,18 @@ open class OrdersFragment : Fragment() {
     }
 
     private fun openEditOrderTab(order: Order) {
-        if (::onNavigationChangedListener.isInitialized) {
-            //onNavigationChangedListener.onNavigationChanged(EDIT_ORDER_TAB)
-            listener = onNavigationChangedListener
-        }
+//        if (order.orderStatus == OrderStatus.ORDERED.toString()
+//            || order.orderStatus == OrderStatus.CONFIRMED.toString()
+//            || order.orderStatus == OrderStatus.DELIVERED.toString()) {
+//            openViewOrderTab(order)
+//        } else {
+            if (::onNavigationChangedListener.isInitialized) {
+                //onNavigationChangedListener.onNavigationChanged(EDIT_ORDER_TAB)
+                listener = onNavigationChangedListener
+            }
 
-        listener?.onNavigationChanged(tabNumber = EDIT_ORDER_TAB, order = order)
+            listener?.onNavigationChanged(tabNumber = EDIT_ORDER_TAB, order = order)
+//        }
     }
 
     private fun setupEmptyView() {
@@ -204,7 +243,12 @@ open class OrdersFragment : Fragment() {
     private fun setupRecyclerView() {
         orders_recycler_view.layoutManager =
             LinearLayoutManager(requireContext())
-        val ordersAdapter = OrdersAdapter(requireContext(), ::deleteOrder, ::openEditOrderTab, ::openViewOrderTab, ::updateOrderStatus)
+        val ordersAdapter = OrdersAdapter(
+            requireContext(),
+            ::deleteOrder,
+            ::openEditOrderTab,
+            ::onOrderStatusChanged
+        )
         orders_recycler_view.adapter = ordersAdapter
 
         // Observer on the LiveData

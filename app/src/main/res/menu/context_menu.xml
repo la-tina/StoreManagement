@@ -4,13 +4,12 @@
         android:id="@+id/order"
         android:title="@string/order" />
     <item
+        android:id="@+id/delivered"
+        android:title="@string/delivered" />
+    <item
         android:id="@+id/edit"
         android:title="@string/edit" />
     <item
-        android:id="@+id/view"
-        android:title="@string/view" />
-    <item
         android:id="@+id/delete"
         android:title="@string/delete" />
-
 </menu>

@@ -9,11 +9,11 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="81dp"
-        android:layout_height="74dp"
+        android:layout_width="95dp"
+        android:layout_height="88dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/avocado"
+        android:src="@drawable/pineapple"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,33 +31,23 @@
         android:textColor="@color/checkBoxColor"
         android:textSize="22sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/product_item_price"
+        android:id="@+id/product_item_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        tools:text="123"
-        android:textColor="@color/buttonFadeText"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/status_pending"
+        android:textAlignment="textStart"
+        android:textColor="@color/orange"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/leva"
-        app:layout_constraintEnd_toStartOf="@+id/leva" />
-
-    <TextView
-        android:id="@+id/leva"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="@string/leva"
-        android:textAlignment="textStart"
-        android:textColor="@color/buttonFadeText"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toTopOf="@+id/view"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView" />
 
     <TextView
         android:id="@+id/product_item_quantity"
@@ -78,7 +68,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="70dp"
+        android:layout_marginEnd="50dp"
         android:background="@drawable/custom_text_view"
         android:text="@string/quantity"
         android:textColor="@color/buttonFadeText"
@@ -86,23 +76,36 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/context_menu_image"
-        android:layout_width="36dp"
-        android:layout_height="28dp"
-        android:layout_marginTop="32dp"
-        android:src="@drawable/vertical_dots"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/product_item_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        tools:text="123"
+        android:textColor="@color/buttonFadeText"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/leva"
+        app:layout_constraintEnd_toStartOf="@+id/leva" />
+
+    <TextView
+        android:id="@+id/leva"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="@string/leva"
+        android:textAlignment="textStart"
+        android:textColor="@color/buttonFadeText"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/view"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/dividingStrip"
+        android:background="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
+        app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

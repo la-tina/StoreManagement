@@ -15,7 +15,9 @@ import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
+import kotlinx.android.synthetic.main.fragment_products_container.*
 import kotlinx.android.synthetic.main.fragment_store.*
+import kotlinx.android.synthetic.main.fragment_store.info_text
 import kotlinx.android.synthetic.main.store_item.*
 
 class StoreFragment : Fragment() {
@@ -50,8 +52,10 @@ class StoreFragment : Fragment() {
         super.onStart()
         setupRecyclerView()
 
-        if (store_item_quantity != null && !savedProductQuantity.isBlank())
+        if (store_item_quantity != null && savedProductQuantity.isNotBlank())
             store_item_quantity.setText(savedProductQuantity)
+
+        info_text?.text = context?.getString(R.string.store_info)
 
         button_save_quantity.setOnClickListener {
             val quantities: MutableMap<String, Int> = (store_recycler_view.adapter as StoreAdapter).quantities
@@ -100,6 +104,7 @@ class StoreFragment : Fragment() {
         if (products.itemCount == 0) {
             store_recycler_view.visibility = View.GONE
             empty_view_products_store.visibility = View.VISIBLE
+            info_text?.visibility = View.GONE
         } else {
             store_recycler_view.visibility = View.VISIBLE
             empty_view_products_store.visibility = View.GONE

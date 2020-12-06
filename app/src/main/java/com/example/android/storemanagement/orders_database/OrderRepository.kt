@@ -3,7 +3,9 @@ package com.example.android.storemanagement.orders_database
 import androidx.lifecycle.LiveData
 import androidx.annotation.WorkerThread
 import android.util.Log
+import androidx.room.TypeConverters
 import com.example.android.storemanagement.order_content_database.OrderContent
+import com.example.android.storemanagement.orders_tab.OrderStatus
 
 class OrderRepository(private val orderDao: OrderDao) {
 
@@ -42,9 +44,8 @@ class OrderRepository(private val orderDao: OrderDao) {
     }
 
     @WorkerThread
-    fun updateOrderStatus(id: Long, isOrdered: Boolean) {
-        Log.v("Room", "Updating isOrdered status : $isOrdered for id : $id")
-        orderDao.updateOrderStatus(id, isOrdered)
+    fun onOrderStatusChanged(id: Long, orderStatus: String) {
+        orderDao.onOrderStatusChanged(id, orderStatus)
     }
 
 //    @WorkerThread

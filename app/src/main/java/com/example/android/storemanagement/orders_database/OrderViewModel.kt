@@ -4,9 +4,12 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.example.android.storemanagement.order_content_database.OrderContent
+import com.example.android.storemanagement.orders_tab.OrderStatus
 import com.example.android.storemanagement.products_database.ProductRoomDatabase
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
+
 
 class OrderViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -14,6 +17,8 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     private val coroutineContext: CoroutineContext
         get() = parentJob + Dispatchers.Main
     private val scope = CoroutineScope(coroutineContext)
+
+    var firebaseDatabase = FirebaseDatabase.getInstance().reference
 
     //Add a private member variable to hold a reference to the repository.
     private val repository: OrderRepository
@@ -40,6 +45,7 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         scope.launch(Dispatchers.IO) {
             val orderId = repository.insert(order)
 
+            firebaseDatabase.child("order").child(order.id.toString()).setValue(order)
             withContext(Dispatchers.Main) {
                 onCompleteAction(orderId)
             }
@@ -62,8 +68,8 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         currentOrderContent = repository.getCurrentOrderContents(orderId)
     }
 
-    fun updateOrderStatus(id: Long, isOrdered: Boolean) = scope.launch(Dispatchers.IO) {
-        repository.updateOrderStatus(id, isOrdered)
+    fun onOrderStatusChanged(id: Long, orderStatus: String) = scope.launch(Dispatchers.IO) {
+        repository.onOrderStatusChanged(id, orderStatus)
     }
 
 //    fun addDeletedProducts(id: Long, deletedOrderContent: List<OrderContent>) = scope.launch(Dispatchers.IO) {

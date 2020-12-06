@@ -50,4 +50,16 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="AlertDialog" parent="Base.Theme.AppCompat.Light.Dialog">
+        <item name="android:textColorPrimary">@color/darkBarColor_a</item>
+        <item name="android:colorAccent">@color/darkBarColor</item>
+    </style>
+
+    <style name="InfoText" parent="TextAppearance.AppCompat">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/darkBarColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
 </resources>

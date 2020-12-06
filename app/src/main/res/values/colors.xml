@@ -2,9 +2,12 @@
 <resources>
     <color name="colorPrimary">#33a79b</color>
     <color name="colorPrimaryMurky">#FF1A978A</color>
+    <color name="light_primary">#ebf9f8</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#19000E</color>
     <color name="barColor">#AEA0B2</color>
+    <color name="darkBarColor">#79677e</color>
+    <color name="darkBarColor_a">#5e5062</color>
     <color name="titleColor">#fffafa</color>
     <color name="buttonFadeBackground">#bfb3b2</color>
     <color name="buttonFadeText">#595757</color>
@@ -13,9 +16,15 @@
     <color name="textColor">#FF5D4B62</color>
     <color name="gray">#FFF0EEF1</color>
     <color name="lightBarColor">#BBAFBE</color>
-    <color name="dividingStrip">#C0BAC2</color>
+    <color name="extraLightBarColor">#f3f1f4</color>
+    <color name="dividingStrip">#f3f1f4</color>
     <color name="purple">#d0c9ea</color>
     <color name="orange">#ff781f</color>
+    <color name="light_orange">#fee4ca</color>
+    <color name="yellow">#f9d71c</color>
+    <color name="light_yellow">#fffee0</color>
+    <color name="green">#a4c639</color>
+    <color name="light_green">#dcedc8</color>
 </resources>
 
 

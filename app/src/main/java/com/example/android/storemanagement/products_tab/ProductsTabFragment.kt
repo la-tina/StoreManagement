@@ -16,6 +16,7 @@ import com.example.android.storemanagement.order_content_database.OrderContentVi
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
+import kotlinx.android.synthetic.main.fragment_products_container.*
 
 abstract class ProductsTabFragment : Fragment() {
 
@@ -65,7 +66,7 @@ abstract class ProductsTabFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_all_products, container, false)
+        inflater.inflate(R.layout.fragment_products_container, container, false)
 
     protected fun openEditProductTab(product: Product) {
         listener?.onNavigationChanged(tabNumber = EDIT_PRODUCT_TAB, product = product)
@@ -76,6 +77,7 @@ abstract class ProductsTabFragment : Fragment() {
         if (products.itemCount == 0) {
             recyclerView.visibility = View.GONE
             emptyView.visibility = View.VISIBLE
+            info_text.visibility = View.GONE
         } else {
             recyclerView.visibility = View.VISIBLE
             emptyView.visibility = View.GONE

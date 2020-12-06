@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "191395528817",
+    "firebase_url": "https://storemanagement-7f11d.firebaseio.com",
+    "project_id": "storemanagement-7f11d",
+    "storage_bucket": "storemanagement-7f11d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:191395528817:android:c2c1f99227578216391bd0",
+        "android_client_info": {
+          "package_name": "com.example.android.storemanagement"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "191395528817-7p4g5f6d18i71gfp1rrpcg5us5m5nqus.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRUacpe5oUPS1xfhnuR4xAHNmsMjU0lBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "191395528817-7p4g5f6d18i71gfp1rrpcg5us5m5nqus.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

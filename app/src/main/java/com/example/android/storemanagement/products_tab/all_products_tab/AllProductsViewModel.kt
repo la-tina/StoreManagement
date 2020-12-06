@@ -7,6 +7,6 @@ import com.example.android.storemanagement.products_tab.ProductsTabViewModel
 
 class AllProductsViewModel(application: Application) : ProductsTabViewModel(application) {
 
-    val allProducts: LiveData<List<Product>> = repository.allProducts
+    val allProducts: LiveData<List<Product>> = productRepository.allProducts
 
 }

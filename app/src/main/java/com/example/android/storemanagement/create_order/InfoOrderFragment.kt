@@ -18,8 +18,8 @@ import kotlinx.android.synthetic.main.fragment_create_product.*
 
 abstract class InfoOrderFragment: Fragment()  {
 
-    abstract val fragmentTitle: String
-    abstract val buttonText: String
+    abstract var fragmentTitle: String
+    abstract var buttonText: String
 
     abstract fun setupRecyclerView()
 
@@ -61,7 +61,7 @@ abstract class InfoOrderFragment: Fragment()  {
         Log.d("Tina", "final price after $finalPrice")
     }
 
-    protected fun setupEmptyView(emptyView: View, recyclerView: RecyclerView) {
+    protected fun setupEmptyView(emptyView: View, infoView: View, recyclerView: RecyclerView) {
         val products = recyclerView.adapter!!
         if (products.itemCount == 0) {
             recyclerView.visibility = View.GONE

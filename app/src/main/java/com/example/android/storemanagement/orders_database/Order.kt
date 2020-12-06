@@ -3,6 +3,7 @@ package com.example.android.storemanagement.orders_database
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.android.storemanagement.order_content_database.OrderContent
+import com.example.android.storemanagement.orders_tab.OrderStatus
 import com.example.android.storemanagement.products_database.Product
 import java.io.Serializable
 
@@ -11,7 +12,7 @@ import java.io.Serializable
 data class Order(
     val finalPrice: Float,
     val date: String,
-    val isOrdered: Boolean
+    val orderStatus: String
 ) : Serializable {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
@@ -44,8 +45,8 @@ interface OrderDao {
     @Query("SELECT * FROM OrderContent WHERE orderId = :orderId ")
     fun getCurrentOrderContents(orderId: Long): LiveData<List<OrderContent>>
 
-    @Query("UPDATE Orders SET isOrdered = :isOrdered WHERE id = :id")
-    fun updateOrderStatus(id: Long, isOrdered: Boolean)
+    @Query("UPDATE Orders SET orderStatus = :orderStatus WHERE id = :id")
+    fun onOrderStatusChanged(id: Long, orderStatus: String)
 
 //    @Query("UPDATE Orders SET deletedOrderContent = :deletedOrderContent WHERE id = :id")
 //    fun addDeletedProducts(id: Long, deletedOrderContent: List<OrderContent>)

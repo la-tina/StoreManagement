@@ -1,11 +1,16 @@
 package com.example.android.storemanagement
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -27,14 +32,20 @@ import com.facebook.stetho.Stetho
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.OkHttpClient
 import java.io.File
+
 
 class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer<List<Order>>, NavigationView.OnNavigationItemSelectedListener {
 
     private var currentFragment: Fragment? = null
     private var ordersFragment: OrdersFragment? = null
+    private var user: FirebaseUser? = null
 
     private val orderViewModel : OrderViewModel by lazy {
         ViewModelProviders.of(this).get(OrderViewModel::class.java)
@@ -43,6 +54,22 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        user = FirebaseAuth.getInstance().currentUser
+
+        if (user != null) {
+            val loggedInInfoText = LOGGED_IN_INFO + user?.email
+            //set title for alert dialog
+            val dialog = AlertDialog.Builder(this, R.style.AlertDialog)
+                .setTitle(R.string.yay_text)
+                .setMessage(loggedInInfoText)
+                .setPositiveButton(R.string.ok) { dialog, _ ->
+                    dialog.dismiss()}.show()
+
+            val textView = dialog.findViewById<View>(android.R.id.message) as TextView
+            textView.textSize = 18f
+            textView.setTextColor(ContextCompat.getColor(this, R.color.darkBarColor))
+        }
 
 //        deleteDatabase("Product_database")
 //        deleteDatabase("Order_database")
@@ -115,6 +142,20 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         toolbarMain?.setNavigationOnClickListener{
             openCloseNavigationDrawer()
         }
+
+        val menu: Menu = navigation_view.menu
+        if (user != null) {
+            val userItem = menu.findItem(R.id.user)
+            userItem.title = user?.email
+            userItem.isCheckable = false
+            val logInLogOutItem = menu.findItem(R.id.action_log_in)
+            logInLogOutItem.title = this.getString(R.string.action_log_out)
+            logInLogOutItem.setIcon(R.drawable.ic_baseline_exit_to_app)
+        } else {
+            menu.removeItem(R.id.user)
+            val logInLogOutItem = menu.findItem(R.id.action_log_in)
+            logInLogOutItem.title = this.getString(R.string.action_log_in)
+        }
     }
 
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
@@ -129,15 +170,23 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
                 Toast.makeText(this, "Export", Toast.LENGTH_SHORT).show()
                 exportDatabaseToCSVFile()
             }
-            R.id.action_log_out -> {
-                Toast.makeText(this, "Log out", Toast.LENGTH_SHORT).show()
+            R.id.action_log_in -> {
+
+                if (user != null) {
+                    Toast.makeText(this, "Logging out", Toast.LENGTH_SHORT).show()
+                    Firebase.auth.signOut()
+                } else {
+                    Toast.makeText(this, "Log in", Toast.LENGTH_SHORT).show()
+                }
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
             }
         }
-        drawer_layout.closeDrawer(GravityCompat.START)
+        openCloseNavigationDrawer()
         return true
     }
 
-    fun openCloseNavigationDrawer() {
+    private fun openCloseNavigationDrawer() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
@@ -164,7 +213,17 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         csvWriter().open(csvFile, append = false) {
             // Header
             writeRow(listOf("Orders"))
-            writeRow(listOf("", "Order ID", "Order status", "Date", "Product in order", "Quantity", "Product final price"))
+            writeRow(
+                listOf(
+                    "",
+                    "Order ID",
+                    "Order status",
+                    "Date",
+                    "Product in order",
+                    "Quantity",
+                    "Product final price"
+                )
+            )
             ordersFragment?.addRowOrders(::writeRow)
             writeRow(emptyList())
             writeRow(emptyList())
@@ -174,7 +233,11 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == CAMERA_PERMISSION_CODE && grantResults.isNotEmpty() &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED
@@ -239,21 +302,27 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         }
 
     private fun openCreateOrderTab() {
-        val previouslyAddedCreateOrderFragment = supportFragmentManager.findFragmentByTag(createOrderTag)
+        val previouslyAddedCreateOrderFragment = supportFragmentManager.findFragmentByTag(
+            createOrderTag
+        )
         val fragment = (previouslyAddedCreateOrderFragment as? CreateOrderFragment) ?: CreateOrderFragment()
 
         openCreateTab(fragment, createOrderTag)
     }
 
     private fun openCreateProductTab() {
-        val previouslyAddedCreateProductFragment = supportFragmentManager.findFragmentByTag(createProductTag)
+        val previouslyAddedCreateProductFragment = supportFragmentManager.findFragmentByTag(
+            createProductTag
+        )
         val fragment = (previouslyAddedCreateProductFragment as? CreateProductFragment) ?: CreateProductFragment()
 
         openCreateTab(fragment, createProductTag)
     }
 
     private fun openEditProductTab(product: Product?) {
-        val previouslyAddedEditProductFragment = supportFragmentManager.findFragmentByTag(editProductTag)
+        val previouslyAddedEditProductFragment = supportFragmentManager.findFragmentByTag(
+            editProductTag
+        )
         val fragment = (previouslyAddedEditProductFragment as? EditProductFragment) ?: EditProductFragment()
         val bundle = Bundle().apply { putSerializable(PRODUCT_KEY, product) }
         fragment.arguments = bundle
@@ -336,6 +405,10 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
             )
             .replace(R.id.fragment_container, fragment, tag)
             .commit()
+    }
+
+    companion object {
+        private const val LOGGED_IN_INFO = "You have successfully logged in as "
     }
 }
 

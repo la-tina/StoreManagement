@@ -1,17 +1,17 @@
 package com.example.android.storemanagement.products_tab.low_stock_products_tab
 
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsTabFragment
-import kotlinx.android.synthetic.main.fragment_products_low_stock.*
+import kotlinx.android.synthetic.main.fragment_products_container.*
 
 
 class ProductsLowStockFragment : ProductsTabFragment() {
@@ -19,22 +19,32 @@ class ProductsLowStockFragment : ProductsTabFragment() {
     private lateinit var viewModel: ProductsLowStockViewModel
 
     override fun setupViewModel() {
-        viewModel = ViewModelProviders.of(this).get(ProductsLowStockViewModel(requireActivity().application)::class.java)
+        viewModel = ViewModelProviders.of(this)
+            .get(ProductsLowStockViewModel(requireActivity().application)::class.java)
     }
 
     override fun setOnNavigationChangedListener(onNavigationChangedListener: OnNavigationChangedListener) {
         listener = onNavigationChangedListener
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_products_low_stock, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
+        inflater.inflate(R.layout.fragment_products_container, container, false)
+
+    override fun onStart() {
+        super.onStart()
+        info_text.text = context?.getString(R.string.low_stock_products_info)
+    }
 
     override fun deleteProduct(product: Product) {
         viewModel.deleteProduct(product)
     }
 
     override fun setupRecyclerView() {
-        products_low_stock_recycler_view?.let { recyclerView ->
+        products_recycler_view?.let { recyclerView ->
             recyclerView.layoutManager =
                 LinearLayoutManager(requireContext())
             val productsLowStockAdapter =
@@ -54,7 +64,7 @@ class ProductsLowStockFragment : ProductsTabFragment() {
                 // Update the cached copy of the words in the adapter.
                 products?.let {
                     productsLowStockAdapter.setProducts(it)
-                    setupEmptyView(empty_view_products_low_stock, products_low_stock_recycler_view)
+                    setupEmptyView(empty_view_products, products_recycler_view)
                     //quantity < 5
                 }
             })

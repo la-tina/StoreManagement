@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator
@@ -13,12 +14,15 @@ import com.example.android.storemanagement.create_order.CreateOrderFieldValidato
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderHolder
 import com.example.android.storemanagement.order_content_database.OrderContent
+import com.example.android.storemanagement.orders_tab.OrderStatus
 import com.example.android.storemanagement.products_database.Product
+import kotlinx.android.synthetic.main.fragment_create_order.*
 
 class EditOrderAdapter(
     private val context: Context,
     private val updateFinalPriceAction: (Float) -> Unit,
-    private val setOrderButtonEnabled: (Boolean) -> Unit
+    private val setOrderButtonEnabled: (Boolean) -> Unit,
+    private val canOrderBeEdited: () -> Boolean
 ) : RecyclerView.Adapter<CreateOrderHolder>() {
 
     private var productsInOrder = emptyList<OrderContent>() // Cached copy of products
@@ -58,6 +62,10 @@ class EditOrderAdapter(
                 holder.productPrice.text = currentProduct.price.toString()
                 holder.productQuantity.setText(currentProductInOrder.quantity.toString())
             }
+        }
+
+        if (!canOrderBeEdited()) {
+            holder.productQuantity.isEnabled = false
         }
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
         Log.d("Watcher", "quantity addWatcher " +  holder.productQuantity.text)

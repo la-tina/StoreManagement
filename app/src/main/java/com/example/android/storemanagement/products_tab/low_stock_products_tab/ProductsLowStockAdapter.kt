@@ -3,6 +3,7 @@ package com.example.android.storemanagement.products_tab.low_stock_products_tab
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsAdapter
@@ -17,6 +18,10 @@ class ProductsLowStockAdapter(
 ) : ProductsAdapter(context, deleteProductAction, openEditProductTab, getProductQuantity) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductsHolder =
-        ProductsHolder(LayoutInflater.from(context).inflate(R.layout.product_low_stock_item, parent, false))
+        ProductsHolder(LayoutInflater.from(context).inflate(R.layout.product_item, parent, false))
 
+    override fun onBindViewHolder(holder: ProductsHolder, position: Int) {
+        super.onBindViewHolder(holder, position)
+        holder.productImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.avocado))
+    }
 }

@@ -9,7 +9,7 @@ class ProductsTabAdapter(
     private var fragments: List<Fragment>
 ) : FragmentStatePagerAdapter(fragmentManager) {
 
-    private val tabTitles = arrayOf("All", "In Stock", "Low Stock")
+    private val tabTitles = arrayOf("All", "In\n Stock", "Low\n Stock", "Pending")
 
     override fun getPageTitle(position: Int): CharSequence? {
         return tabTitles[position]

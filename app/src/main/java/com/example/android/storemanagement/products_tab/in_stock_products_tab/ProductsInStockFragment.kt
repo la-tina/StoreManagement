@@ -12,7 +12,7 @@ import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsTabFragment
-import kotlinx.android.synthetic.main.fragment_products_in_stock.*
+import kotlinx.android.synthetic.main.fragment_products_container.*
 
 class ProductsInStockFragment : ProductsTabFragment() {
 
@@ -27,14 +27,19 @@ class ProductsInStockFragment : ProductsTabFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.fragment_products_in_stock, container, false)
+        inflater.inflate(R.layout.fragment_products_container, container, false)
+
+    override fun onStart() {
+        super.onStart()
+        info_text.text = context?.getString(R.string.in_stock_products_info)
+    }
 
     override fun deleteProduct(product: Product) {
         viewModel.deleteProduct(product)
     }
 
     override fun setupRecyclerView() {
-        products_in_stock_recycler_view?.let { recyclerView ->
+        products_recycler_view?.let { recyclerView ->
             recyclerView.layoutManager =
                 LinearLayoutManager(requireContext())
             val productsInStockAdapter =
@@ -54,7 +59,7 @@ class ProductsInStockFragment : ProductsTabFragment() {
                 // Update the cached copy of the words in the adapter.
                 inStockProducts?.let {
                     productsInStockAdapter.setProducts(it)
-                    setupEmptyView(empty_view_products_in_stock, products_in_stock_recycler_view)
+                    setupEmptyView(empty_view_products, products_recycler_view)
                     //quantity > 0
                 }
             })

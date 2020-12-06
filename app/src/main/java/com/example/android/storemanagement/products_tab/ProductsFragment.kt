@@ -11,6 +11,7 @@ import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_tab.all_products_tab.AllProductsFragment
 import com.example.android.storemanagement.products_tab.in_stock_products_tab.ProductsInStockFragment
 import com.example.android.storemanagement.products_tab.low_stock_products_tab.ProductsLowStockFragment
+import com.example.android.storemanagement.products_tab.pending_products_tab.PendingProductsFragment
 import kotlinx.android.synthetic.main.fragment_products.*
 
 
@@ -53,7 +54,11 @@ class ProductsFragment : Fragment() {
             ProductsLowStockFragment()
         productsLowStockFragment.setOnNavigationChangedListener(onNavigationChangedListener)
 
-        val fragments = listOf(allProductsFragment, productsInStockFragment, productsLowStockFragment)
+        val pendingProductsFragment =
+            PendingProductsFragment()
+        pendingProductsFragment.setOnNavigationChangedListener(onNavigationChangedListener)
+
+        val fragments = listOf(allProductsFragment, productsInStockFragment, productsLowStockFragment, pendingProductsFragment)
 
         val adapter = ProductsTabAdapter(childFragmentManager, fragments)
         // Set the adapter onto the view pager

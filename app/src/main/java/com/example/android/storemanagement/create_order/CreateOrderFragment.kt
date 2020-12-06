@@ -6,17 +6,19 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.Log
 import android.widget.Toast
+import com.example.android.storemanagement.R
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
+import com.example.android.storemanagement.orders_tab.OrderStatus
 import kotlinx.android.synthetic.main.fragment_create_order.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 open class CreateOrderFragment : InfoOrderFragment() {
 
-    override val fragmentTitle: String = "Create Order"
-    override val buttonText: String = "Add Order"
+    override var fragmentTitle: String = "Create Order"
+    override var buttonText: String = "Add Order"
 
     private lateinit var orderContentViewModel: OrderContentViewModel
 
@@ -28,6 +30,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
             .show()
         finalPrice = 0F
         final_price.text = "0"
+        info_text?.text = context?.getString(R.string.create_order_info)
 
         button_add_order.setOnClickListener {
 
@@ -35,7 +38,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val formattedDate = current.format(formatter)
 
-            val order = Order(finalPrice, formattedDate, false)
+            val order = Order(finalPrice, formattedDate, OrderStatus.PENDING.toString())
             Log.d("Tina", "final price created order $finalPrice")
             ordersViewModel.updateFinalPrice(finalPrice, order.id)
             ordersViewModel.insert(order, ::updateQuantities)
@@ -47,7 +50,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
         quantities.forEach { (productName, quantity) ->
 //            if (quantity != 0) {
                 updateQuantity(productName, quantity)
-            Log.d("Tina", "updated qunatity for " + productName + "is " + quantity)
+            Log.d("Tina", "updated quantity for " + productName + "is " + quantity)
                 createOrderContent(productName, orderId, quantity)
 //            }
         }
@@ -74,7 +77,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
 
         Log.v("Room", "Updating final quantity for $productName $finalQuantity")
 
-        productViewModel.updateQuantity(productName, finalQuantity)
+//        productViewModel.updateQuantity(productName, finalQuantity)
         Log.d("Tina", "updated qunatity for " + productName + "is " + quantity)
     }
 
@@ -100,7 +103,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
             // Update the cached copy of the products in the adapter.
             products?.let {
                 createOrdersAdapter.setProducts(it)
-                setupEmptyView(empty_view_create_order, create_order_recycler_view)
+                setupEmptyView(empty_view_create_order, info_text, create_order_recycler_view)
             }
         })
     }

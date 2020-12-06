@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/user"
+            android:icon="@drawable/ic_baseline_person"
+            android:title="@string/user" />
+        <item
             android:id="@+id/action_about"
             android:icon="@drawable/ic_outline_info"
             android:title="@string/action_about" />
@@ -10,8 +14,8 @@
             android:icon="@drawable/ic_baseline_import_export"
             android:title="@string/action_export" />
         <item
-            android:id="@+id/action_log_out"
-            android:icon="@drawable/ic_baseline_exit_to_app"
-            android:title="@string/action_log_out" />
+            android:id="@+id/action_log_in"
+            android:icon="@drawable/ic_baseline_login"
+            android:title="@string/action_log_in" />
     </group>
 </menu>

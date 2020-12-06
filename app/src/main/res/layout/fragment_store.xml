@@ -24,6 +24,15 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <TextView
+        android:id="@+id/info_text"
+        style="@style/InfoText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/store_app_bar" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/store_recycler_view"
         android:layout_width="match_parent"
@@ -33,7 +42,7 @@
         app:layout_constraintBottom_toTopOf="@+id/button_save_quantity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/store_app_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/info_text" />
 
     <ImageView
         android:id="@+id/empty_view_products_store"

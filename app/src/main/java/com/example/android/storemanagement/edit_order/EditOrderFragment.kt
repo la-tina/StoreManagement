@@ -1,27 +1,30 @@
 package com.example.android.storemanagement.edit_order
 
+import android.util.Log
+import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import android.util.Log
 import com.example.android.storemanagement.ORDER_KEY
+import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.InfoOrderFragment
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
+import com.example.android.storemanagement.orders_tab.OrderStatus
 import kotlinx.android.synthetic.main.fragment_create_order.*
 
 open class EditOrderFragment : InfoOrderFragment() {
 
-    override val fragmentTitle: String = "Edit Order"
-    override val buttonText: String = "Save"
-
+    override var fragmentTitle: String = ""
+    override var buttonText: String = "Save"
     var currentOrderContents: List<OrderContent>? = null
 
     lateinit var currentOrder: Order
 
     private val orderContentViewModel: OrderContentViewModel by lazy {
-        ViewModelProviders.of(this).get(OrderContentViewModel(requireActivity().application)::class.java)
+        ViewModelProviders.of(this)
+            .get(OrderContentViewModel(requireActivity().application)::class.java)
     }
 
     override fun onStart() {
@@ -37,6 +40,9 @@ open class EditOrderFragment : InfoOrderFragment() {
         setupRecyclerView()
 
         currentOrder = order
+        toolbarTopOrder.title = if (!canOrderBeEdited()) "Order Content" else "Edit Order"
+        info_text?.text =
+            if (!canOrderBeEdited()) context?.getString(R.string.view_order_info) else context?.getString(R.string.edit_order_info)
 //        if (finalPrice == 0F){
 //            finalPrice = currentOrder.finalPrice
 //        }
@@ -47,8 +53,15 @@ open class EditOrderFragment : InfoOrderFragment() {
 
         setupRecyclerView()
 
+        if (!canOrderBeEdited()) {
+            button_add_order.visibility = View.GONE
+            constraintLayout.maxHeight = 160
+        }
         button_add_order.setOnClickListener { onEditButtonClicked(order) }
     }
+
+    private fun canOrderBeEdited(): Boolean =
+        currentOrder.orderStatus == OrderStatus.PENDING.toString()
 
     private fun onEditButtonClicked(order: Order) {
         val quantities = (create_order_recycler_view.adapter as EditOrderAdapter).quantities
@@ -90,7 +103,7 @@ open class EditOrderFragment : InfoOrderFragment() {
             currentQuantity - (orderedQuantity - editedQuantity)
         else currentQuantity + (editedQuantity - orderedQuantity)
 
-        productViewModel.updateQuantity(productName, finalQuantity)
+//        productViewModel.updateQuantity(productName, finalQuantity)
         if (editedQuantity == 0) {
             deleteOrderContent()
         } else {
@@ -105,7 +118,8 @@ open class EditOrderFragment : InfoOrderFragment() {
         val editOrdersAdapter = EditOrderAdapter(
             requireContext(),
             ::updateFinalPrice,
-            ::setOrderButtonEnabled
+            ::setOrderButtonEnabled,
+            ::canOrderBeEdited
         )
         create_order_recycler_view.adapter = editOrdersAdapter
 
@@ -114,7 +128,7 @@ open class EditOrderFragment : InfoOrderFragment() {
         // in the foreground.
 
         editOrdersAdapter.setProductsInOrder(currentOrderContents)
-        setupEmptyView(empty_view_create_order, create_order_recycler_view)
+        setupEmptyView(empty_view_create_order, info_text, create_order_recycler_view)
 
         productViewModel.allProducts.observe(this, Observer { products ->
             products?.let {

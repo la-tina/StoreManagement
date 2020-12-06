@@ -29,7 +29,7 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout_products"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:background="@color/lightBarColor"
         app:layout_constraintTop_toBottomOf="@id/products_app_bar"
         app:tabSelectedTextColor="@android:color/white"
@@ -53,6 +53,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/low_stock_products" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/pending_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/pending_products" />
 
     </com.google.android.material.tabs.TabLayout>
 

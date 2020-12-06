@@ -41,7 +41,7 @@ interface ProductDao {
     @Query("UPDATE Products SET Overcharge = :overcharge WHERE name = :product")
     fun updateOvercharge(product: String, overcharge: Float)
 
-    @Query("SELECT * FROM Products WHERE Quantity > 0 ORDER BY name ASC")
+    @Query("SELECT * FROM Products WHERE Quantity > 5 ORDER BY name ASC")
     fun getInStockProducts(): LiveData<List<Product>>
 
     @Query("SELECT * FROM Products WHERE Quantity < 5 ORDER BY name ASC")
