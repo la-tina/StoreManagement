@@ -27,9 +27,9 @@ class OrderContentRepository(private val orderContentDao: OrderContentDao) {
     }
 
     @WorkerThread
-    suspend fun updateQuantityOrderContent(barcode: String, quantity: Int) {
+    suspend fun updateQuantityOrderContent(barcode: String, quantity: Int, orderId: Long) {
         Log.v("Room", "Updating order content barcode : $barcode , quantity : $quantity")
-        orderContentDao.updateQuantityOrderContent(barcode, quantity)
+        orderContentDao.updateQuantityOrderContent(barcode, quantity, orderId)
     }
 
     @WorkerThread

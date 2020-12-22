@@ -1,5 +1,6 @@
 package com.example.android.storemanagement
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +24,7 @@ import com.example.android.storemanagement.create_product.EditProductFragment
 import com.example.android.storemanagement.create_product.InfoProductFragment.Companion.CAMERA_PERMISSION_CODE
 import com.example.android.storemanagement.edit_order.EditOrderFragment
 import com.example.android.storemanagement.edit_order.ViewOrderFragment
+import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.orders_tab.OrdersFragment
@@ -41,7 +44,7 @@ import okhttp3.OkHttpClient
 import java.io.File
 
 
-class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer<List<Order>>, NavigationView.OnNavigationItemSelectedListener {
+open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer<List<Order>>, NavigationView.OnNavigationItemSelectedListener {
 
     private var currentFragment: Fragment? = null
     private var ordersFragment: OrdersFragment? = null
@@ -72,7 +75,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         }
 
 //        deleteDatabase("Product_database")
-//        deleteDatabase("Order_database")
+        deleteDatabase("Order_database")
 
         Stetho.initializeWithDefaults(applicationContext)
 
@@ -106,7 +109,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        val firstFragment = supportFragmentManager?.fragments?.first()
+        val firstFragment = supportFragmentManager.fragments.first()
         if (firstFragment != null) {
             supportFragmentManager.putFragment(outState, "FragmentName", firstFragment)
         }
@@ -135,8 +138,21 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         }
     }
 
+    private fun hideKeyboard(activity: Activity) {
+        val imm: InputMethodManager =
+            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view = activity.currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(activity)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
     override fun onResume() {
         super.onResume()
+        hideKeyboard(this as Activity)
         navigation_view?.setNavigationItemSelectedListener(this)
 
         toolbarMain?.setNavigationOnClickListener{
@@ -199,7 +215,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
     private fun exportDatabaseToCSVFile() {
         val csvFile = generateFile(this, getCSVFileName())
         if (csvFile != null) {
-            exportMoviesWithDirectorsToCSVFile(csvFile)
+            exportOrdersToCSVFile(csvFile)
 
             Toast.makeText(this, getString(R.string.csv_file_generated_text), Toast.LENGTH_LONG).show()
             val intent = goToFileIntent(this, csvFile)
@@ -209,7 +225,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         }
     }
 
-    private fun exportMoviesWithDirectorsToCSVFile(csvFile: File) {
+    private fun exportOrdersToCSVFile(csvFile: File) {
         csvWriter().open(csvFile, append = false) {
             // Header
             writeRow(listOf("Orders"))
@@ -261,13 +277,13 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         }
     }
 
-    override fun onNavigationChanged(tabNumber: Int, product: Product?, order: Order?) {
+    override fun onNavigationChanged(tabNumber: Int, product: Product?, order: Order?, firebaseOrder: FirebaseOrder?) {
         when (tabNumber) {
             CREATE_ORDER_TAB -> openCreateOrderTab()
             CREATE_PRODUCT_TAB -> openCreateProductTab()
             EDIT_PRODUCT_TAB -> openEditProductTab(product)
-            EDIT_ORDER_TAB -> openEditOrderTab(order)
-            VIEW_ORDER_TAB -> openViewOrderTab(order)
+            EDIT_ORDER_TAB -> openEditOrderTab(order, firebaseOrder)
+            VIEW_ORDER_TAB -> openViewOrderTab(order, firebaseOrder)
         }
     }
 
@@ -330,20 +346,30 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
         openCreateTab(fragment, editProductTag)
     }
 
-    private fun openEditOrderTab(order: Order?) {
+    private fun openEditOrderTab(order: Order?, firebaseOrder: FirebaseOrder?) {
         val previouslyAddedEditOrderFragment = supportFragmentManager.findFragmentByTag(editOrderTag)
         val fragment = (previouslyAddedEditOrderFragment as? EditOrderFragment) ?: EditOrderFragment()
-        val bundle = Bundle().apply { putSerializable(ORDER_KEY, order) }
-        fragment.arguments = bundle
+        if (order == null) {
+            val bundle = Bundle().apply { putSerializable(ORDER_KEY, firebaseOrder) }
+            fragment.arguments = bundle
+        } else {
+            val bundle = Bundle().apply { putSerializable(ORDER_KEY, order) }
+            fragment.arguments = bundle
+        }
 
         openCreateTab(fragment, editOrderTag)
     }
 
-    private fun openViewOrderTab(order: Order?) {
+    private fun openViewOrderTab(order: Order?, firebaseOrder: FirebaseOrder?) {
         val previouslyAddedViewOrderFragment = supportFragmentManager.findFragmentByTag(viewOrderTag)
         val fragment = (previouslyAddedViewOrderFragment as? ViewOrderFragment) ?: ViewOrderFragment()
-        val bundle = Bundle().apply { putSerializable(VIEW_ORDER_KEY, order) }
-        fragment.arguments = bundle
+        if (order == null) {
+            val bundle = Bundle().apply { putSerializable(VIEW_ORDER_KEY, firebaseOrder) }
+            fragment.arguments = bundle
+        } else {
+            val bundle = Bundle().apply { putSerializable(VIEW_ORDER_KEY, order) }
+            fragment.arguments = bundle
+        }
 
         openCreateTab(fragment, viewOrderTag)
     }
@@ -413,7 +439,7 @@ class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer
 }
 
 interface OnNavigationChangedListener {
-    fun onNavigationChanged(tabNumber: Int, product: Product? = null, order: Order? = null)
+    fun onNavigationChanged(tabNumber: Int, product: Product? = null, order: Order? = null, firebaseOrder: FirebaseOrder? = null)
 }
 
 

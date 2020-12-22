@@ -16,6 +16,8 @@ data class Order(
 ) : Serializable {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+    constructor() : this(0F, "",
+        "")
 }
 
 @Dao

@@ -1,14 +1,15 @@
 package com.example.android.storemanagement.create_order
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityAboveLimit
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.create_order_item.view.*
@@ -49,7 +50,12 @@ class CreateOrderAdapter(
         holder.productPrice.text = currentProduct.price.toString()
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
 
-        setOrderButtonEnabled(isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout))
+        setOrderButtonEnabled(
+            isQuantityCorrect(
+                holder.productQuantity,
+                holder.productQuantityLayout
+            )
+        )
 //            onQuantityChanged(true, holder)
 
     }
@@ -65,38 +71,69 @@ class CreateOrderAdapter(
                         onQuantityChanged(true, holder)
 
                     val shouldEnableOrderButton =
-                        isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout) && enabledProducts.isNotEmpty()
+                        isQuantityCorrect(
+                            holder.productQuantity,
+                            holder.productQuantityLayout
+                        ) && enabledProducts.isNotEmpty()
 
                     if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout)) {
 
                         onQuantityChanged(shouldEnableOrderButton, holder)
                         setOrderButtonEnabled(shouldEnableOrderButton)
 
-                        updateQuantityForProduct(holder.productName.text.toString(), quantity.toInt())
-                        updateFinalPriceAction(getPrice(holder))
+                        updateQuantityForProduct(
+                            holder.productName.text.toString(),
+                            quantity.toInt()
+                        )
+                        updateFinalPriceAction(getPrice())
+                        Log.d("TinaOrder", "afterTextChanged quantity " + quantity.toInt())
                     }
                 }
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout))
-                    updateFinalPriceAction(getPrice(holder) * -1)
+                if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout)) {
+                    holder.productQuantity.text?.toString()?.let { quantity ->
+                        updateQuantityForProduct(
+                            holder.productName.text.toString(),
+                            quantity.toInt()
+                        )
+                        updateFinalPriceAction(getPrice())
+                        Log.d("TinaOrder", "beforeTextChanged quantity " + quantity.toInt())
+                    }
+                }
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                holder.productQuantity.text?.toString()?.let { quantity ->
-//                    val quantityEdited: Int = if (quantity.isEmpty()) 0 else quantity.toInt()
-//                    updateQuantityForProduct(holder.productName.text.toString(), quantityEdited)
-//                    Log.d("Tina", "quantity onTextChanged$quantityEdited")
-//                }
-                setOrderButtonEnabled(isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout))
+                holder.productQuantity.text?.toString()?.let { quantity ->
+                    val quantityEdited: Int = if (quantity.isEmpty()) 0 else quantity.toInt()
+                    updateQuantityForProduct(holder.productName.text.toString(), quantityEdited)
+                    updateFinalPriceAction(getPrice())
+                    Log.d("Tina", "quantity onTextChanged$quantityEdited")
+                }
+                setOrderButtonEnabled(
+                    isQuantityCorrect(
+                        holder.productQuantity,
+                        holder.productQuantityLayout
+                    )
+                )
             }
         }
 
-    private fun getPrice(holder: CreateOrderHolder): Float {
-        val quantity = holder.productQuantity.text.toString().toInt()
-        val productPriceInt = holder.productPrice.text.toString().toFloat()
-        return quantity * productPriceInt
+    private fun getPrice(): Float {
+        var finalPrice = 0F
+        products.forEach { product ->
+            if (!quantities.isNullOrEmpty() && quantities[product.name] != null) {
+                if (!isQuantityAboveLimit(quantities[product.name]!!)) {
+                    finalPrice += quantities[product.name]!! * product.price
+                    Log.d(
+                        "TinaOrder",
+                        "finalPrice $finalPrice name " + product.name + " price " + product.price
+                    )
+                }
+            }
+        }
+        return finalPrice
     }
 
     private fun onQuantityChanged(isQuantityCorrect: Boolean, holder: CreateOrderHolder) {

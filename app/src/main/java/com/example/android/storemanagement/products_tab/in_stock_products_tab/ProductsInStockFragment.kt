@@ -4,10 +4,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseProductData
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
@@ -36,6 +36,7 @@ class ProductsInStockFragment : ProductsTabFragment() {
 
     override fun deleteProduct(product: Product) {
         viewModel.deleteProduct(product)
+        deleteFirebaseProductData(product)
     }
 
     override fun setupRecyclerView() {

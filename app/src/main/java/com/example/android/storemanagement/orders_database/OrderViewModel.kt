@@ -3,8 +3,9 @@ package com.example.android.storemanagement.orders_database
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.setFirebaseOrderData
+import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.order_content_database.OrderContent
-import com.example.android.storemanagement.orders_tab.OrderStatus
 import com.example.android.storemanagement.products_database.ProductRoomDatabase
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.*
@@ -41,13 +42,14 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //Because we're doing a database operation, we're using the IO Dispatcher.
-    fun insert(order: Order, onCompleteAction: (Long) -> Unit) =
+    fun insert(order: Order, onCompleteAction: (Long, String) -> Unit) =
         scope.launch(Dispatchers.IO) {
             val orderId = repository.insert(order)
+            val firebaseOrder = FirebaseOrder(order.finalPrice.toString(), order.date, order.orderStatus, 0.toString())
+            val fbOrderId = setFirebaseOrderData(firebaseOrder)
 
-            firebaseDatabase.child("order").child(order.id.toString()).setValue(order)
             withContext(Dispatchers.Main) {
-                onCompleteAction(orderId)
+                onCompleteAction(orderId, fbOrderId)
             }
         }
 

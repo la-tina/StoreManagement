@@ -46,10 +46,10 @@ class StoreAdapter(
         holder.productName.text = currentProduct.name
         holder.productPrice.text = currentProduct.price.toString()
         holder.productQuantity.setText(currentProduct.quantity.toString())
-        holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
+        holder.productQuantity.addTextChangedListener(getTextWatcher(holder, currentProduct.barcode))
     }
 
-    private fun getTextWatcher(holder: StoreProductsHolder): TextWatcher =
+    private fun getTextWatcher(holder: StoreProductsHolder, barcode: String): TextWatcher =
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
 
@@ -62,7 +62,7 @@ class StoreAdapter(
                     setOrderButtonEnabled(hasEnabled)
                 } else {
                     updateQuantityForProduct(
-                        holder.productName.text.toString(),
+                        barcode,
                         holder.productQuantity.text.toString()
                     )
                     val hasEnabled = true
@@ -79,10 +79,10 @@ class StoreAdapter(
             }
         }
 
-    private fun updateQuantityForProduct(productName: String, quantity: String) {
+    private fun updateQuantityForProduct(barcode: String, quantity: String) {
         when (quantity) {
-            "" -> quantities[productName] = 0
-            else -> quantities[productName] = quantity.toInt()
+            "" -> quantities[barcode] = 0
+            else -> quantities[barcode] = quantity.toInt()
         }
     }
 

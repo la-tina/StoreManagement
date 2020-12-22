@@ -15,13 +15,15 @@ object CreateProductFieldValidator {
     private const val MESSAGE_EMPTY_PRICE = "Тhe price cannot be empty."
     private const val MESSAGE_EMPTY_OVERCHARGE = "Тhe overcharge cannot be empty."
     private const val MESSAGE_EMPTY_NAME = "Product name cannot be empty."
+    private const val MESSAGE_INVALID_PERCENTAGE = "Percentage cannot be negative."
     private const val REGEX = "^((?=.)(?=[0-9]+))|([0-9]+)|((?=[0-9]+)(?=.)(?=[0-9]+))\$"
 
     enum class ProductFieldElements {
         NAME,
         BARCODE,
         PRICE,
-        OVERCHARGE
+        OVERCHARGE,
+        PERCENTAGE
     }
 
     fun isFieldValid(
@@ -40,6 +42,7 @@ object CreateProductFieldValidator {
             )
             ProductFieldElements.PRICE -> validatePrice(editTextView, inputLayoutView)
             ProductFieldElements.OVERCHARGE -> validateOvercharge(editTextView, inputLayoutView)
+            else -> validatePercentage(editTextView, inputLayoutView)
         }
     }
 
@@ -83,6 +86,15 @@ object CreateProductFieldValidator {
         return overchargeLayout.error == null
     }
 
+    private fun validatePercentage(
+        percentageView: EditText,
+        percentageLayout: TextInputLayout
+    ): Boolean {
+        percentageLayout.error = null
+        percentageLayout.isErrorEnabled = false
+        return percentageLayout.error == null
+    }
+
     private fun validatePrice(priceView: EditText, priceLayout: TextInputLayout): Boolean {
         val price = priceView.text.toString()
         priceLayout.error = null
@@ -98,7 +110,6 @@ object CreateProductFieldValidator {
 
         return priceLayout.error == null
     }
-
 
     private fun validateBarcode(
         isBarcodeDuplicatedAction: (String) -> Boolean,

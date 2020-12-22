@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseProductData
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.products_database.Product
@@ -41,6 +42,7 @@ class ProductsLowStockFragment : ProductsTabFragment() {
 
     override fun deleteProduct(product: Product) {
         viewModel.deleteProduct(product)
+        deleteFirebaseProductData(product)
     }
 
     override fun setupRecyclerView() {

@@ -5,17 +5,16 @@ import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseProductQuantity
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
-import kotlinx.android.synthetic.main.fragment_products_container.*
 import kotlinx.android.synthetic.main.fragment_store.*
 import kotlinx.android.synthetic.main.fragment_store.info_text
 import kotlinx.android.synthetic.main.store_item.*
@@ -59,8 +58,8 @@ class StoreFragment : Fragment() {
 
         button_save_quantity.setOnClickListener {
             val quantities: MutableMap<String, Int> = (store_recycler_view.adapter as StoreAdapter).quantities
-            quantities.forEach { (productName, quantity) ->
-                updateQuantity(productName, quantity)
+            quantities.forEach { (barcode, quantity) ->
+                updateQuantity(barcode, quantity)
                 Toast.makeText(requireContext(), "Quantity updated.", Toast.LENGTH_SHORT).show()
             }
         }
@@ -80,8 +79,13 @@ class StoreFragment : Fragment() {
         outState.putCharSequence(KEY_QUANTITY_VALUE, store_item_quantity.text)
     }
 
-    private fun updateQuantity(productName: String, quantity: Int) {
-        productViewModel.updateQuantity(productName, quantity)
+    private fun updateQuantity(barcode: String, quantity: Int) {
+        productViewModel.updateQuantity(barcode, quantity)
+        productViewModel.allProducts.observe(this, Observer { products ->
+            // Update the cached copy of the words in the adapter.
+            val product = products.first{it.barcode == barcode }
+            updateFirebaseProductQuantity(product, quantity.toString())
+        })
     }
 
     private fun setupRecyclerView() {

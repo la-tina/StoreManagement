@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseProductData
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.order_content_database.OrderContent
@@ -56,6 +57,7 @@ class AllProductsFragment : ProductsTabFragment() {
                     }
             })
         viewModel.deleteProduct(product)
+        deleteFirebaseProductData(product)
     }
 
     override fun onCreateView(

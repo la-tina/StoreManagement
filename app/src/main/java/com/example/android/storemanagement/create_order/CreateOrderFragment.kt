@@ -1,12 +1,14 @@
 package com.example.android.storemanagement.create_order
 
 
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import android.util.Log
-import android.widget.Toast
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.setFirebaseOrderContentData
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
@@ -19,6 +21,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
 
     override var fragmentTitle: String = "Create Order"
     override var buttonText: String = "Add Order"
+    lateinit var order: Order
 
     private lateinit var orderContentViewModel: OrderContentViewModel
 
@@ -38,32 +41,46 @@ open class CreateOrderFragment : InfoOrderFragment() {
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val formattedDate = current.format(formatter)
 
-            val order = Order(finalPrice, formattedDate, OrderStatus.PENDING.toString())
+            order = Order(finalPrice, formattedDate, OrderStatus.PENDING.toString())
             Log.d("Tina", "final price created order $finalPrice")
             ordersViewModel.updateFinalPrice(finalPrice, order.id)
             ordersViewModel.insert(order, ::updateQuantities)
         }
     }
 
-    private fun updateQuantities(orderId: Long) {
+    private fun updateQuantities(orderId: Long, fbOrderId: String) {
         val quantities = (create_order_recycler_view.adapter as CreateOrderAdapter).quantities
         quantities.forEach { (productName, quantity) ->
-//            if (quantity != 0) {
+            if (quantity != 0) {
                 updateQuantity(productName, quantity)
-            Log.d("Tina", "updated quantity for " + productName + "is " + quantity)
-                createOrderContent(productName, orderId, quantity)
-//            }
+                Log.d("Tina", "updated quantity for " + productName + "is " + quantity)
+                createOrderContent(productName, orderId, fbOrderId, quantity)
+            }
         }
         parentFragmentManager.popBackStackImmediate()
     }
 
-    private fun createOrderContent(productName: String, orderId: Long, currentQuantity: Int) {
+    private fun createOrderContent(
+        productName: String,
+        orderId: Long,
+        fbOrderId: String,
+        currentQuantity: Int
+    ) {
 
         val currentBarcode = productViewModel.allProducts.value
             ?.first { product -> product.name == productName }!!.barcode
 
         val orderContent = OrderContent(currentBarcode, orderId, currentQuantity)
         orderContentViewModel.insert(orderContent)
+
+        val currentPrice = productViewModel.allProducts.value
+            ?.first { product -> product.name == productName }!!.price
+
+        val currentOvercharge = productViewModel.allProducts.value
+            ?.first { product -> product.name == productName }!!.overcharge
+
+        val firebaseOrderContent = FirebaseOrderContent(orderContent.productBarcode, productName, currentPrice.toString(), currentOvercharge.toString(), orderContent.quantity.toString(), fbOrderId, "")
+        setFirebaseOrderContentData(firebaseOrderContent, fbOrderId)
 //        orderContentViewModel.getProductsInOrder(orderId)
     }
 
@@ -78,7 +95,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
         Log.v("Room", "Updating final quantity for $productName $finalQuantity")
 
 //        productViewModel.updateQuantity(productName, finalQuantity)
-        Log.d("Tina", "updated qunatity for " + productName + "is " + quantity)
+        Log.d("Tina", "updated quantity for " + productName + "is " + quantity)
     }
 
     override fun setupRecyclerView() {

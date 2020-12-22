@@ -9,12 +9,13 @@
     <string name="product_name">Name</string>
     <string name="name">Name</string>
     <string name="scan_barcode">Scan Barcode</string>
-    <string name="overcharge">Overcharge, лв</string>
+    <string name="overcharge">Overcharge, lv</string>
     <string name="barcode">Barcode</string>
-    <string name="price">Price, лв</string>
+    <string name="percentage">% of price</string>
+    <string name="price">Price, lv</string>
     <string name="add_product">ADD PRODUCT</string>
     <string name="empty_not_saved">Not saved</string>
-    <string name="leva">лв</string>
+    <string name="leva">lv</string>
     <string name="ordered">Ordered</string>
     <string name="status_pending">Pending</string>
     <string name="quantity">Quantity</string>
@@ -73,7 +74,7 @@
     <string name="in_stock_products_info">Products with a quantity over 5.</string>
     <string name="low_stock_products_info">Products with a quantity below 5.</string>
     <string name="pending_products_info">Products that haven\'t been delivered yet.</string>
-    <string name="store_info">Change the product quantities from here:</string>
+    <string name="store_info">Edit the products\' quantities from here:</string>
     <string name="create_order_info">Create an order by entering quantities and press \"Add Order\".</string>
     <string name="edit_order_info">Edit the order by changing quantities and press \"Save\". \n The order can be edited because it is in Pending state.</string>
     <string name="view_order_info">The order content for this order. \n It cannot be edited because the order is not in Pending state.</string>

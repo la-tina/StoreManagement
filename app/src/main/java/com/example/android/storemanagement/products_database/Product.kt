@@ -29,8 +29,8 @@ interface ProductDao {
     @Query("SELECT * FROM Products ORDER BY name ASC")
     fun getAllProducts(): LiveData<List<Product>>
 
-    @Query("UPDATE Products SET quantity = :quantity WHERE name = :product")
-    fun updateQuantity(product: String, quantity: Int)
+    @Query("UPDATE Products SET quantity = :quantity WHERE barcode = :barcode")
+    fun updateQuantity(barcode: String, quantity: Int)
 
     @Query("UPDATE Products SET name = :name WHERE Barcode = :barcode")
     fun updateName(barcode: String, name: String)

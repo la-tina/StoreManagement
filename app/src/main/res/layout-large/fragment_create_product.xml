@@ -153,11 +153,12 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/overcharge_text"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="@string/overcharge"
+            app:errorEnabled="true"
             app:layout_constraintBottom_toTopOf="@+id/barcode_text"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/overcharge_percentage_text"
             app:layout_constraintStart_toStartOf="parent">
 
             <EditText
@@ -167,6 +168,28 @@
                 android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
                 android:textSize="25sp"
+                android:inputType="number|numberDecimal"
+                android:textColor="@color/colorAccent"
+                android:textColorHint="@color/colorAccent"
+                android:visibility="visible" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/overcharge_percentage_text"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:hint="@string/percentage"
+            app:errorEnabled="true"
+            app:layout_constraintBottom_toTopOf="@+id/barcode_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/price_text">
+
+            <EditText
+                android:id="@+id/product_overcharge_percentage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:inputType="number|numberDecimal"
                 android:textColor="@color/colorAccent"
                 android:textColorHint="@color/colorAccent"

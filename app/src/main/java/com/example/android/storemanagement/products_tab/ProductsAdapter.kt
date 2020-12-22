@@ -27,7 +27,7 @@ abstract class ProductsAdapter(
     override fun onBindViewHolder(holder: ProductsHolder, position: Int) {
         val currentProduct = products[position]
         holder.productType.text = currentProduct.name
-        holder.productPrice.text = currentProduct.price.toString()
+        holder.productPrice.text = (currentProduct.price + currentProduct.overcharge).toString()
         holder.productQuantity.text = currentProduct.quantity.toString()
         holder.imageContextMenu.setOnClickListener { view -> showPopup(view, currentProduct) }
     }
@@ -36,7 +36,8 @@ abstract class ProductsAdapter(
         PopupMenu(context, view).apply {
             inflate(R.menu.context_menu)
             menu.findItem(R.id.order).isVisible = false
-            menu.findItem(R.id.view).isVisible = false
+            menu.findItem(R.id.delivered).isVisible = false
+            menu.findItem(R.id.order).isVisible = false
             setOnMenuItemClickListener { item: MenuItem? ->
                 when (item!!.itemId) {
                     R.id.edit -> {

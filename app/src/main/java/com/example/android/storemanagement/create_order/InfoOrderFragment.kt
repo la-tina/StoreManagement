@@ -56,7 +56,7 @@ abstract class InfoOrderFragment: Fragment()  {
 
     protected fun updateFinalPrice(price: Float) {
         Log.d("Tina", "final price before $finalPrice")
-        finalPrice += price
+        finalPrice = price
         final_price.text = String.format("%.1f", finalPrice).toFloat().toString()
         Log.d("Tina", "final price after $finalPrice")
     }

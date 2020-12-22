@@ -14,12 +14,6 @@ import java.io.Serializable
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("orderId"),
             onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = Product::class,
-            parentColumns = arrayOf("barcode"),
-            childColumns = arrayOf("productBarcode"),
-            onDelete = ForeignKey.CASCADE
         )]
 )
 data class OrderContent(
@@ -43,8 +37,8 @@ interface OrderContentDao {
     @Query("UPDATE Products SET Quantity = :quantity WHERE barcode = :barcode")
     fun updateQuantity(barcode: String, quantity: Int)
 
-    @Query("UPDATE OrderContent SET Quantity = :quantity WHERE productBarcode = :barcode")
-    fun updateQuantityOrderContent(barcode: String, quantity: Int)
+    @Query("UPDATE OrderContent SET Quantity = :quantity WHERE orderId = :orderId AND productBarcode = :barcode")
+    fun updateQuantityOrderContent(barcode: String, quantity: Int, orderId: Long)
 
     @Query("UPDATE Orders SET finalPrice = :finalPrice WHERE id = :id")
     fun updateOrderFinalPrice(id: Long, finalPrice: Float)
