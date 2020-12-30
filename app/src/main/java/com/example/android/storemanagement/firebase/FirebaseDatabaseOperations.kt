@@ -23,44 +23,44 @@ object FirebaseDatabaseOperations {
 //        }
     }
 
-    fun getFirebaseOrderContents(fbOrderId: String): List<FirebaseOrderContent> {
-        val orderContents: MutableList<FirebaseOrderContent> = mutableListOf()
-        val user: FirebaseUser? = Firebase.auth.currentUser
-        if (user != null) {
-            val uniqueId: String = user.uid
-            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-            val myRef: DatabaseReference = database.getReference("Orders").child(uniqueId)
-            myRef.child(fbOrderId).child("OrderContent")
-            myRef.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val firebaseOrderContents = dataSnapshot.children
-
-                    for (item in firebaseOrderContents) {
-                        val firebaseOrderContent: FirebaseOrderContent? =
-                            item.getValue(FirebaseOrderContent::class.java)
-
-                        if (firebaseOrderContent != null) {
-                            val orderContent = FirebaseOrderContent(
-                                firebaseOrderContent.productBarcode,
-                                firebaseOrderContent.productName,
-                                firebaseOrderContent.productPrice,
-                                firebaseOrderContent.productOvercharge,
-                                firebaseOrderContent.quantity,
-                                firebaseOrderContent.orderId,
-                                item.key!!
-                            )
-                            orderContents.add(orderContent)
-                        }
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
-            })
-        }
-        return orderContents
-    }
+//    fun getFirebaseOrderContents(fbOrderId: String): List<FirebaseOrderContent> {
+//        val orderContents: MutableList<FirebaseOrderContent> = mutableListOf()
+//        val user: FirebaseUser? = Firebase.auth.currentUser
+//        if (user != null) {
+//            val uniqueId: String = user.uid
+//            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+//            val myRef: DatabaseReference = database.getReference("Orders").child(uniqueId)
+//            myRef.child(fbOrderId).child("OrderContent")
+//            myRef.addValueEventListener(object : ValueEventListener {
+//                override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                    val firebaseOrderContents = dataSnapshot.children
+//
+//                    for (item in firebaseOrderContents) {
+//                        val firebaseOrderContent: FirebaseOrderContent? =
+//                            item.getValue(FirebaseOrderContent::class.java)
+//
+//                        if (firebaseOrderContent != null) {
+//                            val orderContent = FirebaseOrderContent(
+//                                firebaseOrderContent.productBarcode,
+//                                firebaseOrderContent.productName,
+//                                firebaseOrderContent.productPrice,
+//                                firebaseOrderContent.productOvercharge,
+//                                firebaseOrderContent.quantity,
+//                                firebaseOrderContent.orderId,
+//                                item.key!!
+//                            )
+//                            orderContents.add(orderContent)
+//                        }
+//                    }
+//                }
+//
+//                override fun onCancelled(error: DatabaseError) {
+//                    TODO("Not yet implemented")
+//                }
+//            })
+//        }
+//        return orderContents
+//    }
 
     fun setFirebaseOrderContentData(orderContent: FirebaseOrderContent, fbOrderId: String) {
         val user: FirebaseUser? = Firebase.auth.currentUser
@@ -78,7 +78,38 @@ object FirebaseDatabaseOperations {
         }
     }
 
-    fun setFirebaseProductData(product: Product) {
+    fun getFirebaseOrderContent(fbOrderId: String): FirebaseOrderContent {
+        lateinit var fbOrderContent: FirebaseOrderContent
+        val user: FirebaseUser? = Firebase.auth.currentUser
+        val uniqueId: String = user?.uid!!
+        val ref = FirebaseDatabase.getInstance().getReference("OrderContent")
+        val productsQuery: Query = ref.child(uniqueId).orderByChild("orderId").equalTo(fbOrderId)
+
+        productsQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val firebaseOrderContent = dataSnapshot.getValue(FirebaseOrderContent::class.java)
+                if (firebaseOrderContent != null) {
+                    val orderContent = FirebaseOrderContent(
+                        firebaseOrderContent.productBarcode,
+                        firebaseOrderContent.productName,
+                        firebaseOrderContent.productPrice,
+                        firebaseOrderContent.productOvercharge,
+                        firebaseOrderContent.quantity,
+                        firebaseOrderContent.orderId,
+                        dataSnapshot.key!!
+                    )
+                    fbOrderContent = orderContent
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("Firebase_Products", "onCancelled", databaseError.toException())
+            }
+        })
+        return fbOrderContent
+    }
+
+    fun setFirebaseProductData(product: FirebaseProduct) {
         val user: FirebaseUser? = Firebase.auth.currentUser
         if (user != null) {
             val uniqueId: String = user.uid
@@ -92,15 +123,12 @@ object FirebaseDatabaseOperations {
         val user: FirebaseUser? = Firebase.auth.currentUser
         val uniqueId: String = user?.uid!!
         val ref = FirebaseDatabase.getInstance().getReference("Orders")
-        val ordersQuery: Query =
-            ref.child(uniqueId).child(firebaseOrderId)
+        val ordersQuery: Query = ref.child(uniqueId).child(firebaseOrderId)
 
-        ordersQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+        ordersQuery.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (appleSnapshot in dataSnapshot.children) {
-                    appleSnapshot.ref.removeValue()
-                    deleteFirebaseOrderContents(appleSnapshot.key!!)
-                }
+                dataSnapshot.ref.removeValue()
+                deleteFirebaseOrderContents(dataSnapshot.key!!)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -149,7 +177,7 @@ object FirebaseDatabaseOperations {
         })
     }
 
-    fun deleteFirebaseProductData(product: Product) {
+    fun deleteFirebaseProductData(product: FirebaseProduct) {
         val user: FirebaseUser? = Firebase.auth.currentUser
         val uniqueId: String = user?.uid!!
         val ref = FirebaseDatabase.getInstance().getReference("Products")
@@ -270,7 +298,7 @@ object FirebaseDatabaseOperations {
         orderContentsQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 //                for (dataSnapshot in dataSnapshot.children) {
-                    dataSnapshot.ref.child("quantity").setValue(quantity)
+                dataSnapshot.ref.child("quantity").setValue(quantity)
 //                }
             }
 
@@ -278,6 +306,36 @@ object FirebaseDatabaseOperations {
         })
     }
 
+//    fun getFirebaseProduct(barcode: String, completionHandler: (organizationName: String?) -> Unit) {
+//        val user: FirebaseUser? = Firebase.auth.currentUser
+//        val uniqueId: String = user?.uid!!
+//        val ref = FirebaseDatabase.getInstance().getReference("Products")
+//        val productsQuery: Query =
+//            ref.child(uniqueId).orderByChild("barcode").equalTo(barcode)
+//
+//        productsQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                val firebaseProduct: FirebaseProduct? =
+//                    dataSnapshot.getValue(FirebaseProduct::class.java)
+//
+//                if (firebaseProduct != null) {
+//                    val product = FirebaseProduct(
+//                        firebaseProduct.name,
+//                        firebaseProduct.price,
+//                        firebaseProduct.overcharge,
+//                        firebaseProduct.barcode,
+//                        firebaseProduct.quantity,
+//                        dataSnapshot.key!!
+//                    )
+//                    completionHandler
+//                }
+//            }
+//
+//            override fun onCancelled(databaseError: DatabaseError) {
+//                Log.e("Firebase_Products", "onCancelled", databaseError.toException())
+//            }
+//        })
+//    }
 
     fun updateFirebaseProduct(
         productBarcode: String,
@@ -306,13 +364,12 @@ object FirebaseDatabaseOperations {
         })
     }
 
-
-    fun updateFirebaseProductQuantity(product: Product, quantity: String) {
+    fun updateFirebaseProductQuantity(barcode: String, quantity: String) {
         val user: FirebaseUser? = Firebase.auth.currentUser
         val uniqueId: String = user?.uid!!
         val ref = FirebaseDatabase.getInstance().getReference("Products")
         val productsQuery: Query =
-            ref.child(uniqueId).orderByChild("barcode").equalTo(product.barcode)
+            ref.child(uniqueId).orderByChild("barcode").equalTo(barcode)
 
         productsQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {

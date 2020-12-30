@@ -33,6 +33,7 @@ open class EditOrderFragment : InfoOrderFragment() {
     override var buttonText: String = "Save"
     var currentOrderContents: List<OrderContent>? = null
     var currentFirebaseOrderContents: MutableList<FirebaseOrderContent> = mutableListOf()
+    private var user: FirebaseUser? = null
 
     var currentOrder: Order? = null
     var currentFirebaseOrder: FirebaseOrder? = null
@@ -42,42 +43,49 @@ open class EditOrderFragment : InfoOrderFragment() {
             .get(OrderContentViewModel(requireActivity().application)::class.java)
     }
 
-    override fun onStart() {
-        super.onStart()
-//        imageView.setImageDrawable("lemon.png")
-        orderContentViewModel.allOrderContents.observe(this, Observer { viewState ->
-            onOrderContentsChanged(viewState)
-        })
+    override fun onResume() {
+        super.onResume()
+        user = Firebase.auth.currentUser
+//        if (user == null) {
+//            orderContentViewModel.allOrderContents.observe(this, Observer { viewState ->
+//                onOrderContentsChanged(viewState)
+//            })
+//        } else {
+        if (user != null) {
+            onOrderContentsChanged(null)
+        }
+//        }
     }
 
     private fun onOrderContentsChanged(viewState: List<OrderContent>?) {
         val order = arguments?.getSerializable(ORDER_KEY)
-        if (order is Order) {
-            setupRecyclerView()
-
-            currentOrder = order
-            toolbarTopOrder.title = if (!canOrderBeEdited()) "Order Content" else "Edit Order"
-            info_text?.text =
-                if (!canOrderBeEdited()) context?.getString(R.string.view_order_info) else context?.getString(
-                    R.string.edit_order_info
-                )
-//        if (finalPrice == 0F){
-//            finalPrice = currentOrder.finalPrice
-//        }
-            Log.d("Tina", "final price edit order " + currentOrder?.finalPrice)
-            final_price.text = currentOrder?.finalPrice.toString()
-
-            currentOrderContents = viewState?.filter { it.orderId == order.id }
-
-            setupRecyclerView()
-
-            if (!canOrderBeEdited()) {
-                button_add_order.visibility = View.GONE
-                constraintLayout.maxHeight = 160
-            }
-            button_add_order.setOnClickListener { onEditButtonClicked(order, null) }
-
-        } else if (order is FirebaseOrder) {
+//        if (order is Order) {
+//            setupRecyclerView()
+//
+//            currentOrder = order
+//            toolbarTopOrder.title = if (!canOrderBeEdited()) "Order Content" else "Edit Order"
+//            info_text?.text =
+//                if (!canOrderBeEdited()) context?.getString(R.string.view_order_info) else context?.getString(
+//                    R.string.edit_order_info
+//                )
+////        if (finalPrice == 0F){
+////            finalPrice = currentOrder.finalPrice
+////        }
+//            Log.d("Tina", "final price edit order " + currentOrder?.finalPrice)
+//            final_price.text = currentOrder?.finalPrice.toString()
+//
+//            currentOrderContents = viewState?.filter { it.orderId == order.id }
+//
+//            setupRecyclerView()
+//
+//            if (!canOrderBeEdited()) {
+//                button_add_order.visibility = View.GONE
+//                constraintLayout.maxHeight = 160
+//            }
+//            button_add_order.setOnClickListener { onEditButtonClicked(order, null) }
+//
+//        } else
+        if (order is FirebaseOrder) {
             currentFirebaseOrder = order
             toolbarTopOrder.title = if (!canOrderBeEdited()) "Order Content" else "Edit Order"
             info_text?.text =
@@ -137,19 +145,6 @@ open class EditOrderFragment : InfoOrderFragment() {
 
                 override fun onCancelled(error: DatabaseError) {}
             })
-            myRef.addChildEventListener(object : ChildEventListener {
-                override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
-                }
-
-                override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
-                }
-
-                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                }
-
-                override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
-                override fun onCancelled(databaseError: DatabaseError) {}
-            })
         }
     }
 
@@ -177,10 +172,12 @@ open class EditOrderFragment : InfoOrderFragment() {
                     }
                 }
             }
-            if (currentFirebaseOrderContents.isNullOrEmpty()) {
+
+            getFirebaseOrderContents(firebaseOrder!!.id)
+            if (finalPrice == 0F) {
                 deleteFirebaseOrderData(currentFirebaseOrder!!.id)
             }
-            updateFirebaseOrderFinalPrice(firebaseOrder!!.id, finalPrice.toString())
+            updateFirebaseOrderFinalPrice(firebaseOrder.id, finalPrice.toString())
             updateFirebaseOrderDate(firebaseOrder.id, getFormattedDate()!!)
         }
 
@@ -194,7 +191,6 @@ open class EditOrderFragment : InfoOrderFragment() {
     }
 
     private fun deleteOrderContent() {
-
 //        currentOrderContents?.filter { it.quantity != 0 }?.forEach {newOrderContent ->
 //            newOrderContents?.add(newOrderContent)
 //        }
@@ -212,15 +208,12 @@ open class EditOrderFragment : InfoOrderFragment() {
 
     private fun updateFirebaseQuantity(firebaseOrderContentId: String, quantity: Int) {
         if (quantity == 0) {
+            Log.d("TinaDel", "updateFirebaseQuantity")
             deleteFirebaseOrderContentData(firebaseOrderContentId)
-//            activity?.runOnUiThread{
-//                currentFirebaseOrderContents.remove(currentFirebaseOrderContents.first{it.id == firebaseOrderContentId})
-//            }
         } else {
             updateFirebaseOrderContent(firebaseOrderContentId, quantity.toString())
         }
     }
-
 
     private fun updateQuantity(
         barcode: String,
@@ -269,7 +262,7 @@ open class EditOrderFragment : InfoOrderFragment() {
         // in the foreground.
 
         editOrdersAdapter.setProductsInOrder(currentOrderContents, currentFirebaseOrderContents)
-        setupEmptyView(empty_view_create_order, info_text, create_order_recycler_view)
+        setupEmptyView(empty_view_create_order, create_order_recycler_view)
 
         productViewModel.allProducts.observe(this, Observer { products ->
             products?.let {

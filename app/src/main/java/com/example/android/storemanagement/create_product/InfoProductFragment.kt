@@ -24,6 +24,9 @@ import com.example.android.storemanagement.create_product.CreateProductFieldVali
 import com.example.android.storemanagement.create_product.CreateProductFieldValidator.isFieldValid
 import com.example.android.storemanagement.products_database.ProductViewModel
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.fragment_create_product.*
 import me.dm7.barcodescanner.zbar.ZBarScannerView
 import kotlin.math.round
@@ -38,6 +41,7 @@ abstract class InfoProductFragment : Fragment() {
 
     var isPercentageViewSelected = false
     var lastPercentage = 0
+    protected var user: FirebaseUser? = null
 
     companion object {
         const val CAMERA_PERMISSION_CODE = 0
@@ -140,6 +144,7 @@ abstract class InfoProductFragment : Fragment() {
         setFieldsTextWatcher()
         hideKeyboard(activity as Activity)
 
+        user = Firebase.auth.currentUser
         button_add_product.setOnClickListener {
             onButtonClicked(
                 product_name.text,

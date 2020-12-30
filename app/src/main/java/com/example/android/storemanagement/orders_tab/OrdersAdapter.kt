@@ -80,7 +80,7 @@ class OrdersAdapter(
                 holder.imageContextMenu.visibility = View.VISIBLE
             }
             holder.imageContextMenu.setOnClickListener { view -> showPopup(view, currentOrder, null) }
-        } else if (currentOrder is FirebaseOrder) {
+        } else if (currentOrder is FirebaseOrder && currentOrder.finalPrice.isNotEmpty()) {
             val orderPrice = String.format("%.1f", currentOrder.finalPrice.toFloat()).toFloat().toString()
             holder.finalPrice.text = orderPrice
             //String.format("%.1f", finalPrice).toFloat().toString()

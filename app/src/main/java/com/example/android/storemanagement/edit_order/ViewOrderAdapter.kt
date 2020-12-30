@@ -12,6 +12,7 @@ import com.example.android.storemanagement.create_order.CreateOrderFieldValidato
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isEditOrderQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderHolder
+import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.products_database.Product
 
@@ -19,11 +20,13 @@ class ViewOrderAdapter(
     private val context: Context) : RecyclerView.Adapter<CreateOrderHolder>() {
 
     private var productsInOrder = emptyList<OrderContent>() // Cached copy of products
+    private var firebaseOrderContents = emptyList<FirebaseOrderContent>()
     private var products = emptyList<Product>()
+    private var areFirebaseOrderContentsLoaded = true
 
     // Gets the number of items in the list
     override fun getItemCount(): Int {
-        return productsInOrder.size
+        return if (areFirebaseOrderContentsLoaded) firebaseOrderContents.size else productsInOrder.size
     }
 
     // Inflates the item views
@@ -35,20 +38,32 @@ class ViewOrderAdapter(
     // Binds each product in the list to a view
     override fun onBindViewHolder(holder: CreateOrderHolder, position: Int) {
         val currentProductInOrder = productsInOrder[position]
+        if (areFirebaseOrderContentsLoaded) {
+            val currentFirebaseProductInOrder = firebaseOrderContents[position]
+            holder.productName.text = currentFirebaseProductInOrder.productName
+            holder.productPrice.text = currentFirebaseProductInOrder.productPrice
+            holder.productQuantity.setText(currentFirebaseProductInOrder.quantity)
 
-        products.forEach { currentProduct ->
-            if (currentProductInOrder.productBarcode == currentProduct.barcode) {
-                holder.productName.text = currentProduct.name
-                holder.productPrice.text = currentProduct.price.toString()
-                holder.productQuantity.setText(currentProductInOrder.quantity.toString())
-                holder.productQuantity.isEnabled = false
+        } else {
+            products.forEach { currentProduct ->
+                if (currentProductInOrder.productBarcode == currentProduct.barcode) {
+                    holder.productName.text = currentProduct.name
+                    holder.productPrice.text = currentProduct.price.toString()
+                    holder.productQuantity.setText(currentProductInOrder.quantity.toString())
+                    holder.productQuantity.isEnabled = false
+                }
             }
         }
     }
 
-    internal fun setProductsInOrder(productsInOrder: List<OrderContent>?) {
+    internal fun setProductsInOrder(productsInOrder: List<OrderContent>?,
+                                    firebaseProductsInOrder: List<FirebaseOrderContent>?) {
         if (productsInOrder != null) {
             this.productsInOrder = productsInOrder
+            areFirebaseOrderContentsLoaded = false
+        } else if (firebaseProductsInOrder != null) {
+            this.firebaseOrderContents = firebaseProductsInOrder
+            areFirebaseOrderContentsLoaded = true
         }
         notifyDataSetChanged()
     }

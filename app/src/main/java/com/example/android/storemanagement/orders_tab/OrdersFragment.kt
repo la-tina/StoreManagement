@@ -8,22 +8,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.*
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseOrderContentData
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseOrderData
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderDate
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderStatus
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseProductQuantity
 import com.example.android.storemanagement.firebase.FirebaseOrder
+import com.example.android.storemanagement.firebase.FirebaseOrderContent
+import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
-import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -38,12 +37,14 @@ open class OrdersFragment : Fragment() {
 
     var listener: OnNavigationChangedListener? = null
     private lateinit var topToolbar: Toolbar
+    protected var user: FirebaseUser? = null
 
-    var ordersList: MutableList<Order> = mutableListOf()
-    var firebaseOrdersList: MutableList<FirebaseOrder> = mutableListOf()
+    //    var ordersList = mutableListOf<Order>()
+    var firebaseOrdersList = mutableListOf<FirebaseOrder>()
+    var firebaseOrderContentsList = mutableListOf<FirebaseOrderContent>()
 
     lateinit var productsInOrderList: List<OrderContent>
-    lateinit var productsList: List<Product>
+    var firebaseProductsList = mutableListOf<FirebaseProduct>()
 
     private val orderViewModel: OrderViewModel by lazy {
         ViewModelProviders.of(this).get(OrderViewModel::class.java)
@@ -71,55 +72,193 @@ open class OrdersFragment : Fragment() {
         )
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initData()
+    override fun onResume() {
+        super.onResume()
+        orders_add_button?.setOnClickListener {
+            if (::onNavigationChangedListener.isInitialized)
+                onNavigationChangedListener.onNavigationChanged(CREATE_ORDER_TAB)
+        }
+
+        // Get a reference to our posts
+        user = Firebase.auth.currentUser
+        getFirebaseOrders()
+        getFirebaseProducts()
+        getFirebaseOrderContents()
+        setupEmptyView()
     }
 
-    private fun initData() {
-        orderViewModel.allOrders.toSingleEvent().observe(this,
-            Observer<List<Order>> { orders ->
-                ordersList = orders as MutableList<Order>
-            }
-        )
-        orderContentViewModel.allOrderContents.toSingleEvent().observe(this,
-            Observer<List<OrderContent>> { productsInOrder ->
-                productsInOrderList = productsInOrder
-            }
-        )
-        productViewModel.allProducts.toSingleEvent().observe(this,
-            Observer<List<Product>> { products ->
-                productsList = products
-            }
-        )
+    private fun getFirebaseOrderContents() {
+        user = Firebase.auth.currentUser
+        if (user != null) {
+            // Get a reference to our posts
+            val uniqueId: String = user?.uid!!
+            val database = FirebaseDatabase.getInstance()
+            val ref: DatabaseReference = database.getReference("OrderContent").child(uniqueId)
+
+            // Attach a listener to read the data at our posts reference
+            ref.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    firebaseOrderContentsList.clear()
+                    val firebaseOrderContents = dataSnapshot.children
+
+                    for (item in firebaseOrderContents) {
+                        val firebaseOrderContent: FirebaseOrderContent? =
+                            item.getValue(FirebaseOrderContent::class.java)
+
+                        if (firebaseOrderContent != null) {
+                            val orderContent = FirebaseOrderContent(
+                                firebaseOrderContent.productBarcode,
+                                firebaseOrderContent.productName,
+                                firebaseOrderContent.productPrice,
+                                firebaseOrderContent.productOvercharge,
+                                firebaseOrderContent.quantity,
+                                firebaseOrderContent.orderId,
+                                item.key!!
+                            )
+                            if (firebaseOrderContentsList.none { it.id == orderContent.id }) {
+                                firebaseOrderContentsList.add(orderContent)
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {}
+            })
+
+            ref.addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                    val firebaseNewOrderContent: FirebaseOrderContent? =
+                        dataSnapshot.getValue(FirebaseOrderContent::class.java)
+                    if (firebaseNewOrderContent != null) {
+                        val orderContent = FirebaseOrderContent(
+                            firebaseNewOrderContent.productBarcode,
+                            firebaseNewOrderContent.productName,
+                            firebaseNewOrderContent.productPrice,
+                            firebaseNewOrderContent.productOvercharge,
+                            firebaseNewOrderContent.quantity,
+                            firebaseNewOrderContent.orderId,
+                            dataSnapshot.key!!
+                        )
+                        if (firebaseOrderContentsList.none { it.id == orderContent.id }) {
+                            firebaseOrderContentsList.add(orderContent)
+                        }
+                    }
+                }
+
+                override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                    val firebaseChangedOrderContent: FirebaseOrderContent? =
+                        dataSnapshot.getValue(FirebaseOrderContent::class.java)
+                    if (firebaseChangedOrderContent != null) {
+                        val orderContent = FirebaseOrderContent(
+                            firebaseChangedOrderContent.productBarcode,
+                            firebaseChangedOrderContent.productName,
+                            firebaseChangedOrderContent.productPrice,
+                            firebaseChangedOrderContent.productOvercharge,
+                            firebaseChangedOrderContent.quantity,
+                            firebaseChangedOrderContent.orderId,
+                            dataSnapshot.key!!
+                        )
+                        val changedOrderContent =
+                            firebaseProductsList.first { t -> t.id == dataSnapshot.key!! }
+                        firebaseOrderContentsList.remove(changedOrderContent)
+                        firebaseOrderContentsList.add(orderContent)
+                    }
+                }
+
+                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                    val firebaseRemovedOrderContent: FirebaseOrderContent? =
+                        dataSnapshot.getValue(FirebaseOrderContent::class.java)
+                    if (firebaseRemovedOrderContent != null) {
+                        val orderContent = FirebaseOrderContent(
+                            firebaseRemovedOrderContent.productBarcode,
+                            firebaseRemovedOrderContent.productName,
+                            firebaseRemovedOrderContent.productPrice,
+                            firebaseRemovedOrderContent.productOvercharge,
+                            firebaseRemovedOrderContent.quantity,
+                            firebaseRemovedOrderContent.orderId,
+                            dataSnapshot.key!!
+                        )
+                        if (!firebaseProductsList.none { it.id == orderContent.id }) {
+                            firebaseProductsList.remove(firebaseProductsList.first { it.id == orderContent.id })
+                        }
+                    }
+                }
+
+                override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+                override fun onCancelled(databaseError: DatabaseError) {}
+            })
+        }
+    }
+
+    private fun onOrderContentsDelivered(fbOrderId: String) {
+        if (user != null) {
+            val uniqueId: String = user?.uid!!
+            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+            val ref: DatabaseReference = database.getReference("OrderContent")
+            val orderContentsQuery: Query =
+                ref.child(uniqueId).orderByChild("orderId").equalTo(fbOrderId)
+            // Attach a listener to read the data at our posts reference
+            orderContentsQuery.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val firebaseOrderContents = dataSnapshot.children
+
+                    for (item in firebaseOrderContents) {
+                        val firebaseOrderContent: FirebaseOrderContent? =
+                            item.getValue(FirebaseOrderContent::class.java)
+
+                        if (firebaseOrderContent != null) {
+                            val orderContent = FirebaseOrderContent(
+                                firebaseOrderContent.productBarcode,
+                                firebaseOrderContent.productName,
+                                firebaseOrderContent.productPrice,
+                                firebaseOrderContent.productOvercharge,
+                                firebaseOrderContent.quantity,
+                                firebaseOrderContent.orderId,
+                                item.key!!
+                            )
+                            updateCurrent(orderContent)
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {}
+            })
+        }
+    }
+
+    fun updateCurrent(orderContent: FirebaseOrderContent) {
+        val productsToBeChanged =
+            firebaseProductsList.filter { it.barcode == orderContent.productBarcode }
+        productsToBeChanged.forEach { firebaseProducts ->
+            val newQuantity =
+                (orderContent.quantity.toInt() + firebaseProducts.quantity.toInt()).toString()
+            updateFirebaseProductQuantity(orderContent.productBarcode, newQuantity)
+        }
     }
 
     open fun addRowOrders(writeRow: (List<Any?>) -> Unit) {
-        ordersList.forEach { order ->
-            val orderContents = productsInOrderList.filter { it.orderId == order.id }
-            orderContents.forEach { orderContent ->
-                val products = productsList.filter { it.barcode == orderContent.productBarcode }
-                products.forEach { product ->
-                    writeRow(
-                        listOf(
-                            "",
-                            order.id,
-                            order.orderStatus,
-                            order.date,
-                            product.name,
-                            orderContent.quantity,
-                            product.price * orderContent.quantity
-                        )
+        firebaseOrdersList.forEach { order ->
+            firebaseOrderContentsList.filter { it.orderId == order.id }.forEach { orderContent ->
+                writeRow(
+                    listOf(
+                        "",
+                        order.id,
+                        order.orderStatus,
+                        order.date,
+                        orderContent.productName,
+                        orderContent.quantity,
+                        orderContent.productPrice.toFloat() * orderContent.quantity.toInt()
                     )
-                }
+                )
             }
+
             writeRow(listOf("Final price", " - ", " - ", " - ", " - ", " - ", order.finalPrice))
             writeRow(emptyList())
         }
     }
 
     open fun addRowProducts(writeRow: (List<Any?>) -> Unit) {
-        productsList.forEach { product ->
+        firebaseProductsList.forEach { product ->
             writeRow(
                 listOf(
                     product.barcode,
@@ -132,20 +271,122 @@ open class OrdersFragment : Fragment() {
         }
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//        setupRecyclerView()
-//    }
+    private fun getFirebaseProducts() {
+        user = Firebase.auth.currentUser
+        if (user != null) {
+            // Get a reference to our posts
+            val uniqueId: String = user?.uid!!
+            val database = FirebaseDatabase.getInstance()
+            val ref: DatabaseReference = database.getReference("Products").child(uniqueId)
 
-    override fun onResume() {
-        super.onResume()
-        orders_add_button?.setOnClickListener {
-            if (::onNavigationChangedListener.isInitialized)
-                onNavigationChangedListener.onNavigationChanged(CREATE_ORDER_TAB)
+            // Attach a listener to read the data at our posts reference
+            ref.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    firebaseProductsList.clear()
+                    val firebaseProducts = dataSnapshot.children
+
+                    for (item in firebaseProducts) {
+                        val firebaseProduct: FirebaseProduct? =
+                            item.getValue(FirebaseProduct::class.java)
+
+                        if (firebaseProduct != null) {
+                            val product = FirebaseProduct(
+                                firebaseProduct.name,
+                                firebaseProduct.price,
+                                firebaseProduct.overcharge,
+                                firebaseProduct.barcode,
+                                firebaseProduct.quantity,
+                                item.key!!
+                            )
+                            Log.d("TinaFirebase", "firebaseProduct onDataChange $product")
+                            if (!firebaseProductsList.contains(product)) {
+                                firebaseProductsList.add(product)
+                                activity?.runOnUiThread {
+                                    setupRecyclerView()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {}
+            })
+
+            ref.addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                    val firebaseNewProduct: FirebaseProduct? =
+                        dataSnapshot.getValue(FirebaseProduct::class.java)
+                    if (firebaseNewProduct != null) {
+                        val product = FirebaseProduct(
+                            firebaseNewProduct.name,
+                            firebaseNewProduct.price,
+                            firebaseNewProduct.overcharge,
+                            firebaseNewProduct.barcode,
+                            firebaseNewProduct.quantity,
+                            dataSnapshot.key!!
+                        )
+                        Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
+                        if (firebaseProductsList.none { it.barcode == product.barcode }) {
+                            firebaseProductsList.add(product)
+                            activity?.runOnUiThread {
+                                setupRecyclerView()
+                            }
+                        }
+                    }
+                }
+
+                override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                    val changedFirebaseProduct: FirebaseProduct? =
+                        dataSnapshot.getValue(FirebaseProduct::class.java)
+                    if (changedFirebaseProduct != null) {
+                        val product = FirebaseProduct(
+                            changedFirebaseProduct.name,
+                            changedFirebaseProduct.price,
+                            changedFirebaseProduct.overcharge,
+                            changedFirebaseProduct.barcode,
+                            changedFirebaseProduct.quantity,
+                            dataSnapshot.key!!
+                        )
+                        Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
+                        val changedProduct =
+                            firebaseProductsList.first { t -> t.id == dataSnapshot.key!! }
+                        firebaseProductsList.remove(changedProduct)
+                        firebaseProductsList.add(product)
+                        activity?.runOnUiThread {
+                            setupRecyclerView()
+                        }
+                    }
+                }
+
+                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                    val firebaseRemovedProduct: FirebaseProduct? =
+                        dataSnapshot.getValue(FirebaseProduct::class.java)
+                    if (firebaseRemovedProduct != null) {
+                        val product = FirebaseProduct(
+                            firebaseRemovedProduct.name,
+                            firebaseRemovedProduct.price,
+                            firebaseRemovedProduct.overcharge,
+                            firebaseRemovedProduct.barcode,
+                            firebaseRemovedProduct.quantity,
+                            dataSnapshot.key!!
+                        )
+                        Log.d("TinaFirebase", "firebaseProduct onChildRemoved $product")
+                        if (!firebaseProductsList.none { it.barcode == product.barcode }) {
+                            firebaseProductsList.remove(product)
+                            activity?.runOnUiThread {
+                                setupRecyclerView()
+                            }
+                        }
+                    }
+                }
+
+                override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+                override fun onCancelled(databaseError: DatabaseError) {}
+            })
         }
+    }
 
-        // Get a reference to our posts
-        val user: FirebaseUser? = Firebase.auth.currentUser
+    private fun getFirebaseOrders() {
         val uniqueId: String = user?.uid!!
         val database = FirebaseDatabase.getInstance()
         val ref: DatabaseReference = database.getReference("Orders").child(uniqueId)
@@ -153,7 +394,7 @@ open class OrdersFragment : Fragment() {
         // Attach a listener to read the data at our posts reference
         ref.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                ordersList.clear()
+                firebaseOrdersList.clear()
                 val firebaseOrders = dataSnapshot.children
 
                 for (item in firebaseOrders) {
@@ -212,9 +453,14 @@ open class OrdersFragment : Fragment() {
                         dataSnapshot.key!!
                     )
                     Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
-                    val changedOrder = firebaseOrdersList.first { t -> t.id == dataSnapshot.key!! }
-                    firebaseOrdersList.remove(changedOrder)
-                    firebaseOrdersList.add(order)
+                    if (firebaseOrdersList.contains(order)) {
+                        firebaseOrdersList.forEach { firebaseOrder ->
+                            if (firebaseOrder.id == dataSnapshot.key!!) {
+                                firebaseOrdersList.remove(firebaseOrder)
+                                firebaseOrdersList.add(order)
+                            }
+                        }
+                    }
                     activity?.runOnUiThread {
                         setupRecyclerView()
                     }
@@ -288,7 +534,7 @@ open class OrdersFragment : Fragment() {
                                 "Koni",
                                 "updated quantities " + currentProduct.productBarcode + " quantity " + currentProduct.quantity
                             )
-                            updateProductQuantity(currentProduct)
+//                            updateProductQuantity(currentProduct)
                         }
                 }
             }
@@ -302,6 +548,9 @@ open class OrdersFragment : Fragment() {
                 }
                 OrderStatus.DELIVERED -> {
                     Log.d("Koni", "onOrderDelivered")
+
+                    onOrderContentsDelivered(firebaseOrder.id)
+                    //updateFirebaseProductQuantity(barcode, newQuantity.toString())
 //                    productsInOrderList.filter { it.orderId == order.id }.forEach { currentProduct ->
 //                        Log.d(
 //                            "Koni",
@@ -345,20 +594,19 @@ open class OrdersFragment : Fragment() {
 //        }
 //    }
 
-    private fun updateProductQuantity(orderContent: OrderContent) {
-        Log.d("Koni", "updateProductQuantity invoked")
-        productsList.forEach { product ->
-            Log.d("Koni", "allProducts?.forEach invoked")
-            if (orderContent.productBarcode == product.barcode) {
-                val newQuantity = product.quantity + orderContent.quantity
-                //Log.d("Koni", "productViewModel.updateProductQuantity invoked")
-                productViewModel.updateProductQuantity(product.barcode, newQuantity)
-                updateFirebaseProductQuantity(product, newQuantity.toString())
-                Log.d("Koni", "updated quantity $newQuantity")
-
-            }
-        }
-    }
+//    private fun updateProductQuantity(orderContent: OrderContent) {
+//        Log.d("Koni", "updateProductQuantity invoked")
+//        productsList.forEach { product ->
+//            Log.d("Koni", "allProducts?.forEach invoked")
+//            if (orderContent.productBarcode == product.barcode) {
+//                val newQuantity = product.quantity + orderContent.quantity
+//                //Log.d("Koni", "productViewModel.updateProductQuantity invoked")
+//                productViewModel.updateProductQuantity(product.barcode, newQuantity)
+//                Log.d("Koni", "updated quantity $newQuantity")
+//
+//            }
+//        }
+//    }
 
     private fun openViewOrderTab(order: Order) {
         if (::onNavigationChangedListener.isInitialized) {
@@ -389,7 +637,8 @@ open class OrdersFragment : Fragment() {
     }
 
     private fun setupEmptyView() {
-        if (firebaseOrdersList?.size == 0) {
+        val orders = orders_recycler_view?.adapter
+        if (orders?.itemCount == 0) {
             orders_recycler_view?.visibility = View.GONE
             empty_view_orders?.visibility = View.VISIBLE
         } else {
@@ -421,7 +670,9 @@ open class OrdersFragment : Fragment() {
 //            }
 //        })
 
-        ordersAdapter.setOrders(null, firebaseOrdersList)
-        setupEmptyView()
+        activity?.runOnUiThread {
+            ordersAdapter.setOrders(null, firebaseOrdersList)
+            setupEmptyView()
+        }
     }
 }

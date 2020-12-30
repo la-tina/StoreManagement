@@ -25,11 +25,13 @@ import com.example.android.storemanagement.create_product.InfoProductFragment.Co
 import com.example.android.storemanagement.edit_order.EditOrderFragment
 import com.example.android.storemanagement.edit_order.ViewOrderFragment
 import com.example.android.storemanagement.firebase.FirebaseOrder
+import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.orders_tab.OrdersFragment
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsFragment
+import com.example.android.storemanagement.products_tab.ProductsTabFragment
 import com.example.android.storemanagement.store_tab.StoreFragment
 import com.facebook.stetho.Stetho
 import com.facebook.stetho.okhttp3.StethoInterceptor
@@ -48,6 +50,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
 
     private var currentFragment: Fragment? = null
     private var ordersFragment: OrdersFragment? = null
+    private var productsTabFragment: ProductsTabFragment? = null
     private var user: FirebaseUser? = null
 
     private val orderViewModel : OrderViewModel by lazy {
@@ -74,7 +77,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
             textView.setTextColor(ContextCompat.getColor(this, R.color.darkBarColor))
         }
 
-//        deleteDatabase("Product_database")
+        deleteDatabase("Product_database")
         deleteDatabase("Order_database")
 
         Stetho.initializeWithDefaults(applicationContext)
@@ -277,11 +280,11 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
         }
     }
 
-    override fun onNavigationChanged(tabNumber: Int, product: Product?, order: Order?, firebaseOrder: FirebaseOrder?) {
+    override fun onNavigationChanged(tabNumber: Int, product: Product?, firebaseProduct: FirebaseProduct?, order: Order?, firebaseOrder: FirebaseOrder?) {
         when (tabNumber) {
             CREATE_ORDER_TAB -> openCreateOrderTab()
             CREATE_PRODUCT_TAB -> openCreateProductTab()
-            EDIT_PRODUCT_TAB -> openEditProductTab(product)
+            EDIT_PRODUCT_TAB -> openEditProductTab(product, firebaseProduct)
             EDIT_ORDER_TAB -> openEditOrderTab(order, firebaseOrder)
             VIEW_ORDER_TAB -> openViewOrderTab(order, firebaseOrder)
         }
@@ -335,13 +338,19 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
         openCreateTab(fragment, createProductTag)
     }
 
-    private fun openEditProductTab(product: Product?) {
+    private fun openEditProductTab(product: Product?, firebaseProduct: FirebaseProduct?) {
         val previouslyAddedEditProductFragment = supportFragmentManager.findFragmentByTag(
             editProductTag
         )
         val fragment = (previouslyAddedEditProductFragment as? EditProductFragment) ?: EditProductFragment()
-        val bundle = Bundle().apply { putSerializable(PRODUCT_KEY, product) }
-        fragment.arguments = bundle
+
+        if (product == null) {
+            val bundle = Bundle().apply { putSerializable(PRODUCT_KEY, firebaseProduct) }
+            fragment.arguments = bundle
+        } else {
+            val bundle = Bundle().apply { putSerializable(PRODUCT_KEY, product) }
+            fragment.arguments = bundle
+        }
 
         openCreateTab(fragment, editProductTag)
     }
@@ -439,7 +448,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
 }
 
 interface OnNavigationChangedListener {
-    fun onNavigationChanged(tabNumber: Int, product: Product? = null, order: Order? = null, firebaseOrder: FirebaseOrder? = null)
+    fun onNavigationChanged(tabNumber: Int, product: Product? = null, firebaseProduct: FirebaseProduct? = null, order: Order? = null, firebaseOrder: FirebaseOrder? = null)
 }
 
 

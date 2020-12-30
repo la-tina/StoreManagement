@@ -48,7 +48,7 @@ class EditOrderAdapter(
             val currentFirebaseProductInOrder = firebaseOrderContents[position]
             holder.productName.text = currentFirebaseProductInOrder.productName
             holder.productPrice.text = currentFirebaseProductInOrder.productPrice
-            holder.productQuantity.setText(currentFirebaseProductInOrder.quantity.toString())
+            holder.productQuantity.setText(currentFirebaseProductInOrder.quantity)
 
             if (!canOrderBeEdited()) {
                 holder.productQuantity.isEnabled = false
@@ -179,7 +179,7 @@ class EditOrderAdapter(
         productsInOrder: List<OrderContent>?,
         firebaseProductsInOrder: List<FirebaseOrderContent>?
     ) {
-        if (productsInOrder != null && !areFirebaseOrderContentsLoaded) {
+        if (productsInOrder != null) {
             this.productsInOrder = productsInOrder
             areFirebaseOrderContentsLoaded = false
         } else if (firebaseProductsInOrder != null) {

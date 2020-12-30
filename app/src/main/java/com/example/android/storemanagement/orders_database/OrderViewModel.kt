@@ -42,14 +42,12 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //Because we're doing a database operation, we're using the IO Dispatcher.
-    fun insert(order: Order, onCompleteAction: (Long, String) -> Unit) =
+    fun insert(order: Order, onCompleteAction: (Long) -> Unit) =
         scope.launch(Dispatchers.IO) {
             val orderId = repository.insert(order)
-            val firebaseOrder = FirebaseOrder(order.finalPrice.toString(), order.date, order.orderStatus, 0.toString())
-            val fbOrderId = setFirebaseOrderData(firebaseOrder)
 
             withContext(Dispatchers.Main) {
-                onCompleteAction(orderId, fbOrderId)
+                onCompleteAction(orderId)
             }
         }
 

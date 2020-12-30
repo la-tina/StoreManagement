@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.annotation.WorkerThread
 import android.util.Log
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.setFirebaseProductData
+import com.example.android.storemanagement.firebase.FirebaseProduct
 
 //A Repository class abstracts access to multiple data sources
 //A Repository manages queries and allows you to use multiple backends.
@@ -18,7 +19,6 @@ class ProductRepository (private val productDao: ProductDao) {
     suspend fun insert(product: Product) {
         Log.v("Room","Inserting product: $product")
         productDao.insert(product)
-        setFirebaseProductData(product)
     }
 
     @WorkerThread

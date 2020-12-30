@@ -61,7 +61,7 @@ abstract class InfoOrderFragment: Fragment()  {
         Log.d("Tina", "final price after $finalPrice")
     }
 
-    protected fun setupEmptyView(emptyView: View, infoView: View, recyclerView: RecyclerView) {
+    protected fun setupEmptyView(emptyView: View, recyclerView: RecyclerView) {
         val products = recyclerView.adapter!!
         if (products.itemCount == 0) {
             recyclerView.visibility = View.GONE

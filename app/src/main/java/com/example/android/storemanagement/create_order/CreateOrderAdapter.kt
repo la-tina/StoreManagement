@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityAboveLimit
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
+import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.products_database.Product
 import kotlinx.android.synthetic.main.create_order_item.view.*
 
@@ -20,7 +21,7 @@ class CreateOrderAdapter(
     private val setOrderButtonEnabled: (Boolean) -> Unit
 ) : RecyclerView.Adapter<CreateOrderHolder>() {
 
-    private var products = emptyList<Product>() // Cached copy of products
+    private var firebaseProducts = mutableListOf<FirebaseProduct>() // Cached copy of products
 
     //productName -> quantity
     var quantities = mutableMapOf<String, Int>()
@@ -29,7 +30,7 @@ class CreateOrderAdapter(
 
     // Gets the number of items in the list
     override fun getItemCount(): Int {
-        return products.size
+        return firebaseProducts.size
     }
 
     // Inflates the item views
@@ -44,10 +45,10 @@ class CreateOrderAdapter(
 
     // Binds each product in the list to a view
     override fun onBindViewHolder(holder: CreateOrderHolder, position: Int) {
-        val currentProduct = products[position]
+        val currentProduct = firebaseProducts[position]
 
         holder.productName.text = currentProduct.name
-        holder.productPrice.text = currentProduct.price.toString()
+        holder.productPrice.text = (currentProduct.price.toFloat() + currentProduct.overcharge.toFloat()).toString()
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
 
         setOrderButtonEnabled(
@@ -122,10 +123,10 @@ class CreateOrderAdapter(
 
     private fun getPrice(): Float {
         var finalPrice = 0F
-        products.forEach { product ->
+        firebaseProducts.forEach { product ->
             if (!quantities.isNullOrEmpty() && quantities[product.name] != null) {
                 if (!isQuantityAboveLimit(quantities[product.name]!!)) {
-                    finalPrice += quantities[product.name]!! * product.price
+                    finalPrice += quantities[product.name]!! * (product.price.toFloat() + product.overcharge.toFloat())
                     Log.d(
                         "TinaOrder",
                         "finalPrice $finalPrice name " + product.name + " price " + product.price
@@ -144,8 +145,10 @@ class CreateOrderAdapter(
         quantities[productName] = quantity
     }
 
-    internal fun setProducts(products: List<Product>) {
-        this.products = products
+    internal fun setProducts(fbProducts: List<FirebaseProduct>) {
+        this.firebaseProducts.clear()
+        this.firebaseProducts.addAll(fbProducts)
+
         notifyDataSetChanged()
     }
 }
