@@ -73,57 +73,35 @@ open class CreateOrderFragment : InfoOrderFragment() {
         user = Firebase.auth.currentUser
         if (user != null) {
             // Get a reference to our posts
-            val uniqueId: String = user?.uid!!
-            val database = FirebaseDatabase.getInstance()
-            val ref: DatabaseReference = database.getReference("Products").child(uniqueId)
+            getFirebaseProducts()
+        }
+    }
 
-            // Attach a listener to read the data at our posts reference
-            ref.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    firebaseProductsList.clear()
-                    val firebaseProducts = dataSnapshot.children
+    private fun getFirebaseProducts() {
+        val uniqueId: String = user?.uid!!
+        val database = FirebaseDatabase.getInstance()
+        val ref: DatabaseReference = database.getReference("Products").child(uniqueId)
 
-                    for (item in firebaseProducts) {
-                        val firebaseProduct: FirebaseProduct? =
-                            item.getValue(FirebaseProduct::class.java)
+        // Attach a listener to read the data at our posts reference
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                firebaseProductsList.clear()
+                val firebaseProducts = dataSnapshot.children
 
-                        if (firebaseProduct != null) {
-                            val product = FirebaseProduct(
-                                firebaseProduct.name,
-                                firebaseProduct.price,
-                                firebaseProduct.overcharge,
-                                firebaseProduct.barcode,
-                                firebaseProduct.quantity,
-                                item.key!!
-                            )
-                            Log.d("TinaFirebase", "firebaseProduct onDataChange $product")
-                            if (firebaseProductsList.none { it.barcode == product.barcode }) {
-                                firebaseProductsList.add(product)
-                                activity?.runOnUiThread {
-                                    setupRecyclerView()
-                                }
-                            }
-                        }
-                    }
-                }
+                for (item in firebaseProducts) {
+                    val firebaseProduct: FirebaseProduct? =
+                        item.getValue(FirebaseProduct::class.java)
 
-                override fun onCancelled(databaseError: DatabaseError) {}
-            })
-
-            ref.addChildEventListener(object : ChildEventListener {
-                override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
-                    val firebaseNewProduct: FirebaseProduct? =
-                        dataSnapshot.getValue(FirebaseProduct::class.java)
-                    if (firebaseNewProduct != null) {
+                    if (firebaseProduct != null) {
                         val product = FirebaseProduct(
-                            firebaseNewProduct.name,
-                            firebaseNewProduct.price,
-                            firebaseNewProduct.overcharge,
-                            firebaseNewProduct.barcode,
-                            firebaseNewProduct.quantity,
-                            dataSnapshot.key!!
+                            firebaseProduct.name,
+                            firebaseProduct.price,
+                            firebaseProduct.overcharge,
+                            firebaseProduct.barcode,
+                            firebaseProduct.quantity,
+                            item.key!!
                         )
-                        Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
+                        Log.d("TinaFirebase", "firebaseProduct onDataChange $product")
                         if (firebaseProductsList.none { it.barcode == product.barcode }) {
                             firebaseProductsList.add(product)
                             activity?.runOnUiThread {
@@ -132,56 +110,83 @@ open class CreateOrderFragment : InfoOrderFragment() {
                         }
                     }
                 }
+            }
 
-                override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
-                    val changedFirebaseProduct: FirebaseProduct? =
-                        dataSnapshot.getValue(FirebaseProduct::class.java)
-                    if (changedFirebaseProduct != null) {
-                        val product = FirebaseProduct(
-                            changedFirebaseProduct.name,
-                            changedFirebaseProduct.price,
-                            changedFirebaseProduct.overcharge,
-                            changedFirebaseProduct.barcode,
-                            changedFirebaseProduct.quantity,
-                            dataSnapshot.key!!
-                        )
-                        Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
-                        val changedProduct =
-                            firebaseProductsList.first { t -> t.id == dataSnapshot.key!! }
-                        firebaseProductsList.remove(changedProduct)
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+
+        ref.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                val firebaseNewProduct: FirebaseProduct? =
+                    dataSnapshot.getValue(FirebaseProduct::class.java)
+                if (firebaseNewProduct != null) {
+                    val product = FirebaseProduct(
+                        firebaseNewProduct.name,
+                        firebaseNewProduct.price,
+                        firebaseNewProduct.overcharge,
+                        firebaseNewProduct.barcode,
+                        firebaseNewProduct.quantity,
+                        dataSnapshot.key!!
+                    )
+                    Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
+                    if (firebaseProductsList.none { it.barcode == product.barcode }) {
                         firebaseProductsList.add(product)
                         activity?.runOnUiThread {
                             setupRecyclerView()
                         }
                     }
                 }
+            }
 
-                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                    val firebaseRemovedProduct: FirebaseProduct? =
-                        dataSnapshot.getValue(FirebaseProduct::class.java)
-                    if (firebaseRemovedProduct != null) {
-                        val product = FirebaseProduct(
-                            firebaseRemovedProduct.name,
-                            firebaseRemovedProduct.price,
-                            firebaseRemovedProduct.overcharge,
-                            firebaseRemovedProduct.barcode,
-                            firebaseRemovedProduct.quantity,
-                            dataSnapshot.key!!
-                        )
-                        Log.d("TinaFirebase", "firebaseProduct onChildRemoved $product")
-                        if (!firebaseProductsList.none { it.barcode == product.barcode }) {
-                            firebaseProductsList.remove(product)
-                            activity?.runOnUiThread {
-                                setupRecyclerView()
-                            }
+            override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                val changedFirebaseProduct: FirebaseProduct? =
+                    dataSnapshot.getValue(FirebaseProduct::class.java)
+                if (changedFirebaseProduct != null) {
+                    val product = FirebaseProduct(
+                        changedFirebaseProduct.name,
+                        changedFirebaseProduct.price,
+                        changedFirebaseProduct.overcharge,
+                        changedFirebaseProduct.barcode,
+                        changedFirebaseProduct.quantity,
+                        dataSnapshot.key!!
+                    )
+                    Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
+                    val changedProduct =
+                        firebaseProductsList.first { t -> t.id == dataSnapshot.key!! }
+                    firebaseProductsList.remove(changedProduct)
+                    firebaseProductsList.add(product)
+                    activity?.runOnUiThread {
+                        setupRecyclerView()
+                    }
+                }
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                val firebaseRemovedProduct: FirebaseProduct? =
+                    dataSnapshot.getValue(FirebaseProduct::class.java)
+                if (firebaseRemovedProduct != null) {
+                    val product = FirebaseProduct(
+                        firebaseRemovedProduct.name,
+                        firebaseRemovedProduct.price,
+                        firebaseRemovedProduct.overcharge,
+                        firebaseRemovedProduct.barcode,
+                        firebaseRemovedProduct.quantity,
+                        dataSnapshot.key!!
+                    )
+                    Log.d("TinaFirebase", "firebaseProduct onChildRemoved $product")
+                    if (!firebaseProductsList.none { it.barcode == product.barcode }) {
+                        firebaseProductsList.remove(product)
+                        activity?.runOnUiThread {
+                            setupRecyclerView()
                         }
                     }
                 }
+            }
 
-                override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
-                override fun onCancelled(databaseError: DatabaseError) {}
-            })
-        }
+            override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+        setupRecyclerView()
     }
 
     private fun updateQuantities(orderId: Long) {
@@ -268,6 +273,6 @@ open class CreateOrderFragment : InfoOrderFragment() {
         // The onChanged() method fires when the observed data changes and the activity is
         // in the foreground.
         createOrdersAdapter.setProducts(firebaseProductsList)
-//        setupEmptyView(empty_view_products, products_recycler_view)
+        setupEmptyView(empty_view_create_order, create_order_recycler_view)
     }
 }

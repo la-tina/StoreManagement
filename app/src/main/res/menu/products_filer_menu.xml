@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/order_by_text"
+        android:title="@string/order_by"
+        android:checkable="false"
+        android:enabled="false" />
+    <item
+        android:id="@+id/quantity_ascending"
+        android:title="@string/quantity_ascending" />
+    <item
+        android:id="@+id/quantity_descending"
+        android:title="@string/quantity_descending" />
+    <item
+        android:id="@+id/name_ascending"
+        android:title="@string/name_ascending" />
+    <item
+        android:id="@+id/name_descending"
+        android:title="@string/name_descending" />
+    <item
+        android:id="@+id/pending"
+        android:visible="false"
+        android:title="@string/pending_status" />
+    <item
+        android:id="@+id/ordered"
+        android:visible="false"
+        android:title="@string/ordered_status" />
+    <item
+        android:id="@+id/confirmed"
+        android:visible="false"
+        android:title="@string/confirmed_status" />
+    <item
+        android:id="@+id/final_price_ascending"
+        android:title="@string/final_price_ascending" />
+    <item
+        android:id="@+id/final_price_descending"
+        android:title="@string/final_price_descending" />
+</menu>

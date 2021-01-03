@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="83dp"
-        android:layout_height="77dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:src="@drawable/apple"
@@ -25,7 +25,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-medium"
-        android:textSize="19sp"
+        android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,7 +39,7 @@
         android:text="@string/status_pending"
         android:textAlignment="textStart"
         android:textColor="@color/orange"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView" />
@@ -52,7 +52,7 @@
         android:layout_marginEnd="8dp"
         tools:text="123"
         android:textColor="@color/buttonFadeText"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/leva"
         app:layout_constraintEnd_toStartOf="@+id/leva" />
@@ -73,8 +73,8 @@
         android:id="@+id/context_menu_image"
         android:layout_width="36dp"
         android:layout_height="28dp"
-        android:layout_marginTop="32dp"
         android:src="@drawable/vertical_dots"
+        app:layout_constraintBottom_toTopOf="@+id/order_item_price"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -82,6 +82,7 @@
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="2dp"
+        android:padding="5dp"
         android:background="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>

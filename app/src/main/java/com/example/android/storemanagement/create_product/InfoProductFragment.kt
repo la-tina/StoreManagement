@@ -40,6 +40,9 @@ abstract class InfoProductFragment : Fragment() {
         CreateProductFieldValidator.ProductFieldElements.NAME
 
     var isPercentageViewSelected = false
+    var isPriceViewSelected = false
+    var isOverchargeViewSelected = false
+
     var lastPercentage = 0
     protected var user: FirebaseUser? = null
 
@@ -52,7 +55,7 @@ abstract class InfoProductFragment : Fragment() {
         const val KEY_PRODUCT_BARCODE_VALUE = "productBarcodeValue"
     }
 
-    private lateinit var mScannerView: ZBarScannerView
+    private lateinit var scannerView: ZBarScannerView
 
     protected val productViewModel: ProductViewModel by lazy {
         ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
@@ -107,7 +110,7 @@ abstract class InfoProductFragment : Fragment() {
         toolbarTopProduct.title = fragmentTitle
         button_add_product.text = buttonText
 
-        mScannerView = ZBarScannerView(context)
+        scannerView = ZBarScannerView(context)
 
         product_name.setText(savedProductName)
         product_price.setText(savedProductPrice)
@@ -118,13 +121,8 @@ abstract class InfoProductFragment : Fragment() {
 
 //        overcharge_percentage_text.setOnClickListener {
 //            isPercentageViewSelected = true
-//            Log.d("TinaInfo", "clicked")
 //        }
-
-        product_overcharge_percentage.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
-            isPercentageViewSelected = hasFocus
-        }
-
+//
 //        price_text.setOnClickListener {
 //            isPriceViewSelected = true
 //        }
@@ -133,6 +131,15 @@ abstract class InfoProductFragment : Fragment() {
 //            isOverchargeViewSelected = true
 //        }
 
+        product_overcharge_percentage.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+            isPercentageViewSelected = hasFocus
+        }
+        product_price.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+            isPriceViewSelected = hasFocus
+        }
+        product_overcharge.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+            isOverchargeViewSelected = hasFocus
+        }
 
         // clear space when there is no error message
         removeEmptyErrorMessageSpace(overcharge_percentage_text)
@@ -154,6 +161,11 @@ abstract class InfoProductFragment : Fragment() {
             )
         }
         button_scan_barcode.setOnClickListener { onBarcodeButtonPressed() }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        hideKeyboard(activity as Activity)
     }
 
     /**
@@ -266,13 +278,14 @@ abstract class InfoProductFragment : Fragment() {
                             && product_overcharge.text.toString().toFloat() != 0F
                         ) {
                             //calculate percentage for percentage field
-                            val percentage: Float = (product_overcharge.text.toString()
-                                .toFloat() / editTextView.text.toString().toFloat()) * 100
-                            product_overcharge_percentage.setText(
-                                percentage.toInt().toString()
-                            )
+                            if (isPriceViewSelected) {
+                                val percentage: Float = (product_overcharge.text.toString()
+                                    .toFloat() / editTextView.text.toString().toFloat()) * 100
+                                product_overcharge_percentage.setText(
+                                    percentage.toInt().toString()
+                                )
+                            }
                         }
-
                     }
                     product_overcharge -> {
                         fieldType = CreateProductFieldValidator.ProductFieldElements.OVERCHARGE
@@ -298,11 +311,13 @@ abstract class InfoProductFragment : Fragment() {
                             && editTextView.text.toString().toFloat() != 0F
                         ) {
                             //calculate percentage for percentage field
-                            val percentage: Float = (editTextView.text.toString()
-                                .toFloat() / product_price.text.toString().toFloat()) * 100
-                            product_overcharge_percentage.setText(
-                                percentage.toInt().toString()
-                            )
+                            if (isOverchargeViewSelected) {
+                                val percentage: Float = (editTextView.text.toString()
+                                    .toFloat() / product_price.text.toString().toFloat()) * 100
+                                product_overcharge_percentage.setText(
+                                    percentage.toInt().toString()
+                                )
+                            }
                         }
                     }
                     product_overcharge_percentage -> {
@@ -314,10 +329,12 @@ abstract class InfoProductFragment : Fragment() {
                         fieldType = CreateProductFieldValidator.ProductFieldElements.PERCENTAGE
                         if (shouldCalculatePercentage(inputLayoutView, editTextView)
                         ) {
-                            val overcharge: Float = (product_overcharge_percentage.text.toString()
-                                .toFloat() * product_price.text.toString().toFloat()) / 100
-                            if (product_overcharge.text.toString() != overcharge.toString()) {
-                                product_overcharge.setText(overcharge.toString())
+                            if (isPercentageViewSelected) {
+                                val overcharge: Float = (product_overcharge_percentage.text.toString()
+                                    .toFloat() * product_price.text.toString().toFloat()) / 100
+                                if (product_overcharge.text.toString() != overcharge.toString()) {
+                                    product_overcharge.setText(overcharge.toString())
+                                }
                             }
                             lastPercentage = editTextView.text.toString().toInt()
                             return

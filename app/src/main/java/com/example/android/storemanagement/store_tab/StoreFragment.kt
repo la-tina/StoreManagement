@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -15,6 +17,7 @@ import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.u
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
+import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -30,6 +33,7 @@ class StoreFragment : Fragment() {
 
     protected var firebaseProductsList = mutableListOf<FirebaseProduct>()
     protected var user: FirebaseUser? = null
+    lateinit var topToolbar: Toolbar
     private val allOrderContents = mutableListOf<OrderContent>()
 
     private val productViewModel: ProductViewModel by lazy {
@@ -62,6 +66,9 @@ class StoreFragment : Fragment() {
             store_item_quantity.setText(savedProductQuantity)
 
         info_text?.text = context?.getString(R.string.store_info)
+        topToolbar = view!!.findViewById(R.id.toolbarTop)
+        topToolbar.inflateMenu(R.menu.products_filer_menu)
+        topToolbar.overflowIcon = ContextCompat.getDrawable(context!!, R.drawable.ic_baseline_filter_alt)
 
         button_save_quantity.setOnClickListener {
             val quantities: MutableMap<String, Int> =
@@ -85,117 +92,250 @@ class StoreFragment : Fragment() {
 
         user = Firebase.auth.currentUser
         if (user != null) {
-            // Get a reference to our posts
-            val uniqueId: String = user?.uid!!
-            val database = FirebaseDatabase.getInstance()
-            val ref: DatabaseReference = database.getReference("Products").child(uniqueId)
-
-            // Attach a listener to read the data at our posts reference
-            ref.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    firebaseProductsList.clear()
-                    val firebaseProducts = dataSnapshot.children
-
-                    for (item in firebaseProducts) {
-                        val firebaseProduct: FirebaseProduct? =
-                            item.getValue(FirebaseProduct::class.java)
-
-                        if (firebaseProduct != null) {
-                            val product = FirebaseProduct(
-                                firebaseProduct.name,
-                                firebaseProduct.price,
-                                firebaseProduct.overcharge,
-                                firebaseProduct.barcode,
-                                firebaseProduct.quantity,
-                                item.key!!
-                            )
-                            Log.d("TinaFirebase", "firebaseProduct onDataChange $product")
-                            if (!firebaseProductsList.contains(product)) {
-                                firebaseProductsList.add(product)
-                                activity?.runOnUiThread {
-                                    setupRecyclerView()
-                                }
-                            }
-                        }
-                    }
+            getFirebaseProducts()
+        } else {
+            productViewModel.allProducts.observe(this, Observer { products ->
+                // Update the cached copy of the words in the adapter.
+                products?.let {
+                    setupRecyclerView(products = products)
                 }
-
-                override fun onCancelled(databaseError: DatabaseError) {}
             })
+        }
 
-            ref.addChildEventListener(object : ChildEventListener {
-                override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
-                    val firebaseNewProduct: FirebaseProduct? =
-                        dataSnapshot.getValue(FirebaseProduct::class.java)
-                    if (firebaseNewProduct != null) {
+        topToolbar.setOnMenuItemClickListener(Toolbar.OnMenuItemClickListener { item ->
+            Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+            when (item.itemId) {
+                R.id.quantity_ascending ->
+                    filterByAscendingQuantity()
+                R.id.quantity_descending ->
+                    filterByDescendingQuantity()
+                R.id.name_ascending ->
+                    filterByAscendingName()
+                R.id.name_descending ->
+                    filterByDescendingName()
+                R.id.final_price_ascending ->
+                    filterByAscendingPrice()
+                R.id.final_price_descending ->
+                    filterByDescendingPrice()
+            }
+            true
+        })
+    }
+
+    private fun getFirebaseProducts() {
+        // Get a reference to our posts
+        val uniqueId: String = user?.uid!!
+        val database = FirebaseDatabase.getInstance()
+        val ref: DatabaseReference = database.getReference("Products").child(uniqueId)
+
+        // Attach a listener to read the data at our posts reference
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                firebaseProductsList.clear()
+                val firebaseProducts = dataSnapshot.children
+
+                for (item in firebaseProducts) {
+                    val firebaseProduct: FirebaseProduct? =
+                        item.getValue(FirebaseProduct::class.java)
+
+                    if (firebaseProduct != null) {
                         val product = FirebaseProduct(
-                            firebaseNewProduct.name,
-                            firebaseNewProduct.price,
-                            firebaseNewProduct.overcharge,
-                            firebaseNewProduct.barcode,
-                            firebaseNewProduct.quantity,
-                            dataSnapshot.key!!
+                            firebaseProduct.name,
+                            firebaseProduct.price,
+                            firebaseProduct.overcharge,
+                            firebaseProduct.barcode,
+                            firebaseProduct.quantity,
+                            item.key!!
                         )
-                        Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
-                        if (firebaseProductsList.none { it.barcode == product.barcode }) {
+                        Log.d("TinaFirebase", "firebaseProduct onDataChange $product")
+                        if (!firebaseProductsList.contains(product)) {
                             firebaseProductsList.add(product)
                             activity?.runOnUiThread {
-                                setupRecyclerView()
+                                setupRecyclerView(firebaseProducts = firebaseProductsList)
                             }
                         }
                     }
                 }
+            }
 
-                override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
-                    val changedFirebaseProduct: FirebaseProduct? =
-                        dataSnapshot.getValue(FirebaseProduct::class.java)
-                    if (changedFirebaseProduct != null) {
-                        val product = FirebaseProduct(
-                            changedFirebaseProduct.name,
-                            changedFirebaseProduct.price,
-                            changedFirebaseProduct.overcharge,
-                            changedFirebaseProduct.barcode,
-                            changedFirebaseProduct.quantity,
-                            dataSnapshot.key!!
-                        )
-                        Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
-                        val changedProduct =
-                            firebaseProductsList.first { t -> t.id == dataSnapshot.key!! }
-                        firebaseProductsList.remove(changedProduct)
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+
+        ref.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                val firebaseNewProduct: FirebaseProduct? =
+                    dataSnapshot.getValue(FirebaseProduct::class.java)
+                if (firebaseNewProduct != null) {
+                    val product = FirebaseProduct(
+                        firebaseNewProduct.name,
+                        firebaseNewProduct.price,
+                        firebaseNewProduct.overcharge,
+                        firebaseNewProduct.barcode,
+                        firebaseNewProduct.quantity,
+                        dataSnapshot.key!!
+                    )
+                    Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
+                    if (firebaseProductsList.none { it.barcode == product.barcode }) {
                         firebaseProductsList.add(product)
                         activity?.runOnUiThread {
-                            setupRecyclerView()
+                            setupRecyclerView(firebaseProducts = firebaseProductsList)
                         }
                     }
                 }
+            }
 
-                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                    val firebaseRemovedProduct: FirebaseProduct? =
-                        dataSnapshot.getValue(FirebaseProduct::class.java)
-                    if (firebaseRemovedProduct != null) {
-                        val product = FirebaseProduct(
-                            firebaseRemovedProduct.name,
-                            firebaseRemovedProduct.price,
-                            firebaseRemovedProduct.overcharge,
-                            firebaseRemovedProduct.barcode,
-                            firebaseRemovedProduct.quantity,
-                            dataSnapshot.key!!
-                        )
-                        Log.d("TinaFirebase", "firebaseProduct onChildRemoved $product")
-                        if (!firebaseProductsList.none { it.barcode == product.barcode }) {
-                            firebaseProductsList.remove(product)
-                            activity?.runOnUiThread {
-                                setupRecyclerView()
-                            }
+            override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                val changedFirebaseProduct: FirebaseProduct? =
+                    dataSnapshot.getValue(FirebaseProduct::class.java)
+                if (changedFirebaseProduct != null) {
+                    val product = FirebaseProduct(
+                        changedFirebaseProduct.name,
+                        changedFirebaseProduct.price,
+                        changedFirebaseProduct.overcharge,
+                        changedFirebaseProduct.barcode,
+                        changedFirebaseProduct.quantity,
+                        dataSnapshot.key!!
+                    )
+                    Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
+                    val changedProduct =
+                        firebaseProductsList.first { t -> t.id == dataSnapshot.key!! }
+                    firebaseProductsList.remove(changedProduct)
+                    firebaseProductsList.add(product)
+                    activity?.runOnUiThread {
+                        setupRecyclerView(firebaseProducts = firebaseProductsList)
+                    }
+                }
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                val firebaseRemovedProduct: FirebaseProduct? =
+                    dataSnapshot.getValue(FirebaseProduct::class.java)
+                if (firebaseRemovedProduct != null) {
+                    val product = FirebaseProduct(
+                        firebaseRemovedProduct.name,
+                        firebaseRemovedProduct.price,
+                        firebaseRemovedProduct.overcharge,
+                        firebaseRemovedProduct.barcode,
+                        firebaseRemovedProduct.quantity,
+                        dataSnapshot.key!!
+                    )
+                    Log.d("TinaFirebase", "firebaseProduct onChildRemoved $product")
+                    if (!firebaseProductsList.none { it.barcode == product.barcode }) {
+                        firebaseProductsList.remove(product)
+                        activity?.runOnUiThread {
+                            setupRecyclerView(firebaseProducts = firebaseProductsList)
                         }
                     }
                 }
+            }
 
-                override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
-                override fun onCancelled(databaseError: DatabaseError) {}
-            })
+            override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+        setupRecyclerView(firebaseProducts = firebaseProductsList)
+    }
+
+    private fun filterByAscendingQuantity() {
+        if (user != null) {
+            val ascendingQuantityComparator = compareBy<FirebaseProduct> { it.quantity.toInt() }
+            val sortedOrderContentsList =
+                firebaseProductsList.sortedWith(ascendingQuantityComparator)
+            setupRecyclerView(firebaseProducts = sortedOrderContentsList)
         } else {
-            setupRecyclerView()
+            productViewModel.allProducts.observe(this, Observer { products ->
+                // Update the cached copy of the words in the adapter.
+                products?.let {
+                    val ascendingQuantityComparator = compareBy<Product> { it.quantity }
+                    val sortedProductList = products.sortedWith(ascendingQuantityComparator)
+                    setupRecyclerView(products = sortedProductList)
+                }
+            })
+        }
+    }
+
+    private fun filterByDescendingQuantity() {
+        if (user != null) {
+            val descendingQuantityComparator = compareByDescending<FirebaseProduct> { it.quantity.toInt() }
+            val sortedOrderContentsList =
+                firebaseProductsList.sortedWith(descendingQuantityComparator)
+            setupRecyclerView(firebaseProducts = sortedOrderContentsList)
+        } else {
+            productViewModel.allProducts.observe(this, Observer { products ->
+                // Update the cached copy of the words in the adapter.
+                products?.let {
+                    val descendingQuantityComparator = compareByDescending<Product> { it.quantity }
+                    val sortedProductList = products.sortedWith(descendingQuantityComparator)
+                    setupRecyclerView(products = sortedProductList)
+                }
+            })
+        }
+    }
+
+    private fun filterByAscendingName() {
+        if (user != null) {
+            val ascendingNameComparator = compareBy<FirebaseProduct> { it.name }
+            val sortedOrderContentsList = firebaseProductsList.sortedWith(ascendingNameComparator)
+            setupRecyclerView(firebaseProducts = sortedOrderContentsList)
+        } else {
+            productViewModel.allProducts.observe(this, Observer { products ->
+                // Update the cached copy of the words in the adapter.
+                products?.let {
+                    val ascendingNameComparator = compareBy<Product> { it.name }
+                    val sortedProductList = products.sortedWith(ascendingNameComparator)
+                    setupRecyclerView(products = sortedProductList)
+                }
+            })
+        }
+    }
+
+    private fun filterByDescendingName() {
+        if (user != null) {
+            val descendingNameComparator = compareByDescending<FirebaseProduct> { it.name }
+            val sortedOrderContentsList = firebaseProductsList.sortedWith(descendingNameComparator)
+            setupRecyclerView(firebaseProducts = sortedOrderContentsList)
+        } else {
+            productViewModel.allProducts.observe(this, Observer { products ->
+                // Update the cached copy of the words in the adapter.
+                products?.let {
+                    val descendingNameComparator = compareByDescending<Product> { it.name }
+                    val sortedProductList = products.sortedWith(descendingNameComparator)
+                    setupRecyclerView(products = sortedProductList)
+                }
+            })
+        }
+    }
+
+    private fun filterByAscendingPrice() {
+        if (user != null) {
+            val ascendingPriceComparator = compareBy<FirebaseProduct> { it.price.toFloat() }
+            val sortedOrderContentsList = firebaseProductsList.sortedWith(ascendingPriceComparator)
+            setupRecyclerView(firebaseProducts = sortedOrderContentsList)
+        } else {
+            productViewModel.allProducts.observe(this, Observer { products ->
+                // Update the cached copy of the words in the adapter.
+                products?.let {
+                    val ascendingPriceComparator = compareByDescending<Product> { it.price }
+                    val sortedProductList = products.sortedWith(ascendingPriceComparator)
+                    setupRecyclerView(products = sortedProductList)
+                }
+            })
+        }
+    }
+
+    private fun filterByDescendingPrice() {
+        if (user != null) {
+            val descendingPriceComparator = compareByDescending<FirebaseProduct> { it.price.toFloat() }
+            val sortedOrderContentsList = firebaseProductsList.sortedWith(descendingPriceComparator)
+            setupRecyclerView(firebaseProducts = sortedOrderContentsList)
+        } else {
+            productViewModel.allProducts.observe(this, Observer { products ->
+                // Update the cached copy of the words in the adapter.
+                products?.let {
+                    val descendingPriceComparator = compareByDescending<Product> { it.price }
+                    val sortedProductList = products.sortedWith(descendingPriceComparator)
+                    setupRecyclerView(products = sortedProductList)
+                }
+            })
         }
     }
 
@@ -212,22 +352,20 @@ class StoreFragment : Fragment() {
         updateFirebaseProductQuantity(barcode, quantity.toString())
     }
 
-    private fun setupRecyclerView() {
+    private fun setupRecyclerView(
+        products: List<Product>? = null,
+        firebaseProducts: List<FirebaseProduct>? = null,
+    ) {
         store_recycler_view.layoutManager =
             LinearLayoutManager(requireContext())
         val storeAdapter = StoreAdapter(requireContext(), ::setOrderButtonEnabled)
         store_recycler_view.adapter = storeAdapter
 
         if (user == null) {
-            productViewModel.allProducts.observe(this, Observer { products ->
-                // Update the cached copy of the words in the adapter.
-                products?.let {
-                    storeAdapter.setProducts(it, null)
-                    setupEmptyView()
-                }
-            })
+            storeAdapter.setProducts(products, null)
+            setupEmptyView()
         } else {
-            storeAdapter.setProducts(null, firebaseProductsList)
+            storeAdapter.setProducts(null, firebaseProducts)
             setupEmptyView()
         }
     }

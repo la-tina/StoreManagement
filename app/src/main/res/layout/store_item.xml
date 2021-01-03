@@ -8,31 +8,28 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="87dp"
-        android:layout_height="84dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_marginBottom="8dp"
         android:src="@drawable/raspberry"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/store_item_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/store_item_text" />
 
     <TextView
         android:id="@+id/store_item_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:fontFamily="sans-serif"
         android:padding="8dp"
         android:text="Name"
         android:textAlignment="viewStart"
         android:textColor="@color/checkBoxColor"
-        android:textSize="22sp"
+        android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/store_item_price"
         app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/quantity" />
 
     <TextView
         android:id="@+id/store_item_price"
@@ -41,7 +38,7 @@
         android:layout_marginEnd="8dp"
         tools:text="123"
         android:textColor="@color/buttonFadeText"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/leva"
         app:layout_constraintEnd_toStartOf="@+id/leva" />
@@ -66,7 +63,7 @@
         android:background="@drawable/custom_text_view"
         android:text="@string/quantity"
         android:textColor="@color/buttonFadeText"
-        android:textSize="18sp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@id/store_item_quantity"
         app:layout_constraintEnd_toStartOf="@+id/store_item_quantity"
         app:layout_constraintTop_toTopOf="@id/store_item_quantity" />
@@ -81,6 +78,7 @@
         android:textColor="@color/colorPrimaryDark"
         android:textColorHint="@color/colorAccent"
         android:visibility="visible"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

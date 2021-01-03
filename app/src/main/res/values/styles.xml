@@ -62,4 +62,8 @@
         <item name="android:padding">10dp</item>
     </style>
 
+    <style parent="android:style/Theme.Dialog" name="FullHeightDialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
 </resources>

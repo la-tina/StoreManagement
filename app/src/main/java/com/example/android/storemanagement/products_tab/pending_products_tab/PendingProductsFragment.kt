@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.OnNavigationChangedListener
@@ -14,11 +16,13 @@ import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.orders_tab.OrderStatus
 import com.example.android.storemanagement.products_database.Product
+import com.example.android.storemanagement.products_tab.ProductsFragment
 import com.example.android.storemanagement.products_tab.ProductsTabFragment
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.fragment_products.*
 import kotlinx.android.synthetic.main.fragment_products_container.*
 
 
@@ -46,24 +50,110 @@ class PendingProductsFragment : ProductsTabFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_products_container, container, false)
+    ): View? = inflater.inflate(R.layout.fragment_products_container, container, false)
 
     override fun onStart() {
         super.onStart()
         info_text.text = context?.getString(R.string.pending_products_info)
     }
 
+    private fun filterByAscendingQuantity() {
+        val ascendingQuantityComparator = compareBy<FirebaseOrderContent> { it.quantity.toInt() }
+        val sortedOrderContentsList = currentFirebaseOrderContents.sortedWith(ascendingQuantityComparator)
+        setupRecyclerView(firebaseOrderContents = sortedOrderContentsList)
+    }
+
+    private fun filterByDescendingQuantity() {
+        val ascendingQuantityComparator = compareByDescending<FirebaseOrderContent> { it.quantity.toInt() }
+        val sortedOrderContentsList = currentFirebaseOrderContents.sortedWith(ascendingQuantityComparator)
+        setupRecyclerView(firebaseOrderContents = sortedOrderContentsList)
+    }
+
+    private fun filterByAscendingName() {
+        val ascendingNameComparator = compareBy<FirebaseOrderContent> { it.productName }
+        val sortedOrderContentsList = currentFirebaseOrderContents.sortedWith(ascendingNameComparator)
+        setupRecyclerView(firebaseOrderContents = sortedOrderContentsList)
+    }
+
+    private fun filterByDescendingName() {
+        val descendingNameComparator = compareByDescending<FirebaseOrderContent> { it.productName }
+        val sortedOrderContentsList = currentFirebaseOrderContents.sortedWith(descendingNameComparator)
+        setupRecyclerView(firebaseOrderContents = sortedOrderContentsList)
+    }
+
+    private fun filterPendingOrderContents() {
+        val pendingOrders = notDeliveredOrdersList.filter { it.orderStatus == OrderStatus.PENDING.toString() }
+        var pendingOrderContents: List<FirebaseOrderContent> = emptyList()
+        pendingOrders.forEach { pendingOrder ->
+            pendingOrderContents = currentFirebaseOrderContents.filter { it.orderId == pendingOrder.id }
+        }
+        setupRecyclerView(firebaseOrderContents = pendingOrderContents)
+    }
+
+    private fun filterOrderedOrderContents() {
+        val orderedOrders = notDeliveredOrdersList.filter { it.orderStatus == OrderStatus.ORDERED.toString() }
+        var pendingOrderContents: List<FirebaseOrderContent> = emptyList()
+        orderedOrders.forEach { pendingOrder ->
+            pendingOrderContents = currentFirebaseOrderContents.filter { it.orderId == pendingOrder.id }
+        }
+        setupRecyclerView(firebaseOrderContents = pendingOrderContents)
+    }
+
+    private fun filterConfirmedOrderContents() {
+        val confirmedOrders = notDeliveredOrdersList.filter { it.orderStatus == OrderStatus.CONFIRMED.toString() }
+        var pendingOrderContents: List<FirebaseOrderContent> = emptyList()
+        confirmedOrders.forEach { pendingOrder ->
+            pendingOrderContents = currentFirebaseOrderContents.filter { it.orderId == pendingOrder.id }
+        }
+        setupRecyclerView(firebaseOrderContents = pendingOrderContents)
+    }
+
+    private fun filterByAscendingPrice() {
+        val ascendingPriceComparator = compareBy<FirebaseOrderContent> { it.productPrice.toFloat() }
+        val sortedOrderContentsList = currentFirebaseOrderContents.sortedWith(ascendingPriceComparator)
+        setupRecyclerView(firebaseOrderContents = sortedOrderContentsList)
+    }
+
+    private fun filterByDescendingPrice() {
+        val descendingPriceComparator = compareByDescending<FirebaseOrderContent> { it.productPrice.toFloat() }
+        val sortedOrderContentsList = currentFirebaseOrderContents.sortedWith(descendingPriceComparator)
+        setupRecyclerView(firebaseOrderContents = sortedOrderContentsList)
+    }
+
     override fun onResume() {
         super.onResume()
-
         user = Firebase.auth.currentUser
         if (user != null) {
             getFirebaseOrders()
         } else {
-            setupViewModel()
-            setupRecyclerView()
+            setupEmptyView(empty_view_products, products_recycler_view)
         }
+
+        setStatusMenuItemsVisibility(true)
+        (parentFragment as ProductsFragment).toolbarTop.setOnMenuItemClickListener(Toolbar.OnMenuItemClickListener { item ->
+            Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+            when (item.itemId) {
+                R.id.quantity_ascending ->
+                    filterByAscendingQuantity()
+                R.id.quantity_descending ->
+                    filterByDescendingQuantity()
+                R.id.name_ascending ->
+                    filterByAscendingName()
+                R.id.name_descending ->
+                    filterByDescendingName()
+                R.id.pending ->
+                    filterPendingOrderContents()
+                R.id.ordered ->
+                    filterOrderedOrderContents()
+                R.id.confirmed ->
+                    filterConfirmedOrderContents()
+                R.id.final_price_ascending ->
+                    filterByAscendingPrice()
+                R.id.final_price_descending ->
+                    filterByDescendingPrice()
+            }
+            true
+        })
     }
 
     private fun getFirebaseOrders() {
@@ -88,7 +178,7 @@ class PendingProductsFragment : ProductsTabFragment() {
                             item.key!!
                         )
                         Log.d("TinaFirebase", "firebaseOrder onDataChange $order")
-                        if (notDeliveredOrdersList.none {it.id == order.id} && shouldGetOrderData(order)) {
+                        if (notDeliveredOrdersList.none { it.id == order.id } && shouldGetOrderData(order)) {
                             notDeliveredOrdersList.add(order)
                             getFirebaseOrderContents(order.id)
                         }
@@ -111,7 +201,7 @@ class PendingProductsFragment : ProductsTabFragment() {
                         dataSnapshot.key!!
                     )
                     Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
-                    if (notDeliveredOrdersList.none {it.id == order.id} && shouldGetOrderData(order)) {
+                    if (notDeliveredOrdersList.none { it.id == order.id } && shouldGetOrderData(order)) {
                         notDeliveredOrdersList.add(order)
                         getFirebaseOrderContents(order.id)
                     }
@@ -159,6 +249,7 @@ class PendingProductsFragment : ProductsTabFragment() {
             override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+        setupRecyclerView(firebaseOrderContents = currentFirebaseOrderContents)
     }
 
     private fun shouldGetOrderData(order: FirebaseOrder) =
@@ -196,7 +287,7 @@ class PendingProductsFragment : ProductsTabFragment() {
 
                                 currentFirebaseOrderContents.add(orderContent)
                                 activity?.runOnUiThread {
-                                    setupRecyclerView()
+                                    setupRecyclerView(firebaseOrderContents = currentFirebaseOrderContents)
                                 }
                             }
                         }
@@ -208,7 +299,11 @@ class PendingProductsFragment : ProductsTabFragment() {
         }
     }
 
-    override fun setupRecyclerView() {
+    override fun setupRecyclerView(
+        products: List<Product>?,
+        firebaseProducts: List<FirebaseProduct>?,
+        firebaseOrderContents: List<FirebaseOrderContent>?
+    ) {
         products_recycler_view?.let { recyclerView ->
             recyclerView.layoutManager =
                 LinearLayoutManager(requireContext())
@@ -252,10 +347,13 @@ class PendingProductsFragment : ProductsTabFragment() {
 //                })
 //            })
 
-            pendingProductsAdapter.setOrderContents(
-                currentFirebaseOrderContents.toList(),
-                notDeliveredOrdersList.toList()
-            )
+            if (firebaseOrderContents != null) {
+                pendingProductsAdapter.setOrderContents(
+                    firebaseOrderContents,
+                    notDeliveredOrdersList.toList()
+                )
+            }
+            setupEmptyView(empty_view_products, products_recycler_view)
         }
     }
 }

@@ -20,6 +20,7 @@ import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import kotlinx.android.synthetic.main.fragment_products.*
 import kotlinx.android.synthetic.main.fragment_products_container.*
 
 abstract class ProductsTabFragment : Fragment() {
@@ -50,7 +51,11 @@ abstract class ProductsTabFragment : Fragment() {
 
     abstract fun setupViewModel()
 
-    abstract fun setupRecyclerView()
+    abstract fun setupRecyclerView(
+        products: List<Product>? = null,
+        firebaseProducts: List<FirebaseProduct>? = null,
+        firebaseOrderContents: List<FirebaseOrderContent>? = null
+    )
 
     protected fun getFirebaseProducts(
         database: FirebaseDatabase,
@@ -81,7 +86,7 @@ abstract class ProductsTabFragment : Fragment() {
                         if (firebaseProductsList.none { it.barcode == product.barcode }) {
                             firebaseProductsList.add(product)
                             activity?.runOnUiThread {
-                                setupRecyclerView()
+                                setupRecyclerView(null, firebaseProductsList)
                             }
                         }
                     }
@@ -108,7 +113,7 @@ abstract class ProductsTabFragment : Fragment() {
                     if (firebaseProductsList.none { it.barcode == product.barcode }) {
                         firebaseProductsList.add(product)
                         activity?.runOnUiThread {
-                            setupRecyclerView()
+                            setupRecyclerView(null, firebaseProductsList)
                         }
                     }
                 }
@@ -132,7 +137,7 @@ abstract class ProductsTabFragment : Fragment() {
                     firebaseProductsList.remove(changedProduct)
                     firebaseProductsList.add(product)
                     activity?.runOnUiThread {
-                        setupRecyclerView()
+                        setupRecyclerView(null, firebaseProductsList)
                     }
                 }
             }
@@ -153,7 +158,7 @@ abstract class ProductsTabFragment : Fragment() {
                     if (!firebaseProductsList.none { it.barcode == product.barcode }) {
                         firebaseProductsList.remove(product)
                         activity?.runOnUiThread {
-                            setupRecyclerView()
+                            setupRecyclerView(null, firebaseProductsList)
                         }
                     }
                 }
@@ -162,14 +167,20 @@ abstract class ProductsTabFragment : Fragment() {
             override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+        setupRecyclerView(firebaseProducts = firebaseProductsList)
+    }
+
+    protected fun setStatusMenuItemsVisibility(shouldBeVisible: Boolean) {
+        (parentFragment as ProductsFragment).toolbarTop.menu.getItem(5).isVisible = shouldBeVisible
+        (parentFragment as ProductsFragment).toolbarTop.menu.getItem(6).isVisible = shouldBeVisible
+        (parentFragment as ProductsFragment).toolbarTop.menu.getItem(7).isVisible = shouldBeVisible
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_products_container, container, false)
+    ): View? = inflater.inflate(R.layout.fragment_products_container, container, false)
 
     protected fun openEditProductTab(product: Product?, firebaseProduct: FirebaseProduct?) {
         listener?.onNavigationChanged(
@@ -184,7 +195,7 @@ abstract class ProductsTabFragment : Fragment() {
         if (products.itemCount == 0) {
             recyclerView.visibility = View.GONE
             emptyView.visibility = View.VISIBLE
-            info_text.visibility = View.GONE
+//            info_text.visibility = View.GONE
         } else {
             recyclerView.visibility = View.VISIBLE
             emptyView.visibility = View.GONE

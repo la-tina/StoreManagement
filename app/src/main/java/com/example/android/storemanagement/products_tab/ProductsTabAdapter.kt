@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 class ProductsTabAdapter(
     fragmentManager: FragmentManager,
     private var fragments: List<Fragment>
-) : FragmentStatePagerAdapter(fragmentManager) {
+) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     private val tabTitles = arrayOf("All", "In\n Stock", "Low\n Stock", "Pending")
 

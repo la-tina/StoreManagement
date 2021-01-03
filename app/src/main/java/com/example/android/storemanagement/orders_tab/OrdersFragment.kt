@@ -1,12 +1,16 @@
 package com.example.android.storemanagement.orders_tab
 
 
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -72,6 +76,80 @@ open class OrdersFragment : Fragment() {
         )
     }
 
+    override fun onStart() {
+        super.onStart()
+        setHasOptionsMenu(true)
+        topToolbar = view!!.findViewById(R.id.toolbarTop)
+        topToolbar.inflateMenu(R.menu.orders_filter_menu)
+        topToolbar.overflowIcon = ContextCompat.getDrawable(context!!, R.drawable.ic_baseline_filter_alt)
+        topToolbar.setOnMenuItemClickListener(Toolbar.OnMenuItemClickListener { item ->
+            Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+            when (item.itemId) {
+                R.id.new_old_date ->
+                    filterByNewDate()
+                R.id.old_new_date ->
+                    filterByOldDate()
+                R.id.pending ->
+                    filterPendingOrders()
+                R.id.ordered ->
+                    filterOrderedOrders()
+                R.id.confirmed ->
+                    filterConfirmedOrders()
+                R.id.delivered ->
+                    filterDeliveredOrders()
+                R.id.final_price_ascending ->
+                    filterByAscendingFinalPrice()
+                R.id.final_price_descending ->
+                    filterByDescendingFinalPrice()
+            }
+            true
+        })
+    }
+
+    private fun filterByNewDate() {
+        val newDateComparator = compareByDescending<FirebaseOrder> { it.date }
+        val sortedOrdersList = firebaseOrdersList.sortedWith(newDateComparator)
+        setupRecyclerView(sortedOrdersList)
+    }
+
+    private fun filterByOldDate() {
+        val oldDateComparator = compareBy<FirebaseOrder> { it.date }
+        val sortedOrdersList = firebaseOrdersList.sortedWith(oldDateComparator)
+        setupRecyclerView(sortedOrdersList)
+    }
+
+    private fun filterPendingOrders() {
+        val pendingOrders = firebaseOrdersList.filter { it.orderStatus == OrderStatus.PENDING.toString() }
+        setupRecyclerView(pendingOrders)
+    }
+
+    private fun filterOrderedOrders() {
+        val pendingOrders = firebaseOrdersList.filter { it.orderStatus == OrderStatus.ORDERED.toString() }
+        setupRecyclerView(pendingOrders)
+    }
+
+    private fun filterConfirmedOrders() {
+        val pendingOrders = firebaseOrdersList.filter { it.orderStatus == OrderStatus.CONFIRMED.toString() }
+        setupRecyclerView(pendingOrders)
+    }
+
+    private fun filterDeliveredOrders() {
+        val pendingOrders = firebaseOrdersList.filter { it.orderStatus == OrderStatus.DELIVERED.toString() }
+        setupRecyclerView(pendingOrders)
+    }
+
+    private fun filterByAscendingFinalPrice() {
+        val finalPriceComparator = compareBy<FirebaseOrder> { it.finalPrice.toFloat() }
+        val sortedOrdersList = firebaseOrdersList.sortedWith(finalPriceComparator)
+        setupRecyclerView(sortedOrdersList)
+    }
+
+    private fun filterByDescendingFinalPrice() {
+        val finalPriceComparator = compareByDescending<FirebaseOrder> { it.finalPrice.toFloat() }
+        val sortedOrdersList = firebaseOrdersList.sortedWith(finalPriceComparator)
+        setupRecyclerView(sortedOrdersList)
+    }
+
     override fun onResume() {
         super.onResume()
         orders_add_button?.setOnClickListener {
@@ -84,7 +162,7 @@ open class OrdersFragment : Fragment() {
         getFirebaseOrders()
         getFirebaseProducts()
         getFirebaseOrderContents()
-        setupEmptyView()
+        setupRecyclerView(firebaseOrdersList)
     }
 
     private fun getFirebaseOrderContents() {
@@ -302,7 +380,7 @@ open class OrdersFragment : Fragment() {
                             if (!firebaseProductsList.contains(product)) {
                                 firebaseProductsList.add(product)
                                 activity?.runOnUiThread {
-                                    setupRecyclerView()
+                                    setupRecyclerView(firebaseOrdersList)
                                 }
                             }
                         }
@@ -329,7 +407,7 @@ open class OrdersFragment : Fragment() {
                         if (firebaseProductsList.none { it.barcode == product.barcode }) {
                             firebaseProductsList.add(product)
                             activity?.runOnUiThread {
-                                setupRecyclerView()
+                                setupRecyclerView(firebaseOrdersList)
                             }
                         }
                     }
@@ -353,7 +431,7 @@ open class OrdersFragment : Fragment() {
                         firebaseProductsList.remove(changedProduct)
                         firebaseProductsList.add(product)
                         activity?.runOnUiThread {
-                            setupRecyclerView()
+                            setupRecyclerView(firebaseOrdersList)
                         }
                     }
                 }
@@ -374,7 +452,7 @@ open class OrdersFragment : Fragment() {
                         if (!firebaseProductsList.none { it.barcode == product.barcode }) {
                             firebaseProductsList.remove(product)
                             activity?.runOnUiThread {
-                                setupRecyclerView()
+                                setupRecyclerView(firebaseOrdersList)
                             }
                         }
                     }
@@ -407,11 +485,12 @@ open class OrdersFragment : Fragment() {
                             firebaseOrder.orderStatus,
                             item.key!!
                         )
+
                         Log.d("TinaFirebase", "firebaseOrder onDataChange $order")
                         if (!firebaseOrdersList.contains(order)) {
                             firebaseOrdersList.add(order)
                             activity?.runOnUiThread {
-                                setupRecyclerView()
+                                setupRecyclerView(firebaseOrdersList)
                             }
                         }
                     }
@@ -432,11 +511,12 @@ open class OrdersFragment : Fragment() {
                         firebaseNewOrder.orderStatus,
                         dataSnapshot.key!!
                     )
+
                     Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
                     if (!firebaseOrdersList.contains(order)) {
                         firebaseOrdersList.add(order)
                         activity?.runOnUiThread {
-                            setupRecyclerView()
+                            setupRecyclerView(firebaseOrdersList)
                         }
                     }
                 }
@@ -452,6 +532,7 @@ open class OrdersFragment : Fragment() {
                         changedFirebaseOrder.orderStatus,
                         dataSnapshot.key!!
                     )
+
                     Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
                     if (firebaseOrdersList.contains(order)) {
                         firebaseOrdersList.forEach { firebaseOrder ->
@@ -462,7 +543,7 @@ open class OrdersFragment : Fragment() {
                         }
                     }
                     activity?.runOnUiThread {
-                        setupRecyclerView()
+                        setupRecyclerView(firebaseOrdersList)
                     }
                 }
             }
@@ -477,11 +558,12 @@ open class OrdersFragment : Fragment() {
                         firebaseRemovedOrder.orderStatus,
                         dataSnapshot.key!!
                     )
+
                     Log.d("TinaFirebase", "firebaseOrder onChildRemoved $order")
                     if (firebaseOrdersList.contains(order)) {
                         firebaseOrdersList.remove(order)
                         activity?.runOnUiThread {
-                            setupRecyclerView()
+                            setupRecyclerView(firebaseOrdersList)
                         }
                     }
                 }
@@ -647,7 +729,7 @@ open class OrdersFragment : Fragment() {
         }
     }
 
-    private fun setupRecyclerView() {
+    private fun setupRecyclerView(firebaseOrders: List<FirebaseOrder>) {
         orders_recycler_view?.layoutManager =
             LinearLayoutManager(requireContext())
         val ordersAdapter = OrdersAdapter(
@@ -671,7 +753,7 @@ open class OrdersFragment : Fragment() {
 //        })
 
         activity?.runOnUiThread {
-            ordersAdapter.setOrders(null, firebaseOrdersList)
+            ordersAdapter.setOrders(null, firebaseOrders)
             setupEmptyView()
         }
     }

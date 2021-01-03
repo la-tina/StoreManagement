@@ -75,8 +75,24 @@
     <string name="low_stock_products_info">Products with a quantity below 5.</string>
     <string name="pending_products_info">Products that haven\'t been delivered yet.</string>
     <string name="store_info">Edit the products\' quantities from here:</string>
-    <string name="create_order_info">Create an order by entering quantities and press \"Add Order\".</string>
+    <string name="create_order_info">Create an order by entering quantities and press \n \"Add Order\".</string>
     <string name="edit_order_info">Edit the order by changing quantities and press \"Save\". \n The order can be edited because it is in Pending state.</string>
     <string name="view_order_info">The order content for this order. \n It cannot be edited because the order is not in Pending state.</string>
+    <string name="date_new_old">Date /New - Old/</string>
+    <string name="date_old_new">Date /Old - New/</string>
+    <string name="pending_status">Pending status</string>
+    <string name="ordered_status">Ordered status</string>
+    <string name="confirmed_status">Confirmed status</string>
+    <string name="delivered_status">Delivered status</string>
+    <string name="final_price_ascending">Final price /Ascending/</string>
+    <string name="final_price_descending">Final price /Descending/</string>
+    <string name="order_by">ORDER BY:</string>
+    <string name="quantity_ascending">Quantity /Ascending/</string>
+    <string name="quantity_descending">Quantity /Descending/</string>
+    <string name="name_descending">Name /Descending/</string>
+    <string name="name_ascending">Name /Ascending/</string>
+    <string name="retrieving_orders">Retrieving orders</string>
+    <string name="retrieving_products">Retrieving products</string>
+    <string name="retrieving_pending_products">Retrieving pending products</string>
 
 </resources>

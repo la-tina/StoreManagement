@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.example.android.storemanagement.CREATE_PRODUCT_TAB
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
@@ -13,6 +14,7 @@ import com.example.android.storemanagement.products_tab.in_stock_products_tab.Pr
 import com.example.android.storemanagement.products_tab.low_stock_products_tab.ProductsLowStockFragment
 import com.example.android.storemanagement.products_tab.pending_products_tab.PendingProductsFragment
 import kotlinx.android.synthetic.main.fragment_products.*
+import kotlinx.android.synthetic.main.fragment_products.view.*
 
 
 class ProductsFragment : Fragment() {
@@ -20,7 +22,10 @@ class ProductsFragment : Fragment() {
     lateinit var onNavigationChangedListener: OnNavigationChangedListener
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_products, container, false)
+        val view = inflater.inflate(R.layout.fragment_products, container, false)
+        view.toolbarTop.inflateMenu(R.menu.products_filer_menu)
+        view.toolbarTop.overflowIcon = ContextCompat.getDrawable(context!!, R.drawable.ic_baseline_filter_alt)
+        return view
     }
 
     override fun onResume() {
