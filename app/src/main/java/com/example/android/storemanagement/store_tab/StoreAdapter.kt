@@ -46,7 +46,8 @@ class StoreAdapter(
         if (areFirebaseProductsLoaded) {
             val currentProduct = firebaseProducts[position]
             holder.productName.text = currentProduct.name
-            holder.productPrice.text = (currentProduct.price.toFloat() + currentProduct.overcharge.toFloat()).toString()
+            val overcharge = if (currentProduct.overcharge.isBlank()) 0F else currentProduct.overcharge.toFloat()
+            holder.productPrice.text = (currentProduct.price.toFloat() + overcharge).toString()
             holder.productQuantity.setText(currentProduct.quantity)
             holder.productQuantity.addTextChangedListener(getTextWatcher(holder, currentProduct.barcode))
         } else {

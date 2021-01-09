@@ -195,7 +195,7 @@ open class CreateProductFragment : InfoProductFragment() {
                 quantity.toString(),
                 ""
             )
-            FirebaseDatabaseOperations.setFirebaseProductData(firebaseProduct)
+            FirebaseDatabaseOperations.addFirebaseProduct(firebaseProduct)
         }
         parentFragmentManager.popBackStackImmediate()
     }

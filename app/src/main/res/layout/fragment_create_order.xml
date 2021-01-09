@@ -33,6 +33,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
+    <TextView
+        android:id="@+id/user_info"
+        style="@style/InfoText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/extraLightBarColor"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/info_text" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/create_order_recycler_view"
         android:layout_width="match_parent"
@@ -41,7 +53,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/info_text" />
+        app:layout_constraintTop_toBottomOf="@+id/user_info" />
 
     <ImageView
         android:id="@+id/empty_view_create_order"
@@ -87,10 +99,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:text="20"
             android:textColor="@color/buttonFadeText"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:text="20"
             app:layout_constraintBottom_toBottomOf="@+id/text_leva"
             app:layout_constraintEnd_toStartOf="@+id/text_leva"
             app:layout_constraintTop_toTopOf="@+id/text_leva" />
@@ -117,9 +129,9 @@
             android:layout_marginBottom="10dp"
             android:padding="10dp"
             android:text="@string/final_price"
+            android:textColor="@color/darkBarColor"
             android:textSize="17sp"
             android:textStyle="bold"
-            android:textColor="@color/darkBarColor"
             app:layout_constraintBottom_toBottomOf="@+id/final_price"
             app:layout_constraintEnd_toStartOf="@+id/final_price"
             app:layout_constraintTop_toTopOf="@+id/final_price" />
@@ -130,8 +142,8 @@
             android:layout_height="5dp"
             android:background="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

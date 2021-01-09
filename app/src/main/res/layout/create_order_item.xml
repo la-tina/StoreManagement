@@ -7,6 +7,22 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/product_item_quantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="sans-serif"
+        android:padding="8dp"
+        android:text="@string/in_stock_quantity"
+        android:textAlignment="viewStart"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/order_item_quantity_layout"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/order_item_quantity_layout"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/product_item_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

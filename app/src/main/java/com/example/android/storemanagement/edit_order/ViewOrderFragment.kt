@@ -2,12 +2,9 @@ package com.example.android.storemanagement.edit_order
 
 import android.util.Log
 import androidx.lifecycle.Observer
-import android.view.View
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.ORDER_KEY
-import com.example.android.storemanagement.R
-import com.example.android.storemanagement.VIEW_ORDER_KEY
 import com.example.android.storemanagement.create_order.InfoOrderFragment
 import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
@@ -72,6 +69,7 @@ class ViewOrderFragment : InfoOrderFragment() {
                                 firebaseOrderContent.productOvercharge,
                                 firebaseOrderContent.quantity,
                                 firebaseOrderContent.orderId,
+                                firebaseOrderContent.userId,
                                 item.key!!
                             )
                             if (!currentFirebaseOrderContents.contains(orderContent) && firebaseOrderContent.orderId == fbOrderId) {

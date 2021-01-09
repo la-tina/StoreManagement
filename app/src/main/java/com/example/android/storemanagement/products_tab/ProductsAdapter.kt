@@ -30,7 +30,8 @@ abstract class ProductsAdapter(
         if (areFirebaseProductsLoaded) {
             val currentProduct = firebaseProducts[position]
             holder.productType.text = currentProduct.name
-            holder.productPrice.text = (currentProduct.price.toFloat() + currentProduct.overcharge.toFloat()).toString()
+            val overcharge = if (currentProduct.overcharge.isBlank()) 0F else currentProduct.overcharge.toFloat()
+            holder.productPrice.text = (currentProduct.price.toFloat() + overcharge).toString()
             holder.productQuantity.text = currentProduct.quantity
             holder.imageContextMenu.setOnClickListener { view -> showPopup(view, null, currentProduct) }
             holder.itemView.setOnClickListener {

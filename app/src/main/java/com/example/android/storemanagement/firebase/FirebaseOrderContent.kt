@@ -8,9 +8,10 @@ data class FirebaseOrderContent(val productBarcode: String,
                                 val productOvercharge: String,
                                 val quantity: String,
                                 val orderId: String,
+                                val userId: String,
                                 val id: String) {
     constructor() : this("", "",
-        "", "","", "", "")
+        "", "","", "", "", "")
 
     fun isEqual(orderContent: FirebaseOrderContent?): Boolean {
         return orderContent != null

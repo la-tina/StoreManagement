@@ -11,6 +11,8 @@
         android:id="@+id/appName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="45sp"
+        android:padding="10dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
         android:fontFamily="cursive"
@@ -19,7 +21,6 @@
         android:text="@string/store_management"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="52sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,12 +73,12 @@
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonContionue"
+        app:layout_constraintBottom_toTopOf="@+id/buttonContinue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/buttonContionue"
+        android:id="@+id/buttonContinue"
         android:layout_width="match_parent"
         android:layout_height="@dimen/login_button_height"
         android:layout_marginBottom="@dimen/login_button_margin"
@@ -88,45 +89,36 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!--        <LinearLayout-->
-    <!--            android:id="@+id/progressBar"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_below="@+id/mainButtons"-->
-    <!--            android:layout_centerHorizontal="true"-->
-    <!--            android:layout_margin="@dimen/login_progress_bar_margin"-->
-    <!--            android:orientation="horizontal"-->
-    <!--            android:visibility="invisible">-->
+    <ImageView
+        android:id="@+id/imageViewBlueberry"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="30dp"
+        android:src="@drawable/blueberry"
+        app:layout_constraintBottom_toTopOf="@+id/register_text"
+        app:layout_constraintStart_toStartOf="parent"  />
 
-    <!--            <ProgressBar-->
-    <!--                style="?android:attr/progressBarStyleSmall"-->
-    <!--                android:layout_width="wrap_content"-->
-    <!--                android:layout_height="wrap_content"-->
-    <!--                android:layout_gravity="center_horizontal"/>-->
+    <ImageView
+        android:id="@+id/imageViewAvocado"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/avocado"
+        app:layout_constraintBottom_toTopOf="@+id/register_text"
+        app:layout_constraintStart_toEndOf="@+id/imageViewBlueberry"
+        app:layout_constraintEnd_toStartOf="@+id/imageViewRaspberry" />
 
-    <!--            <TextView-->
-    <!--                android:layout_width="wrap_content"-->
-    <!--                android:layout_height="wrap_content"-->
-    <!--                android:text="@string/login_progress_loading"-->
-    <!--                android:textAppearance="?android:attr/textAppearanceSmall"-->
-    <!--                android:textColor="@color/colorPrimary"/>-->
+    <ImageView
+        android:id="@+id/imageViewRaspberry"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="25dp"
+        android:src="@drawable/raspberry"
+        app:layout_constraintBottom_toTopOf="@+id/register_text"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!--        </LinearLayout>-->
-
-    <!--        <LinearLayout-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="match_parent"-->
-    <!--            android:layout_below="@+id/progressBar"-->
-    <!--            android:gravity="center_horizontal|bottom"-->
-    <!--            android:orientation="vertical">-->
-
-    <!--            <Button-->
-    <!--                android:id="@+id/registerButton"-->
-    <!--                style="?android:attr/borderlessButtonStyle"-->
-    <!--                android:layout_width="wrap_content"-->
-    <!--                android:layout_height="@dimen/login_bottom_btn_height"-->
-    <!--                android:text="@string/login_button_register"-->
-    <!--                android:textColor="@android:color/white"/>-->
     <FrameLayout
         android:id="@+id/login_fragment_container"
         android:layout_width="0dp"

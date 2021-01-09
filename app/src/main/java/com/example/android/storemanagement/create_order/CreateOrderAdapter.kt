@@ -12,13 +12,16 @@ import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityAboveLimit
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.firebase.FirebaseProduct
-import com.example.android.storemanagement.products_database.Product
+import com.example.android.storemanagement.firebase.FirebaseUserInternal
 import kotlinx.android.synthetic.main.create_order_item.view.*
+import kotlinx.android.synthetic.main.fragment_create_order.view.*
+
 
 class CreateOrderAdapter(
     private val context: Context,
     private val updateFinalPriceAction: (Float) -> Unit,
-    private val setOrderButtonEnabled: (Boolean) -> Unit
+    private val setOrderButtonEnabled: (Boolean) -> Unit,
+    private val firebaseUser: FirebaseUserInternal
 ) : RecyclerView.Adapter<CreateOrderHolder>() {
 
     private var firebaseProducts = mutableListOf<FirebaseProduct>() // Cached copy of products
@@ -48,7 +51,10 @@ class CreateOrderAdapter(
         val currentProduct = firebaseProducts[position]
 
         holder.productName.text = currentProduct.name
-        holder.productPrice.text = (currentProduct.price.toFloat() + currentProduct.overcharge.toFloat()).toString()
+        val overcharge = if (currentProduct.overcharge.isBlank()) 0F else currentProduct.overcharge.toFloat()
+        holder.productPrice.text = (currentProduct.price.toFloat() + overcharge).toString()
+        holder.inStockProductQuantity.visibility = View.VISIBLE
+        holder.inStockProductQuantity.text = context.resources.getString(R.string.in_stock_quantity).plus(" ").plus(currentProduct.quantity)
         holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
 
         setOrderButtonEnabled(
@@ -126,11 +132,8 @@ class CreateOrderAdapter(
         firebaseProducts.forEach { product ->
             if (!quantities.isNullOrEmpty() && quantities[product.name] != null) {
                 if (!isQuantityAboveLimit(quantities[product.name]!!)) {
-                    finalPrice += quantities[product.name]!! * (product.price.toFloat() + product.overcharge.toFloat())
-                    Log.d(
-                        "TinaOrder",
-                        "finalPrice $finalPrice name " + product.name + " price " + product.price
-                    )
+                    val overcharge = if (product.overcharge.isEmpty()) 0F else product.overcharge.toFloat()
+                    finalPrice += quantities[product.name]!! * (product.price.toFloat() + overcharge)
                 }
             }
         }
@@ -159,4 +162,5 @@ class CreateOrderHolder(view: View) : RecyclerView.ViewHolder(view) {
     val productPrice = view.order_item_price!!
     val productQuantityLayout = view.order_item_quantity_layout!!
     val productQuantity = view.order_item_quantity!!
+    val inStockProductQuantity = view.product_item_quantity
 }

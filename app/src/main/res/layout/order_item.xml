@@ -19,15 +19,30 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/order_date"
+        android:id="@+id/order_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif-medium"
         android:textSize="16sp"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text = "idffsdfsdfer3534535"/>
+
+    <TextView
+        android:id="@+id/order_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@id/order_id"
+        app:layout_constraintBottom_toTopOf="@id/status"
+        tools:text="3435345345"/>
 
     <TextView
         android:id="@+id/status"
@@ -71,8 +86,8 @@
 
     <ImageView
         android:id="@+id/context_menu_image"
-        android:layout_width="36dp"
-        android:layout_height="28dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/vertical_dots"
         app:layout_constraintBottom_toTopOf="@+id/order_item_price"
         app:layout_constraintEnd_toEndOf="parent"

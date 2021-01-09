@@ -1,7 +1,7 @@
 package com.example.android.storemanagement.orders_tab
 
 
-import android.app.Dialog
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,6 +16,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.*
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.Utils.getFormattedDate
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.addFirebaseProduct
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseOrderData
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderDate
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderStatus
@@ -33,8 +35,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.fragment_orders.*
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 
 open class OrdersFragment : Fragment() {
@@ -153,8 +153,21 @@ open class OrdersFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         orders_add_button?.setOnClickListener {
-            if (::onNavigationChangedListener.isInitialized)
-                onNavigationChangedListener.onNavigationChanged(CREATE_ORDER_TAB)
+            if (user == null) {
+                val dialog = AlertDialog.Builder(context!!, R.style.AlertDialog)
+                    .setTitle(R.string.info)
+                    .setMessage(R.string.no_user_info)
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+                    }.show()
+
+                val textView = dialog.findViewById<View>(android.R.id.message) as TextView
+                textView.textSize = 17f
+                textView.setTextColor(ContextCompat.getColor(context!!, R.color.darkBarColor))
+            } else {
+                if (::onNavigationChangedListener.isInitialized)
+                    onNavigationChangedListener.onNavigationChanged(USERS_TAB)
+            }
         }
 
         // Get a reference to our posts
@@ -191,6 +204,7 @@ open class OrdersFragment : Fragment() {
                                 firebaseOrderContent.productOvercharge,
                                 firebaseOrderContent.quantity,
                                 firebaseOrderContent.orderId,
+                                firebaseOrderContent.userId,
                                 item.key!!
                             )
                             if (firebaseOrderContentsList.none { it.id == orderContent.id }) {
@@ -215,6 +229,7 @@ open class OrdersFragment : Fragment() {
                             firebaseNewOrderContent.productOvercharge,
                             firebaseNewOrderContent.quantity,
                             firebaseNewOrderContent.orderId,
+                            firebaseNewOrderContent.userId,
                             dataSnapshot.key!!
                         )
                         if (firebaseOrderContentsList.none { it.id == orderContent.id }) {
@@ -234,10 +249,11 @@ open class OrdersFragment : Fragment() {
                             firebaseChangedOrderContent.productOvercharge,
                             firebaseChangedOrderContent.quantity,
                             firebaseChangedOrderContent.orderId,
+                            firebaseChangedOrderContent.userId,
                             dataSnapshot.key!!
                         )
                         val changedOrderContent =
-                            firebaseProductsList.first { t -> t.id == dataSnapshot.key!! }
+                            firebaseOrderContentsList.first { t -> t.id == dataSnapshot.key!! }
                         firebaseOrderContentsList.remove(changedOrderContent)
                         firebaseOrderContentsList.add(orderContent)
                     }
@@ -254,6 +270,7 @@ open class OrdersFragment : Fragment() {
                             firebaseRemovedOrderContent.productOvercharge,
                             firebaseRemovedOrderContent.quantity,
                             firebaseRemovedOrderContent.orderId,
+                            firebaseRemovedOrderContent.userId,
                             dataSnapshot.key!!
                         )
                         if (!firebaseProductsList.none { it.id == orderContent.id }) {
@@ -268,7 +285,7 @@ open class OrdersFragment : Fragment() {
         }
     }
 
-    private fun onOrderContentsDelivered(fbOrderId: String) {
+    private fun updateDeliveredProducts(fbOrderId: String) {
         if (user != null) {
             val uniqueId: String = user?.uid!!
             val database: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -292,9 +309,22 @@ open class OrdersFragment : Fragment() {
                                 firebaseOrderContent.productOvercharge,
                                 firebaseOrderContent.quantity,
                                 firebaseOrderContent.orderId,
+                                firebaseOrderContent.userId,
                                 item.key!!
                             )
-                            updateCurrent(orderContent)
+                            if (firebaseProductsList.none { it.barcode == orderContent.productBarcode }) {
+                                val firebaseProduct = FirebaseProduct(
+                                    orderContent.productName,
+                                    orderContent.productPrice,
+                                    orderContent.productOvercharge,
+                                    orderContent.productBarcode,
+                                    orderContent.quantity,
+                                    ""
+                                )
+                                addFirebaseProduct(firebaseProduct)
+                            } else {
+                                updateProductQuantity(orderContent.productBarcode, orderContent.quantity.toInt())
+                            }
                         }
                     }
                 }
@@ -304,13 +334,13 @@ open class OrdersFragment : Fragment() {
         }
     }
 
-    fun updateCurrent(orderContent: FirebaseOrderContent) {
+    fun updateProductQuantity(productBarcode: String, quantityToBeAdded: Int) {
         val productsToBeChanged =
-            firebaseProductsList.filter { it.barcode == orderContent.productBarcode }
+            firebaseProductsList.filter { it.barcode == productBarcode }
         productsToBeChanged.forEach { firebaseProducts ->
             val newQuantity =
-                (orderContent.quantity.toInt() + firebaseProducts.quantity.toInt()).toString()
-            updateFirebaseProductQuantity(orderContent.productBarcode, newQuantity)
+                (quantityToBeAdded + firebaseProducts.quantity.toInt()).toString()
+            updateFirebaseProductQuantity(productBarcode, newQuantity)
         }
     }
 
@@ -483,7 +513,8 @@ open class OrdersFragment : Fragment() {
                             firebaseOrder.finalPrice,
                             firebaseOrder.date,
                             firebaseOrder.orderStatus,
-                            item.key!!
+                            item.key!!,
+                            firebaseOrder.userId
                         )
 
                         Log.d("TinaFirebase", "firebaseOrder onDataChange $order")
@@ -509,7 +540,8 @@ open class OrdersFragment : Fragment() {
                         firebaseNewOrder.finalPrice,
                         firebaseNewOrder.date,
                         firebaseNewOrder.orderStatus,
-                        dataSnapshot.key!!
+                        dataSnapshot.key!!,
+                        firebaseNewOrder.userId
                     )
 
                     Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
@@ -530,7 +562,8 @@ open class OrdersFragment : Fragment() {
                         changedFirebaseOrder.finalPrice,
                         changedFirebaseOrder.date,
                         changedFirebaseOrder.orderStatus,
-                        dataSnapshot.key!!
+                        dataSnapshot.key!!,
+                        changedFirebaseOrder.userId
                     )
 
                     Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
@@ -556,7 +589,8 @@ open class OrdersFragment : Fragment() {
                         firebaseRemovedOrder.finalPrice,
                         firebaseRemovedOrder.date,
                         firebaseRemovedOrder.orderStatus,
-                        dataSnapshot.key!!
+                        dataSnapshot.key!!,
+                        firebaseRemovedOrder.userId
                     )
 
                     Log.d("TinaFirebase", "firebaseOrder onChildRemoved $order")
@@ -577,21 +611,13 @@ open class OrdersFragment : Fragment() {
     private fun updateDate(id: Long) {
         val formattedDate = getFormattedDate()
 
-        if (formattedDate != null) {
-            orderViewModel.updateDate(formattedDate, id)
-        }
-        updateFirebaseOrderDate(id.toString(), formattedDate.toString())
+        orderViewModel.updateDate(formattedDate, id)
+        updateFirebaseOrderDate(id.toString(), formattedDate)
     }
 
     private fun updateFirebaseDate(firebaseId: String) {
         val formattedDate = getFormattedDate()
-        updateFirebaseOrderDate(firebaseId, formattedDate.toString())
-    }
-
-    private fun getFormattedDate(): String? {
-        val current = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        return current.format(formatter)
+        updateFirebaseOrderDate(firebaseId, formattedDate)
     }
 
     private fun onOrderStatusChanged(
@@ -631,19 +657,12 @@ open class OrdersFragment : Fragment() {
                 OrderStatus.DELIVERED -> {
                     Log.d("Koni", "onOrderDelivered")
 
-                    onOrderContentsDelivered(firebaseOrder.id)
-                    //updateFirebaseProductQuantity(barcode, newQuantity.toString())
-//                    productsInOrderList.filter { it.orderId == order.id }.forEach { currentProduct ->
-//                        Log.d(
-//                            "Koni",
-//                            "updated quantities " + currentProduct.productBarcode + " quantity " + currentProduct.quantity
-//                        )
-//                        updateProductQuantity(currentProduct)
-//                    }
+                    updateDeliveredProducts(firebaseOrder.id)
                 }
             }
         }
     }
+
 
     private fun deleteOrder(order: Order?, firebaseOrder: FirebaseOrder?) {
         Log.d("Koni", "deleteOrder invoked")
@@ -660,7 +679,7 @@ open class OrdersFragment : Fragment() {
         }
     }
 
-    //on Edit order
+//on Edit order
 //    private fun updateProductQuantity(orderContent: OrderContent) {
 //        Log.d("Koni", "updateProductQuantity invoked")
 //        productsList.forEach { product ->

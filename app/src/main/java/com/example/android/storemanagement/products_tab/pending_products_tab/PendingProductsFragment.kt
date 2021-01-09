@@ -175,7 +175,8 @@ class PendingProductsFragment : ProductsTabFragment() {
                             firebaseOrder.finalPrice,
                             firebaseOrder.date,
                             firebaseOrder.orderStatus,
-                            item.key!!
+                            item.key!!,
+                            firebaseOrder.userId
                         )
                         Log.d("TinaFirebase", "firebaseOrder onDataChange $order")
                         if (notDeliveredOrdersList.none { it.id == order.id } && shouldGetOrderData(order)) {
@@ -198,7 +199,8 @@ class PendingProductsFragment : ProductsTabFragment() {
                         firebaseNewOrder.finalPrice,
                         firebaseNewOrder.date,
                         firebaseNewOrder.orderStatus,
-                        dataSnapshot.key!!
+                        dataSnapshot.key!!,
+                        firebaseNewOrder.userId
                     )
                     Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
                     if (notDeliveredOrdersList.none { it.id == order.id } && shouldGetOrderData(order)) {
@@ -216,7 +218,8 @@ class PendingProductsFragment : ProductsTabFragment() {
                         changedFirebaseOrder.finalPrice,
                         changedFirebaseOrder.date,
                         changedFirebaseOrder.orderStatus,
-                        dataSnapshot.key!!
+                        dataSnapshot.key!!,
+                        changedFirebaseOrder.userId
                     )
                     Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
                     notDeliveredOrdersList.forEach { firebaseOrder ->
@@ -237,7 +240,8 @@ class PendingProductsFragment : ProductsTabFragment() {
                         firebaseRemovedOrder.finalPrice,
                         firebaseRemovedOrder.date,
                         firebaseRemovedOrder.orderStatus,
-                        dataSnapshot.key!!
+                        dataSnapshot.key!!,
+                        firebaseRemovedOrder.userId
                     )
                     Log.d("TinaFirebase", "firebaseOrder onChildRemoved $order")
                     if (notDeliveredOrdersList.contains(order)) {
@@ -281,6 +285,7 @@ class PendingProductsFragment : ProductsTabFragment() {
                                 firebaseOrderContent.productOvercharge,
                                 firebaseOrderContent.quantity,
                                 firebaseOrderContent.orderId,
+                                firebaseOrderContent.userId,
                                 item.key!!
                             )
                             if (currentFirebaseOrderContents.none { it.id == orderContent.id }) {

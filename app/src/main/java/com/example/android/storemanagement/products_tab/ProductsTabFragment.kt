@@ -21,7 +21,6 @@ import com.example.android.storemanagement.products_database.ProductViewModel
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_products.*
-import kotlinx.android.synthetic.main.fragment_products_container.*
 
 abstract class ProductsTabFragment : Fragment() {
 

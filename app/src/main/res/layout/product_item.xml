@@ -64,7 +64,7 @@
         android:layout_marginStart="8dp"
         android:textAlignment="textStart"
         android:textColor="@color/textColor"
-        android:textSize="14sp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/quantity"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/quantity"

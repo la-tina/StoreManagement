@@ -1,7 +1,7 @@
 package com.example.android.storemanagement.firebase
 
 import android.util.Log
-import com.example.android.storemanagement.products_database.Product
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
@@ -9,6 +9,57 @@ import com.google.firebase.ktx.Firebase
 
 
 object FirebaseDatabaseOperations {
+
+    fun addFirebaseUser(completionHandler: (fbUserId: String) -> Unit) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val uniqueId: String = user!!.uid
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val myRef: DatabaseReference = database.getReference("Users")
+//        val userKey = myRef.push().key!!
+//        val firebaseUser = FirebaseUserInternal(uniqueId, user.displayName.toString(), user.email.toString())
+//        myRef.child(userKey).setValue(firebaseUser)
+        val users = mutableListOf<FirebaseUserInternal>()
+        myRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                var isAccountDuplicated = false
+                for (fbUser in dataSnapshot.children) {
+                    isAccountDuplicated = false
+                    val firebaseUser = fbUser.getValue(FirebaseUserInternal::class.java)
+                    Log.d("UserTina", "fbUser " + firebaseUser?.id + " curr " + uniqueId)
+                    if (firebaseUser?.id == uniqueId) {
+                        isAccountDuplicated = true
+                    }
+                }
+                if (!isAccountDuplicated) {
+                    val userKey = myRef.push().key!!
+                    val firebaseUser = FirebaseUserInternal(uniqueId, user.displayName.toString(), user.email.toString(), "")
+                    users.add(firebaseUser)
+                    myRef.child(userKey).setValue(firebaseUser)
+                    completionHandler(userKey)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+            }
+        })
+    }
+
+    fun updateFirebaseUserType(fbUserId: String, userType: String, completionHandler: () -> Unit) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val uniqueId: String = user!!.uid
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val myRef: DatabaseReference = database.getReference("Users")
+        val userQuery: Query = myRef.child(fbUserId).orderByChild("id").equalTo(uniqueId)
+        userQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                dataSnapshot.ref.child("accountType").setValue(userType)
+                completionHandler()
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+            }
+        })
+    }
 
     fun setFirebaseOrderData(order: FirebaseOrder): String {
         val user: FirebaseUser? = Firebase.auth.currentUser
@@ -96,6 +147,7 @@ object FirebaseDatabaseOperations {
                         firebaseOrderContent.productOvercharge,
                         firebaseOrderContent.quantity,
                         firebaseOrderContent.orderId,
+                        firebaseOrderContent.userId,
                         dataSnapshot.key!!
                     )
                     fbOrderContent = orderContent
@@ -109,7 +161,7 @@ object FirebaseDatabaseOperations {
         return fbOrderContent
     }
 
-    fun setFirebaseProductData(product: FirebaseProduct) {
+    fun addFirebaseProduct(product: FirebaseProduct) {
         val user: FirebaseUser? = Firebase.auth.currentUser
         if (user != null) {
             val uniqueId: String = user.uid

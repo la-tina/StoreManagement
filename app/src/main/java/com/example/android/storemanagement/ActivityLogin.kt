@@ -2,32 +2,31 @@ package com.example.android.storemanagement
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.BoringLayout.make
 import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.addFirebaseUser
+import com.example.android.storemanagement.firebase.FirebaseUserInternal
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
-import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_login.*
 
 
-class LoginActivity : AppCompatActivity() {
+class ActivityLogin : AppCompatActivity() {
 
     private var currentFragment: Fragment? = null
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -66,9 +65,16 @@ class LoginActivity : AppCompatActivity() {
             signIn()
         }
 
-        buttonContionue.setOnClickListener {
+        buttonContinue.setOnClickListener {
             openMainActivity()
         }
+    }
+
+    private fun openAccountTypeSelectionActivity(fbUserId: String) {
+        val intent = Intent(this, ActivityAccountTypeSelection::class.java)
+        intent.putExtra("fbUserId", fbUserId)
+        startActivity(intent)
+        finish()
     }
 
     private fun openMainActivity() {
@@ -151,11 +157,32 @@ class LoginActivity : AppCompatActivity() {
         if (user != null) {
             // User is signed in
             Log.d("Tina", "signed in $account")
-            openMainActivity()
+            addFirebaseUser { fbUserId -> checkFirebaseUserType(fbUserId) }
         } else {
             // No user is signed in
             Log.d("Tina", "no user signed in")
         }
+    }
+
+    private fun checkFirebaseUserType(fbUserId: String) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val uniqueId: String = user!!.uid
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val myRef: Query = database.getReference("Users").orderByChild("id").equalTo(uniqueId)
+        myRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val firebaseUser = dataSnapshot.getValue(FirebaseUserInternal::class.java)
+                Log.d("UserTina", "fbUser " + firebaseUser?.id + " curr " + uniqueId)
+                if (firebaseUser != null && firebaseUser.accountType.isBlank()) {
+                    runOnUiThread { openAccountTypeSelectionActivity(fbUserId) }
+                } else {
+                    runOnUiThread { openMainActivity() }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+            }
+        })
     }
 
     override fun onStart() {

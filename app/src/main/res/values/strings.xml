@@ -94,5 +94,14 @@
     <string name="retrieving_orders">Retrieving orders</string>
     <string name="retrieving_products">Retrieving products</string>
     <string name="retrieving_pending_products">Retrieving pending products</string>
+    <string name="info">Information</string>
+    <string name="no_user_info">Log in to your Google account to be able to create an order.</string>
+    <string name="select_an_user_to_proceed_with_creating_an_order">Select an user to proceed with creating an order.</string>
+    <string name="in_stock_quantity">In stock quantity:</string>
+    <string name="user_products_info">\'s products</string>
+    <string name="choose_an_account_type">Choose an account type:</string>
+    <string name="vendor">Vendor</string>
+    <string name="retailer">Retailer</string>
+    <string name="customer">Customer</string>
 
 </resources>

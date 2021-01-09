@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".IntroActivity">
+            android:name=".ActivityIntro">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,7 +25,10 @@
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan"/>
         <activity
-            android:name=".LoginActivity"
+            android:name=".ActivityLogin"
+            android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".ActivityAccountTypeSelection"
             android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".AboutActivity"

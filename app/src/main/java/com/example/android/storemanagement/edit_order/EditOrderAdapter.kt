@@ -13,6 +13,7 @@ import com.example.android.storemanagement.create_order.CreateOrderFieldValidato
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderHolder
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
+import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.products_database.Product
 
@@ -26,6 +27,7 @@ class EditOrderAdapter(
     private var productsInOrder = emptyList<OrderContent>() // Cached copy of products
     private var products = emptyList<Product>()
     private var firebaseOrderContents = emptyList<FirebaseOrderContent>()
+    private var firebaseUserProducts = emptyList<FirebaseProduct>()
     private var areFirebaseOrderContentsLoaded = false
 
     //barcode -> quantity
@@ -49,6 +51,12 @@ class EditOrderAdapter(
             holder.productName.text = currentFirebaseProductInOrder.productName
             holder.productPrice.text = currentFirebaseProductInOrder.productPrice
             holder.productQuantity.setText(currentFirebaseProductInOrder.quantity)
+            firebaseUserProducts.forEach { product ->
+                if (product.barcode == currentFirebaseProductInOrder.productBarcode) {
+                    holder.inStockProductQuantity.text =
+                        context.resources.getString(R.string.in_stock_quantity).plus(" ").plus(product.quantity)
+                }
+            }
 
             if (!canOrderBeEdited()) {
                 holder.productQuantity.isEnabled = false
@@ -177,13 +185,15 @@ class EditOrderAdapter(
 
     internal fun setProductsInOrder(
         productsInOrder: List<OrderContent>?,
-        firebaseProductsInOrder: List<FirebaseOrderContent>?
+        firebaseProductsInOrder: List<FirebaseOrderContent>?,
+        currentFirebaseUserProducts: List<FirebaseProduct>
     ) {
         if (productsInOrder != null) {
             this.productsInOrder = productsInOrder
             areFirebaseOrderContentsLoaded = false
         } else if (firebaseProductsInOrder != null) {
             this.firebaseOrderContents = firebaseProductsInOrder
+            this.firebaseUserProducts = currentFirebaseUserProducts
             areFirebaseOrderContentsLoaded = true
         }
         notifyDataSetChanged()

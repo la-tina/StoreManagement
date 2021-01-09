@@ -278,7 +278,7 @@ abstract class InfoProductFragment : Fragment() {
                             && product_overcharge.text.toString().toFloat() != 0F
                         ) {
                             //calculate percentage for percentage field
-                            if (isPriceViewSelected) {
+                            if (shouldCalculatePrice(editTextView)) {
                                 val percentage: Float = (product_overcharge.text.toString()
                                     .toFloat() / editTextView.text.toString().toFloat()) * 100
                                 product_overcharge_percentage.setText(
@@ -311,7 +311,7 @@ abstract class InfoProductFragment : Fragment() {
                             && editTextView.text.toString().toFloat() != 0F
                         ) {
                             //calculate percentage for percentage field
-                            if (isOverchargeViewSelected) {
+                            if (shouldCalculateOvercharge(editTextView)) {
                                 val percentage: Float = (editTextView.text.toString()
                                     .toFloat() / product_price.text.toString().toFloat()) * 100
                                 product_overcharge_percentage.setText(
@@ -329,12 +329,10 @@ abstract class InfoProductFragment : Fragment() {
                         fieldType = CreateProductFieldValidator.ProductFieldElements.PERCENTAGE
                         if (shouldCalculatePercentage(inputLayoutView, editTextView)
                         ) {
-                            if (isPercentageViewSelected) {
-                                val overcharge: Float = (product_overcharge_percentage.text.toString()
-                                    .toFloat() * product_price.text.toString().toFloat()) / 100
-                                if (product_overcharge.text.toString() != overcharge.toString()) {
-                                    product_overcharge.setText(overcharge.toString())
-                                }
+                            val overcharge: Float = (product_overcharge_percentage.text.toString()
+                                .toFloat() * product_price.text.toString().toFloat()) / 100
+                            if (product_overcharge.text.toString() != overcharge.toString()) {
+                                product_overcharge.setText(overcharge.toString())
                             }
                             lastPercentage = editTextView.text.toString().toInt()
                             return
@@ -374,15 +372,15 @@ abstract class InfoProductFragment : Fragment() {
             .toFloat() != 0F && lastPercentage != editTextView.text.toString()
             .toInt() && isPercentageViewSelected
 
-//    private fun shouldCalculatePrice(
-//        inputLayoutView: TextInputLayout,
-//        editTextView: EditText) =
-//        editTextView.text.toString().toFloat() != 0F && lastPrice != editTextView.text.toString().toFloat() && isPriceViewSelected
-//
-//    private fun shouldCalculateOvercharge(
-//        inputLayoutView: TextInputLayout,
-//        editTextView: EditText) =
-//        editTextView.text.toString().toFloat() != 0F && lastOvercharge != editTextView.text.toString().toFloat() && isOverchargeViewSelected
+    private fun shouldCalculatePrice(
+        editTextView: EditText
+    ) =
+        editTextView.text.toString().toFloat() != 0F && isPriceViewSelected
+
+    private fun shouldCalculateOvercharge(
+        editTextView: EditText
+    ) =
+        editTextView.text.toString().toFloat() != 0F && isOverchargeViewSelected
 
     object TextChangedWatcher : TextWatcher {
         override fun afterTextChanged(s: Editable?) {}

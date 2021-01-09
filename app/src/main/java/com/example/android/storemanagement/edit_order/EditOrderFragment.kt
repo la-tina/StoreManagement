@@ -2,11 +2,11 @@ package com.example.android.storemanagement.edit_order
 
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.ORDER_KEY
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.Utils
 import com.example.android.storemanagement.create_order.InfoOrderFragment
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseOrderContentData
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseOrderData
@@ -15,6 +15,8 @@ import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.u
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderFinalPrice
 import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
+import com.example.android.storemanagement.firebase.FirebaseProduct
+import com.example.android.storemanagement.firebase.FirebaseUserInternal
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
@@ -24,8 +26,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.fragment_create_order.*
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 open class EditOrderFragment : InfoOrderFragment() {
 
@@ -34,6 +34,8 @@ open class EditOrderFragment : InfoOrderFragment() {
     var currentOrderContents: List<OrderContent>? = null
     var currentFirebaseOrderContents: MutableList<FirebaseOrderContent> = mutableListOf()
     private var user: FirebaseUser? = null
+    private var currentFirebaseUserProducts = mutableListOf<FirebaseProduct>()
+    private var currentUser: FirebaseUserInternal? = null
 
     var currentOrder: Order? = null
     var currentFirebaseOrder: FirebaseOrder? = null
@@ -46,66 +48,34 @@ open class EditOrderFragment : InfoOrderFragment() {
     override fun onResume() {
         super.onResume()
         user = Firebase.auth.currentUser
-//        if (user == null) {
-//            orderContentViewModel.allOrderContents.observe(this, Observer { viewState ->
-//                onOrderContentsChanged(viewState)
-//            })
-//        } else {
+
         if (user != null) {
-            onOrderContentsChanged(null)
+            onOrderContentsChanged()
         }
-//        }
     }
 
-    private fun onOrderContentsChanged(viewState: List<OrderContent>?) {
-        val order = arguments?.getSerializable(ORDER_KEY)
-//        if (order is Order) {
-//            setupRecyclerView()
-//
-//            currentOrder = order
-//            toolbarTopOrder.title = if (!canOrderBeEdited()) "Order Content" else "Edit Order"
-//            info_text?.text =
-//                if (!canOrderBeEdited()) context?.getString(R.string.view_order_info) else context?.getString(
-//                    R.string.edit_order_info
-//                )
-////        if (finalPrice == 0F){
-////            finalPrice = currentOrder.finalPrice
-////        }
-//            Log.d("Tina", "final price edit order " + currentOrder?.finalPrice)
-//            final_price.text = currentOrder?.finalPrice.toString()
-//
-//            currentOrderContents = viewState?.filter { it.orderId == order.id }
-//
-//            setupRecyclerView()
-//
-//            if (!canOrderBeEdited()) {
-//                button_add_order.visibility = View.GONE
-//                constraintLayout.maxHeight = 160
-//            }
-//            button_add_order.setOnClickListener { onEditButtonClicked(order, null) }
-//
-//        } else
-        if (order is FirebaseOrder) {
-            currentFirebaseOrder = order
-            toolbarTopOrder.title = if (!canOrderBeEdited()) "Order Content" else "Edit Order"
-            info_text?.text =
-                if (!canOrderBeEdited()) context?.getString(R.string.view_order_info) else context?.getString(
-                    R.string.edit_order_info
-                )
+    private fun onOrderContentsChanged() {
+        val order = arguments?.getSerializable(ORDER_KEY) as FirebaseOrder
+        currentFirebaseOrder = order
+        toolbarTopOrder.title = if (!canOrderBeEdited()) "Order Content" else "Edit Order"
+        info_text?.text =
+            if (!canOrderBeEdited()) context?.getString(R.string.view_order_info) else context?.getString(
+                R.string.edit_order_info
+            )
 //        if (finalPrice == 0F){
 //            finalPrice = currentOrder.finalPrice
 //        }
-            Log.d("Tina", "final price edit order " + currentFirebaseOrder?.finalPrice)
-            final_price.text = currentFirebaseOrder?.finalPrice.toString()
+        Log.d("Tina", "final price edit order " + currentFirebaseOrder?.finalPrice)
+        final_price.text = currentFirebaseOrder?.finalPrice.toString()
 
-            getFirebaseOrderContents(order.id)
+        getFirebaseUser(currentFirebaseOrder?.userId!!)
+        getFirebaseOrderContents(order.id)
 
-            if (!canOrderBeEdited()) {
-                button_add_order.visibility = View.GONE
-                constraintLayout.maxHeight = 160
-            }
-            button_add_order.setOnClickListener { onEditButtonClicked(null, order) }
+        if (!canOrderBeEdited()) {
+            button_add_order.visibility = View.GONE
+            constraintLayout.maxHeight = 160
         }
+        button_add_order.setOnClickListener { onEditButtonClicked(null, order) }
     }
 
     private fun getFirebaseOrderContents(fbOrderId: String) {
@@ -131,10 +101,12 @@ open class EditOrderFragment : InfoOrderFragment() {
                                 firebaseOrderContent.productOvercharge,
                                 firebaseOrderContent.quantity,
                                 firebaseOrderContent.orderId,
+                                firebaseOrderContent.userId,
                                 item.key!!
                             )
                             if (!currentFirebaseOrderContents.contains(orderContent) && firebaseOrderContent.orderId == fbOrderId) {
                                 currentFirebaseOrderContents.add(orderContent)
+                                getCurrentFirebaseUserProduct(orderContent.userId, orderContent.productBarcode)
                                 activity?.runOnUiThread {
                                     setupRecyclerView()
                                 }
@@ -146,6 +118,66 @@ open class EditOrderFragment : InfoOrderFragment() {
                 override fun onCancelled(error: DatabaseError) {}
             })
         }
+    }
+
+    private fun getFirebaseUser(userId: String) {
+        val database = FirebaseDatabase.getInstance()
+        val usersQuery: Query = database.getReference("Users").orderByChild("id").equalTo(userId)
+        usersQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                val firebaseUser =
+                    dataSnapshot.getValue(FirebaseUserInternal::class.java)
+                activity?.runOnUiThread {
+                    user_info?.text = firebaseUser?.name.plus(context?.resources?.getString(R.string.user_products_info))
+                    setupRecyclerView()
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {}
+            override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+    }
+
+    private fun getCurrentFirebaseUserProduct(userId: String, barcode: String) {
+        val ref = FirebaseDatabase.getInstance().getReference("Products")
+        val productsQuery: Query =
+            ref.child(userId).orderByChild("barcode").equalTo(barcode)
+
+        productsQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                val firebaseProduct =
+                    dataSnapshot.getValue(FirebaseProduct::class.java)
+                if (currentFirebaseUserProducts.none { it.barcode == firebaseProduct?.barcode } && firebaseProduct != null) {
+                    currentFirebaseUserProducts.add(firebaseProduct)
+                    activity?.runOnUiThread {
+                        setupRecyclerView()
+                    }
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {}
+            override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+//        productsQuery.addValueEventListener(object : ValueEventListener {
+//            override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                val firebaseProduct: FirebaseProduct? =
+//                    dataSnapshot.getValue(FirebaseProduct::class.java)
+//                if (currentFirebaseUserProducts.none { it.barcode == firebaseProduct?.barcode } && firebaseProduct != null) {
+//                    currentFirebaseUserProducts.add(firebaseProduct)
+//                    activity?.runOnUiThread {
+//                        setupRecyclerView()
+//                    }
+//                }
+//            }
+//
+//            override fun onCancelled(databaseError: DatabaseError) {
+//                Log.e("Firebase_Products", "onCancelled", databaseError.toException())
+//            }
+//        })
     }
 
     private fun canOrderBeEdited(): Boolean = if (currentOrder != null)
@@ -178,16 +210,10 @@ open class EditOrderFragment : InfoOrderFragment() {
                 deleteFirebaseOrderData(currentFirebaseOrder!!.id)
             }
             updateFirebaseOrderFinalPrice(firebaseOrder.id, finalPrice.toString())
-            updateFirebaseOrderDate(firebaseOrder.id, getFormattedDate()!!)
+            updateFirebaseOrderDate(firebaseOrder.id, Utils.getFormattedDate()!!)
         }
 
         parentFragmentManager.popBackStackImmediate()
-    }
-
-    private fun getFormattedDate(): String? {
-        val current = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        return current.format(formatter)
     }
 
     private fun deleteOrderContent() {
@@ -261,13 +287,13 @@ open class EditOrderFragment : InfoOrderFragment() {
         // The onChanged() method fires when the observed data changes and the activity is
         // in the foreground.
 
-        editOrdersAdapter.setProductsInOrder(currentOrderContents, currentFirebaseOrderContents)
+        editOrdersAdapter.setProductsInOrder(currentOrderContents, currentFirebaseOrderContents, currentFirebaseUserProducts)
         setupEmptyView(empty_view_create_order, create_order_recycler_view)
 
-        productViewModel.allProducts.observe(this, Observer { products ->
-            products?.let {
-                editOrdersAdapter.setProducts(it)
-            }
-        })
+//        productViewModel.allProducts.observe(this, Observer { products ->
+//            products?.let {
+//                editOrdersAdapter.setProducts(it)
+//            }
+//        })
     }
 }

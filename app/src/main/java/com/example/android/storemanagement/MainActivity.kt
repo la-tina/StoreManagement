@@ -26,9 +26,11 @@ import com.example.android.storemanagement.edit_order.EditOrderFragment
 import com.example.android.storemanagement.edit_order.ViewOrderFragment
 import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.firebase.FirebaseProduct
+import com.example.android.storemanagement.firebase.FirebaseUserInternal
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.orders_tab.OrdersFragment
+import com.example.android.storemanagement.orders_tab.UserSelectionFragment
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsFragment
 import com.example.android.storemanagement.products_tab.ProductsTabFragment
@@ -46,14 +48,16 @@ import okhttp3.OkHttpClient
 import java.io.File
 
 
-open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Observer<List<Order>>, NavigationView.OnNavigationItemSelectedListener {
+open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Observer<List<Order>>,
+    NavigationView.OnNavigationItemSelectedListener {
 
     private var currentFragment: Fragment? = null
     private var ordersFragment: OrdersFragment? = null
     private var productsTabFragment: ProductsTabFragment? = null
     private var user: FirebaseUser? = null
+    var newOrderCreated = false
 
-    private val orderViewModel : OrderViewModel by lazy {
+    private val orderViewModel: OrderViewModel by lazy {
         ViewModelProviders.of(this).get(OrderViewModel::class.java)
     }
 
@@ -62,18 +66,23 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
         setContentView(R.layout.activity_main)
 
         user = FirebaseAuth.getInstance().currentUser
-
-        if (user != null) {
-            val loggedInInfoText = LOGGED_IN_INFO + user?.email
+        val isLoggedInInfoShown = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isLoggedInInfoShown", false)
+        if (user != null && !isLoggedInInfoShown) {
+            val loggedInInfoText = LOGGED_IN_INFO + user?.displayName
             //set title for alert dialog
             val dialog = AlertDialog.Builder(this, R.style.AlertDialog)
                 .setTitle(R.string.yay_text)
                 .setMessage(loggedInInfoText)
                 .setPositiveButton(R.string.ok) { dialog, _ ->
-                    dialog.dismiss()}.show()
+                    dialog.dismiss()
+                }.show()
 
+            getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                .edit()
+                .putBoolean("isLoggedInInfoShown", true)
+                .apply()
             val textView = dialog.findViewById<View>(android.R.id.message) as TextView
-            textView.textSize = 18f
+            textView.textSize = 17f
             textView.setTextColor(ContextCompat.getColor(this, R.color.darkBarColor))
         }
 
@@ -106,7 +115,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
     }
 
     override fun onChanged(allOrders: List<Order>?) {
-        
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -158,14 +167,14 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
         hideKeyboard(this as Activity)
         navigation_view?.setNavigationItemSelectedListener(this)
 
-        toolbarMain?.setNavigationOnClickListener{
+        toolbarMain?.setNavigationOnClickListener {
             openCloseNavigationDrawer()
         }
 
         val menu: Menu = navigation_view.menu
         if (user != null) {
             val userItem = menu.findItem(R.id.user)
-            userItem.title = user?.email
+            userItem.title = user?.displayName
             userItem.isCheckable = false
             val logInLogOutItem = menu.findItem(R.id.action_log_in)
             logInLogOutItem.title = this.getString(R.string.action_log_out)
@@ -194,10 +203,14 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
                 if (user != null) {
                     Toast.makeText(this, "Logging out", Toast.LENGTH_SHORT).show()
                     Firebase.auth.signOut()
+                    getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("isLoggedInInfoShown", false)
+                        .apply()
                 } else {
                     Toast.makeText(this, "Log in", Toast.LENGTH_SHORT).show()
                 }
-                val intent = Intent(this, LoginActivity::class.java)
+                val intent = Intent(this, ActivityLogin::class.java)
                 startActivity(intent)
             }
         }
@@ -213,7 +226,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
         }
     }
 
-    private fun getCSVFileName() : String = "StoreManagementDB.csv"
+    private fun getCSVFileName(): String = "StoreManagementDB.csv"
 
     private fun exportDatabaseToCSVFile() {
         val csvFile = generateFile(this, getCSVFileName())
@@ -280,13 +293,21 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
         }
     }
 
-    override fun onNavigationChanged(tabNumber: Int, product: Product?, firebaseProduct: FirebaseProduct?, order: Order?, firebaseOrder: FirebaseOrder?) {
+    override fun onNavigationChanged(
+        tabNumber: Int,
+        product: Product?,
+        firebaseProduct: FirebaseProduct?,
+        order: Order?,
+        firebaseOrder: FirebaseOrder?,
+        firebaseUser: FirebaseUserInternal?
+    ) {
         when (tabNumber) {
-            CREATE_ORDER_TAB -> openCreateOrderTab()
+            CREATE_ORDER_TAB -> openCreateOrderTab(firebaseUser!!)
             CREATE_PRODUCT_TAB -> openCreateProductTab()
             EDIT_PRODUCT_TAB -> openEditProductTab(product, firebaseProduct)
             EDIT_ORDER_TAB -> openEditOrderTab(order, firebaseOrder)
             VIEW_ORDER_TAB -> openViewOrderTab(order, firebaseOrder)
+            USERS_TAB -> openUsersTab()
         }
     }
 
@@ -301,7 +322,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
         if (currentFragment is ProductsFragment)
             (currentFragment as ProductsFragment).onNavigationChangedListener = this
 
-        if (currentFragment is OrdersFragment){
+        if (currentFragment is OrdersFragment) {
             (currentFragment as OrdersFragment).onNavigationChangedListener = this
             ordersFragment = currentFragment as OrdersFragment
         }
@@ -317,15 +338,29 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
             is EditProductFragment -> editProductTag
             is EditOrderFragment -> editOrderTag
             is ViewOrderFragment -> viewOrderTag
+            is UserSelectionFragment -> usersTag
             else -> throw IllegalStateException()
         }
 
-    private fun openCreateOrderTab() {
+    private fun openUsersTab() {
+        val previouslyAddedUsersFragment = supportFragmentManager.findFragmentByTag(
+            usersTag
+        )
+        val fragment = (previouslyAddedUsersFragment as? UserSelectionFragment) ?: UserSelectionFragment()
+
+        fragment.onNavigationChangedListener = this
+        openCreateTab(fragment, usersTag)
+    }
+
+    private fun openCreateOrderTab(firebaseUser: FirebaseUserInternal) {
         val previouslyAddedCreateOrderFragment = supportFragmentManager.findFragmentByTag(
             createOrderTag
         )
         val fragment = (previouslyAddedCreateOrderFragment as? CreateOrderFragment) ?: CreateOrderFragment()
-
+        val bundle = Bundle().apply {
+            putSerializable(USER_KEY, firebaseUser)
+        }
+        fragment.arguments = bundle
         openCreateTab(fragment, createOrderTag)
     }
 
@@ -448,7 +483,14 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener , Obs
 }
 
 interface OnNavigationChangedListener {
-    fun onNavigationChanged(tabNumber: Int, product: Product? = null, firebaseProduct: FirebaseProduct? = null, order: Order? = null, firebaseOrder: FirebaseOrder? = null)
+    fun onNavigationChanged(
+        tabNumber: Int,
+        product: Product? = null,
+        firebaseProduct: FirebaseProduct? = null,
+        order: Order? = null,
+        firebaseOrder: FirebaseOrder? = null,
+        firebaseUser: FirebaseUserInternal? = null
+    )
 }
 
 

@@ -43,6 +43,7 @@ class OrdersAdapter(
         val currentOrder: Any = if (areFirebaseOrdersLoaded) firebaseOrders[position] else orders[position]
         if (currentOrder is Order) {
             val orderPrice = String.format("%.1f", currentOrder.finalPrice).toFloat().toString()
+            holder.id.text = currentOrder.id.toString()
             holder.finalPrice.text = orderPrice
             //String.format("%.1f", finalPrice).toFloat().toString()
             holder.date.text = currentOrder.date
@@ -82,6 +83,7 @@ class OrdersAdapter(
             holder.imageContextMenu.setOnClickListener { view -> showPopup(view, currentOrder, null) }
         } else if (currentOrder is FirebaseOrder && currentOrder.finalPrice.isNotEmpty()) {
             val orderPrice = String.format("%.1f", currentOrder.finalPrice.toFloat()).toFloat().toString()
+            holder.id.text = currentOrder.id
             holder.finalPrice.text = orderPrice
             //String.format("%.1f", finalPrice).toFloat().toString()
             holder.date.text = currentOrder.date
@@ -208,6 +210,7 @@ class OrdersAdapter(
 
 class OrdersHolder(val view: View) : RecyclerView.ViewHolder(view) {
     // Holds the OrderTextView that will add each product to
+    val id: TextView = view.order_id!!
     val finalPrice = view.order_item_price!!
     val date = view.order_date!!
     val imageContextMenu: ImageView = view.context_menu_image!!
