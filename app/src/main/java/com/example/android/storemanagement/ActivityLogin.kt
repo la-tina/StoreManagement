@@ -157,7 +157,7 @@ class ActivityLogin : AppCompatActivity() {
         if (user != null) {
             // User is signed in
             Log.d("Tina", "signed in $account")
-            addFirebaseUser { fbUserId -> checkFirebaseUserType(fbUserId) }
+            addFirebaseUser { fbUserId -> if (fbUserId != null) {checkFirebaseUserType(fbUserId) } else openMainActivity() }
         } else {
             // No user is signed in
             Log.d("Tina", "no user signed in")
@@ -165,6 +165,26 @@ class ActivityLogin : AppCompatActivity() {
     }
 
     private fun checkFirebaseUserType(fbUserId: String) {
+//        val user = FirebaseAuth.getInstance().currentUser
+//        val uniqueId: String = user!!.uid
+//        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+//        val myRef: Query = database.getReference("Users")
+//        myRef.addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                val users = dataSnapshot.children
+//                for (user in users) {
+//                    val firebaseUser = user.getValue(FirebaseUserInternal::class.java)
+//                    if (firebaseUser?.id == fbUserId) {
+//                        Log.d("UserTina", "fbUser " + firebaseUser.id + " curr " + uniqueId)
+//                        if (firebaseUser.accountType.isBlank()) {
+//                            Log.d("UserTina", " type " + firebaseUser.accountType)
+//                            runOnUiThread { openAccountTypeSelectionActivity(fbUserId) }
+//                        } else {
+//                            runOnUiThread { openMainActivity() }
+//                        }
+//                    }
+//                }
+//            }
         val user = FirebaseAuth.getInstance().currentUser
         val uniqueId: String = user!!.uid
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()

@@ -6,6 +6,7 @@ import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatActivity
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseUserType
 import kotlinx.android.synthetic.main.activity_account_type.*
+import java.util.*
 
 
 class ActivityAccountTypeSelection : AppCompatActivity() {
@@ -38,7 +39,7 @@ class ActivityAccountTypeSelection : AppCompatActivity() {
     private fun onTypeMarked(isChecked: Boolean, buttonView: CompoundButton) {
         if (isChecked) {
             buttonSave.isEnabled = true
-            markedType = buttonView.text.toString()
+            markedType = buttonView.text.toString().toUpperCase(Locale.ROOT)
         }
     }
 

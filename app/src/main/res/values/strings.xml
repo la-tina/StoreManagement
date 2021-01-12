@@ -33,6 +33,7 @@
     <string name="status_ordered">Ordered</string>
     <string name="status_delivered">Delivered</string>
     <string name="status_confirmed">Confirmed</string>
+    <string name="status_cancelled">Cancelled</string>
 
     <string name="register_text">Continue without login</string>
     <string name="email_text">Google email</string>
@@ -103,5 +104,12 @@
     <string name="vendor">Vendor</string>
     <string name="retailer">Retailer</string>
     <string name="customer">Customer</string>
+    <string name="vendors">Vendors</string>
+    <string name="retailers">Retailers</string>
+    <string name="type">Type</string>
+    <string name="notifications">Notifications</string>
+    <string name="orders_notifications">Here are all orders\' notifications received from other users.</string>
+    <string name="new_order">New order</string>
+    <string name="confirm">Confirm</string>
 
 </resources>

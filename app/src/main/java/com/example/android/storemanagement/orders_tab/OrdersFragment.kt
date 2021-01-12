@@ -17,14 +17,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.*
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.Utils.getFormattedDate
+import com.example.android.storemanagement.firebase.*
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.addFirebaseNotification
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.addFirebaseProduct
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseOrderData
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderDate
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderStatus
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseProductQuantity
-import com.example.android.storemanagement.firebase.FirebaseOrder
-import com.example.android.storemanagement.firebase.FirebaseOrderContent
-import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
 import com.example.android.storemanagement.orders_database.Order
@@ -69,19 +68,20 @@ open class OrdersFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(
+        val view = inflater.inflate(
             R.layout.fragment_orders,
             container,
             false
         )
+        topToolbar = view!!.findViewById(R.id.toolbarTop)
+        topToolbar.inflateMenu(R.menu.orders_filter_menu)
+        topToolbar.overflowIcon = ContextCompat.getDrawable(context!!, R.drawable.ic_baseline_filter_alt)
+        return view
     }
 
     override fun onStart() {
         super.onStart()
         setHasOptionsMenu(true)
-        topToolbar = view!!.findViewById(R.id.toolbarTop)
-        topToolbar.inflateMenu(R.menu.orders_filter_menu)
-        topToolbar.overflowIcon = ContextCompat.getDrawable(context!!, R.drawable.ic_baseline_filter_alt)
         topToolbar.setOnMenuItemClickListener(Toolbar.OnMenuItemClickListener { item ->
             Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
             when (item.itemId) {
@@ -625,34 +625,15 @@ open class OrdersFragment : Fragment() {
         firebaseOrder: FirebaseOrder?,
         orderStatus: OrderStatus
     ) {
-        if (order != null) {
-            updateDate(order.id)
-            Log.d("Koni", " orderStatus.toString() $orderStatus")
-            orderViewModel.onOrderStatusChanged(order.id, orderStatus.toString())
-
-            when (orderStatus) {
-                OrderStatus.ORDERED -> {
-                    Log.d("Koni", "onOrderOrdered")
-                }
-                OrderStatus.DELIVERED -> {
-                    Log.d("Koni", "onOrderDelivered")
-                    productsInOrderList.filter { it.orderId == order.id }
-                        .forEach { currentProduct ->
-                            Log.d(
-                                "Koni",
-                                "updated quantities " + currentProduct.productBarcode + " quantity " + currentProduct.quantity
-                            )
-//                            updateProductQuantity(currentProduct)
-                        }
-                }
-            }
-        } else if (firebaseOrder != null) {
+        if (firebaseOrder != null) {
             updateFirebaseDate(firebaseOrder.id)
             updateFirebaseOrderStatus(firebaseOrder.id, orderStatus.toString())
 
             when (orderStatus) {
                 OrderStatus.ORDERED -> {
                     Log.d("Koni", "onOrderOrdered")
+                    val firebaseNotification = FirebaseNotification(firebaseOrder.id, user?.uid!!, true.toString(), false.toString())
+                    addFirebaseNotification(firebaseNotification, firebaseOrder.userId)
                 }
                 OrderStatus.DELIVERED -> {
                     Log.d("Koni", "onOrderDelivered")
@@ -662,7 +643,6 @@ open class OrdersFragment : Fragment() {
             }
         }
     }
-
 
     private fun deleteOrder(order: Order?, firebaseOrder: FirebaseOrder?) {
         Log.d("Koni", "deleteOrder invoked")
@@ -719,11 +699,10 @@ open class OrdersFragment : Fragment() {
     }
 
     private fun openEditOrderTab(order: Order?, firebaseOrder: FirebaseOrder?) {
-//        if (order.orderStatus == OrderStatus.ORDERED.toString()
-//            || order.orderStatus == OrderStatus.CONFIRMED.toString()
-//            || order.orderStatus == OrderStatus.DELIVERED.toString()) {
-//            openViewOrderTab(order)
-//        } else {
+        FirebaseDatabaseOperations.getFirebaseUser(user!!.uid) { user -> openEditOrderFragment(user, firebaseOrder) }
+    }
+
+    private fun openEditOrderFragment(userInternal: FirebaseUserInternal, firebaseOrder: FirebaseOrder?) {
         if (::onNavigationChangedListener.isInitialized) {
             //onNavigationChangedListener.onNavigationChanged(EDIT_ORDER_TAB)
             listener = onNavigationChangedListener
@@ -731,10 +710,9 @@ open class OrdersFragment : Fragment() {
 
         listener?.onNavigationChanged(
             tabNumber = EDIT_ORDER_TAB,
-            order = order,
-            firebaseOrder = firebaseOrder
+            firebaseOrder = firebaseOrder,
+            firebaseUser = userInternal
         )
-//        }
     }
 
     private fun setupEmptyView() {

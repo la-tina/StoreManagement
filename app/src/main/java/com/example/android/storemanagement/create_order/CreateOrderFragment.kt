@@ -35,10 +35,6 @@ open class CreateOrderFragment : InfoOrderFragment() {
 
     private lateinit var orderContentViewModel: OrderContentViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun onStart() {
         super.onStart()
         firebaseUser = arguments?.getSerializable(USER_KEY) as FirebaseUserInternal

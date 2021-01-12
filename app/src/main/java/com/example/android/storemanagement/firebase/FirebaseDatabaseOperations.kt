@@ -10,32 +10,35 @@ import com.google.firebase.ktx.Firebase
 
 object FirebaseDatabaseOperations {
 
-    fun addFirebaseUser(completionHandler: (fbUserId: String) -> Unit) {
+    fun addFirebaseUser(completionHandler: (fbUserId: String?) -> Unit) {
         val user = FirebaseAuth.getInstance().currentUser
         val uniqueId: String = user!!.uid
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
         val myRef: DatabaseReference = database.getReference("Users")
+        val usersQuery = myRef.orderByChild("id").equalTo(uniqueId)
 //        val userKey = myRef.push().key!!
 //        val firebaseUser = FirebaseUserInternal(uniqueId, user.displayName.toString(), user.email.toString())
 //        myRef.child(userKey).setValue(firebaseUser)
         val users = mutableListOf<FirebaseUserInternal>()
-        myRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        usersQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                var isAccountDuplicated = false
-                for (fbUser in dataSnapshot.children) {
-                    isAccountDuplicated = false
-                    val firebaseUser = fbUser.getValue(FirebaseUserInternal::class.java)
-                    Log.d("UserTina", "fbUser " + firebaseUser?.id + " curr " + uniqueId)
-                    if (firebaseUser?.id == uniqueId) {
-                        isAccountDuplicated = true
-                    }
-                }
-                if (!isAccountDuplicated) {
+//                var isAccountDuplicated = false
+//                for (fbUser in dataSnapshot.children) {
+//                    isAccountDuplicated = false
+//                    val firebaseUser = fbUser.getValue(FirebaseUserInternal::class.java)
+//                    Log.d("TinaLogin", "fbUser " + firebaseUser?.id + " curr " + uniqueId)
+//                    if (firebaseUser?.id == uniqueId) {
+//                        isAccountDuplicated = true
+//                    }
+//                }
+                if (!dataSnapshot.exists()) {
                     val userKey = myRef.push().key!!
                     val firebaseUser = FirebaseUserInternal(uniqueId, user.displayName.toString(), user.email.toString(), "")
                     users.add(firebaseUser)
                     myRef.child(userKey).setValue(firebaseUser)
                     completionHandler(userKey)
+                } else {
+                    completionHandler(null)
                 }
             }
 
@@ -61,66 +64,115 @@ object FirebaseDatabaseOperations {
         })
     }
 
+    fun getCurrentFirebaseUserInternal(completionHandler: (firebaseUser: FirebaseUserInternal) -> Unit) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val uniqueId: String = user!!.uid
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val userQuery: Query = database.getReference("Users")
+        userQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val users = dataSnapshot.children
+                for (user in users) {
+                    val firebaseUser = user.getValue(FirebaseUserInternal::class.java)
+                    if (firebaseUser?.id == uniqueId) {
+                        completionHandler(firebaseUser!!)
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+            }
+        })
+    }
+
+    fun isNotificationAddedForUser(
+        userId: String,
+        notification: FirebaseNotification,
+        completionHandler: (isNotificationExisting: Boolean) -> Unit
+    ) {
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val myRef: DatabaseReference = database.getReference("Notifications").child(userId)
+        val usersQuery = myRef.orderByChild("orderId").equalTo(notification.orderId)
+        usersQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    completionHandler(false)
+                } else {
+                    completionHandler(true)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+            }
+        })
+    }
+
+    fun addFirebaseNotification(notification: FirebaseNotification, userId: String) {
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val myRef: DatabaseReference = database.getReference("Notifications").child(userId)
+        val notificationKey = myRef.push().key!!
+        myRef.child(notificationKey).setValue(notification)
+    }
+
+    fun updateFirebaseSeenIndicator() {
+        val user: FirebaseUser? = Firebase.auth.currentUser
+        val uniqueId: String = user?.uid!!
+        val ref = FirebaseDatabase.getInstance().getReference("Notifications")
+        val notificationsQuery: Query = ref.child(uniqueId)
+        notificationsQuery.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (notification in dataSnapshot.children) {
+                    notification.ref.child("seen").setValue(true.toString())
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+    }
+
+    fun areThereNewNotifications(completionHandler: (areAllNotificationsSeen: Boolean) -> Unit) {
+        val user: FirebaseUser? = Firebase.auth.currentUser
+        val uniqueId: String = user?.uid!!
+        val ref = FirebaseDatabase.getInstance().getReference("Notifications")
+        val notificationsQuery: Query = ref.child(uniqueId)
+        Log.d("TinaNotifications", "")
+        notificationsQuery.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                val firebaseNotification = dataSnapshot.getValue(FirebaseNotification::class.java)
+                if (firebaseNotification != null && firebaseNotification.seen == false.toString()) {
+                    completionHandler(false)
+                    Log.d("TinaNotifications", "areAllNotSeen false")
+                }
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                val firebaseNotification = dataSnapshot.getValue(FirebaseNotification::class.java)
+                if (firebaseNotification != null && firebaseNotification.seen == false.toString()) {
+                    completionHandler(false)
+                    Log.d("TinaNotifications", "areAllNotSeen false")
+                }
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+    }
+
     fun setFirebaseOrderData(order: FirebaseOrder): String {
         val user: FirebaseUser? = Firebase.auth.currentUser
-//        if (user != null) {
         val uniqueId: String = user?.uid!!
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
         val myRef: DatabaseReference = database.getReference("Orders").child(uniqueId)
         val orderKey = myRef.push().key!!
-//        updateFirebaseOrderId(orderId, orderKey)
         myRef.child(orderKey).setValue(order)
         return orderKey
-//        }
     }
-
-//    fun getFirebaseOrderContents(fbOrderId: String): List<FirebaseOrderContent> {
-//        val orderContents: MutableList<FirebaseOrderContent> = mutableListOf()
-//        val user: FirebaseUser? = Firebase.auth.currentUser
-//        if (user != null) {
-//            val uniqueId: String = user.uid
-//            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-//            val myRef: DatabaseReference = database.getReference("Orders").child(uniqueId)
-//            myRef.child(fbOrderId).child("OrderContent")
-//            myRef.addValueEventListener(object : ValueEventListener {
-//                override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                    val firebaseOrderContents = dataSnapshot.children
-//
-//                    for (item in firebaseOrderContents) {
-//                        val firebaseOrderContent: FirebaseOrderContent? =
-//                            item.getValue(FirebaseOrderContent::class.java)
-//
-//                        if (firebaseOrderContent != null) {
-//                            val orderContent = FirebaseOrderContent(
-//                                firebaseOrderContent.productBarcode,
-//                                firebaseOrderContent.productName,
-//                                firebaseOrderContent.productPrice,
-//                                firebaseOrderContent.productOvercharge,
-//                                firebaseOrderContent.quantity,
-//                                firebaseOrderContent.orderId,
-//                                item.key!!
-//                            )
-//                            orderContents.add(orderContent)
-//                        }
-//                    }
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    TODO("Not yet implemented")
-//                }
-//            })
-//        }
-//        return orderContents
-//    }
 
     fun setFirebaseOrderContentData(orderContent: FirebaseOrderContent, fbOrderId: String) {
         val user: FirebaseUser? = Firebase.auth.currentUser
-//        if (user != null) {
-//            val uniqueId: String = user.uid
-//            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-//            val myRef: DatabaseReference = database.getReference("Orders").child(uniqueId)
-//            myRef.child(fbOrderId).child("OrderContent").push().setValue(orderContent)
-//        }
         if (user != null) {
             val uniqueId: String = user.uid
             val database: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -170,6 +222,59 @@ object FirebaseDatabaseOperations {
             myRef.push().setValue(product)
         }
     }
+
+    fun addFirebaseProductForUser(userId: String, product: FirebaseProduct) {
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val myRef: DatabaseReference = database.getReference("Products").child(userId)
+        myRef.push().setValue(product)
+    }
+
+    fun getFirebaseOrder(userId: String, orderId: String, completionHandler: (order: FirebaseOrder) -> Unit) {
+        val ref = FirebaseDatabase.getInstance().getReference("Orders")
+        val ordersQuery: Query =
+            ref.child(userId).child(orderId)
+
+        ordersQuery.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val firebaseOrder = dataSnapshot.getValue(FirebaseOrder::class.java)
+                if (firebaseOrder != null) {
+                    val order = FirebaseOrder(
+                        firebaseOrder.finalPrice,
+                        firebaseOrder.date,
+                        firebaseOrder.orderStatus,
+                        dataSnapshot.key!!,
+                        firebaseOrder.userId
+                    )
+                    completionHandler(order)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("Firebase_Products", "onCancelled", databaseError.toException())
+            }
+        })
+    }
+
+    fun getFirebaseUser(userId: String, completionHandler: (user: FirebaseUserInternal) -> Unit) {
+        val ref = FirebaseDatabase.getInstance().getReference("Users")
+
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val users = dataSnapshot.children
+                for (user in users) {
+                    val firebaseUser = user.getValue(FirebaseUserInternal::class.java)
+                    if (firebaseUser != null && firebaseUser.id == userId) {
+                        completionHandler(firebaseUser)
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("Firebase_Products", "onCancelled", databaseError.toException())
+            }
+        })
+    }
+
 
     fun deleteFirebaseOrderData(firebaseOrderId: String) {
         val user: FirebaseUser? = Firebase.auth.currentUser
@@ -422,6 +527,24 @@ object FirebaseDatabaseOperations {
         val ref = FirebaseDatabase.getInstance().getReference("Products")
         val productsQuery: Query =
             ref.child(uniqueId).orderByChild("barcode").equalTo(barcode)
+
+        productsQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (appleSnapshot in dataSnapshot.children) {
+                    appleSnapshot.ref.child("quantity").setValue(quantity)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("Firebase_Products", "onCancelled", databaseError.toException())
+            }
+        })
+    }
+
+    fun updateFirebaseProductQuantityForUser(userId: String, barcode: String, quantity: String) {
+        val ref = FirebaseDatabase.getInstance().getReference("Products")
+        val productsQuery: Query =
+            ref.child(userId).orderByChild("barcode").equalTo(barcode)
 
         productsQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {

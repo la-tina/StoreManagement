@@ -10,8 +10,7 @@ const val editProductTag = "editProductFragment"
 const val editOrderTag = "editOrderFragment"
 const val viewOrderTag = "viewOrderFragment"
 const val usersTag = "usersFragment"
-const val registerTag = "registerTag"
-const val loginTag = "loginTag"
+const val notificationsTag = "notificationsFragment"
 
 const val BARCODE_KEY = "Barcode"
 
@@ -19,8 +18,7 @@ const val PRODUCT_KEY = "Product"
 const val ORDER_KEY = "Order"
 const val VIEW_ORDER_KEY = "Order"
 const val USER_KEY = "User name"
-const val USER_EMAIL_KEY = "User email"
-const val ABOUT_KEY = "About"
+const val NOTIFICATION_KEY = "Notification"
 
 const val BARCODE_ACTIVITY_REQUEST_CODE = 0
 
@@ -30,9 +28,7 @@ const val EDIT_PRODUCT_TAB = 2
 const val EDIT_ORDER_TAB = 3
 const val VIEW_ORDER_TAB = 4
 const val USERS_TAB = 5
-
-const val LOGIN_TAB = 5
-const val REGISTER_TAB = 6
+const val NOTIFICATIONS_TAB = 6
 
 const val RC_SIGN_IN = 100
 

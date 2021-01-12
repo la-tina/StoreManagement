@@ -25,6 +25,8 @@
     <color name="light_yellow">#fffee0</color>
     <color name="green">#a4c639</color>
     <color name="light_green">#dcedc8</color>
+    <color name="dark_gray">#616161</color>
+    <color name="light_gray">#c1c1c1</color>
 </resources>
 
 

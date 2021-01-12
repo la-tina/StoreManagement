@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -24,13 +25,14 @@ import com.example.android.storemanagement.create_product.EditProductFragment
 import com.example.android.storemanagement.create_product.InfoProductFragment.Companion.CAMERA_PERMISSION_CODE
 import com.example.android.storemanagement.edit_order.EditOrderFragment
 import com.example.android.storemanagement.edit_order.ViewOrderFragment
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.areThereNewNotifications
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getCurrentFirebaseUserInternal
 import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.firebase.FirebaseUserInternal
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.orders_tab.OrdersFragment
-import com.example.android.storemanagement.orders_tab.UserSelectionFragment
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsFragment
 import com.example.android.storemanagement.products_tab.ProductsTabFragment
@@ -46,6 +48,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.OkHttpClient
 import java.io.File
+import java.util.*
 
 
 open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Observer<List<Order>>,
@@ -56,6 +59,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
     private var productsTabFragment: ProductsTabFragment? = null
     private var user: FirebaseUser? = null
     var newOrderCreated = false
+    private lateinit var menu: Menu
 
     private val orderViewModel: OrderViewModel by lazy {
         ViewModelProviders.of(this).get(OrderViewModel::class.java)
@@ -64,6 +68,10 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbarMain)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        toolbarMain.inflateMenu(R.menu.info_menu)
+        toolbarMain.overflowIcon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_notifications)
 
         user = FirebaseAuth.getInstance().currentUser
         val isLoggedInInfoShown = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isLoggedInInfoShown", false)
@@ -170,12 +178,23 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
         toolbarMain?.setNavigationOnClickListener {
             openCloseNavigationDrawer()
         }
+        Log.d("TinaNotifications", "onResume")
+        setNotificationIcon()
 
         val menu: Menu = navigation_view.menu
         if (user != null) {
             val userItem = menu.findItem(R.id.user)
             userItem.title = user?.displayName
             userItem.isCheckable = false
+            userItem.isEnabled = false
+            val accountType = menu.findItem(R.id.account_type_text)
+            accountType.isCheckable = false
+            accountType.isEnabled = false
+            getCurrentFirebaseUserInternal { fbUserInternal ->
+                val firstLetter: String = fbUserInternal.accountType.substring(0, 1)
+                val accountTypeText = firstLetter + fbUserInternal.accountType.substring(1).toLowerCase(Locale.ROOT)
+                accountType.title = accountTypeText
+            }
             val logInLogOutItem = menu.findItem(R.id.action_log_in)
             logInLogOutItem.title = this.getString(R.string.action_log_out)
             logInLogOutItem.setIcon(R.drawable.ic_baseline_exit_to_app)
@@ -184,6 +203,46 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
             val logInLogOutItem = menu.findItem(R.id.action_log_in)
             logInLogOutItem.title = this.getString(R.string.action_log_in)
         }
+    }
+
+    private fun setNotificationIcon() {
+        areThereNewNotifications { areAllNotificationsSeen ->
+            Log.d("TinaNotifications", "Main $areAllNotificationsSeen")
+            when (areAllNotificationsSeen) {
+                true -> toolbarMain.overflowIcon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_notifications)
+                false -> toolbarMain.overflowIcon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_notifications_active)
+            }
+        }
+    }
+
+//    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+//        areThereNewNotifications { areAllNotificationsSeen ->
+//            Log.d("TinaNotifications", "Main $areAllNotificationsSeen")
+//            when (areAllNotificationsSeen) {
+////                true -> menu?.getItem(0).icon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_notifications)
+//                false -> menu?.getItem(0)?.icon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_notifications_active)
+//            }
+//        }
+//        return super.onPrepareOptionsMenu(menu)
+//    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        this.menu = menu
+        menuInflater.inflate(R.menu.info_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here.
+        val id = item.itemId
+        if (id == R.id.action_notifications) {
+            Toast.makeText(this, "Notifications", Toast.LENGTH_LONG).show()
+            openNotificationsTab()
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
@@ -305,7 +364,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
             CREATE_ORDER_TAB -> openCreateOrderTab(firebaseUser!!)
             CREATE_PRODUCT_TAB -> openCreateProductTab()
             EDIT_PRODUCT_TAB -> openEditProductTab(product, firebaseProduct)
-            EDIT_ORDER_TAB -> openEditOrderTab(order, firebaseOrder)
+            EDIT_ORDER_TAB -> openEditOrderTab(firebaseUser!!, order, firebaseOrder)
             VIEW_ORDER_TAB -> openViewOrderTab(order, firebaseOrder)
             USERS_TAB -> openUsersTab()
         }
@@ -339,17 +398,24 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
             is EditOrderFragment -> editOrderTag
             is ViewOrderFragment -> viewOrderTag
             is UserSelectionFragment -> usersTag
+            is NotificationsFragment -> notificationsTag
             else -> throw IllegalStateException()
         }
 
     private fun openUsersTab() {
-        val previouslyAddedUsersFragment = supportFragmentManager.findFragmentByTag(
-            usersTag
-        )
+        val previouslyAddedUsersFragment = supportFragmentManager.findFragmentByTag(usersTag)
         val fragment = (previouslyAddedUsersFragment as? UserSelectionFragment) ?: UserSelectionFragment()
 
         fragment.onNavigationChangedListener = this
         openCreateTab(fragment, usersTag)
+    }
+
+    private fun openNotificationsTab() {
+        val previouslyAddedNotificationsFragment = supportFragmentManager.findFragmentByTag(notificationsTag)
+        val fragment = (previouslyAddedNotificationsFragment as? NotificationsFragment) ?: NotificationsFragment()
+
+        fragment.onNavigationChangedListener = this
+        openCreateTab(fragment, notificationsTag)
     }
 
     private fun openCreateOrderTab(firebaseUser: FirebaseUserInternal) {
@@ -390,14 +456,14 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
         openCreateTab(fragment, editProductTag)
     }
 
-    private fun openEditOrderTab(order: Order?, firebaseOrder: FirebaseOrder?) {
+    private fun openEditOrderTab(firebaseUser: FirebaseUserInternal, order: Order?, firebaseOrder: FirebaseOrder?) {
         val previouslyAddedEditOrderFragment = supportFragmentManager.findFragmentByTag(editOrderTag)
         val fragment = (previouslyAddedEditOrderFragment as? EditOrderFragment) ?: EditOrderFragment()
         if (order == null) {
-            val bundle = Bundle().apply { putSerializable(ORDER_KEY, firebaseOrder) }
-            fragment.arguments = bundle
-        } else {
-            val bundle = Bundle().apply { putSerializable(ORDER_KEY, order) }
+            val bundle = Bundle().apply {
+                putSerializable(ORDER_KEY, firebaseOrder)
+                putSerializable(USER_KEY, firebaseUser)
+            }
             fragment.arguments = bundle
         }
 
@@ -424,13 +490,6 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
 
         openMainTab(fragment, storeTag)
     }
-
-//    private fun openAboutTab() {
-//        val previouslyAddedAboutFragment = supportFragmentManager.findFragmentByTag(aboutTag)
-//        val fragment = (previouslyAddedAboutFragment as? AboutFragment) ?: AboutFragment()
-//
-//        openMainTab(fragment, aboutTag)
-//    }
 
     private fun openOrdersTab() {
         val previouslyAddedTitleFragment = supportFragmentManager.findFragmentByTag(titleTag)
@@ -492,6 +551,3 @@ interface OnNavigationChangedListener {
         firebaseUser: FirebaseUserInternal? = null
     )
 }
-
-
-

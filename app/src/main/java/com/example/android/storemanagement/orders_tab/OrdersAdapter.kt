@@ -64,6 +64,11 @@ class OrdersAdapter(
                     holder.status.setTextColor(context.getColor(R.color.colorPrimary))
                     holder.view.setBackgroundColor(context.getColor(R.color.light_primary))
                 }
+                OrderStatus.CANCELLED.toString() -> {
+                    holder.status.text = context.getString(R.string.status_cancelled)
+                    holder.status.setTextColor(context.getColor(R.color.dark_gray))
+                    holder.view.setBackgroundColor(context.getColor(R.color.light_gray))
+                }
                 else -> {
                     holder.status.text = context.getString(R.string.status_pending)
                     holder.status.setTextColor(context.getColor(R.color.orange))
@@ -104,6 +109,11 @@ class OrdersAdapter(
                     holder.status.setTextColor(context.getColor(R.color.colorPrimary))
                     holder.view.setBackgroundColor(context.getColor(R.color.light_primary))
                 }
+                OrderStatus.CANCELLED.toString() -> {
+                    holder.status.text = context.getString(R.string.status_cancelled)
+                    holder.status.setTextColor(context.getColor(R.color.dark_gray))
+                    holder.view.setBackgroundColor(context.getColor(R.color.light_gray))
+                }
                 else -> {
                     holder.status.text = context.getString(R.string.status_pending)
                     holder.status.setTextColor(context.getColor(R.color.orange))
@@ -115,7 +125,7 @@ class OrdersAdapter(
                 openEditOrderTab(null, currentOrder)
             }
 
-            if (currentOrder.orderStatus == OrderStatus.DELIVERED.toString()) {
+            if (currentOrder.orderStatus == OrderStatus.DELIVERED.toString() || currentOrder.orderStatus == OrderStatus.CANCELLED.toString()) {
                 holder.imageContextMenu.visibility = View.GONE
             } else {
                 holder.imageContextMenu.visibility = View.VISIBLE

@@ -6,6 +6,10 @@
             android:icon="@drawable/ic_baseline_person"
             android:title="@string/user" />
         <item
+            android:id="@+id/account_type_text"
+            android:icon="@drawable/ic_baseline_local_florist"
+            android:title="@string/type" />
+        <item
             android:id="@+id/action_about"
             android:icon="@drawable/ic_outline_info"
             android:title="@string/action_about" />

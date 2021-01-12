@@ -1,4 +1,4 @@
-package com.example.android.storemanagement.orders_tab
+package com.example.android.storemanagement
 
 
 import android.os.Bundle
@@ -7,16 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.android.storemanagement.CREATE_ORDER_TAB
-import com.example.android.storemanagement.OnNavigationChangedListener
-import com.example.android.storemanagement.R
-import com.example.android.storemanagement.UsersAdapter
-import com.example.android.storemanagement.create_order.CreateOrderFragment
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getCurrentFirebaseUserInternal
 import com.example.android.storemanagement.firebase.FirebaseUserInternal
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.fragment_users.*
 import kotlinx.android.synthetic.main.fragment_users.view.*
 
@@ -39,7 +33,7 @@ open class UserSelectionFragment : Fragment() {
             false
         )
         view.toolbarTop.setNavigationIcon(R.drawable.ic_baseline_arrow_back)
-        view.toolbarTop.setNavigationOnClickListener{
+        view.toolbarTop.setNavigationOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
         return view
@@ -47,8 +41,24 @@ open class UserSelectionFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        getFirebaseUsers()
-        setupRecyclerView(users)
+        getCurrentFirebaseUserInternal { firebaseUser ->
+
+            when (firebaseUser.accountType) {
+                UserType.VENDOR.toString() -> {
+                    getFirebaseUsers(UserType.VENDOR)
+                    toolbarTop.title = context?.getString(R.string.vendors)
+                }
+                UserType.RETAILER.toString() -> {
+                    getFirebaseUsers(UserType.VENDOR)
+                    toolbarTop.title = context?.getString(R.string.vendors)
+                }
+                UserType.CUSTOMER.toString() -> {
+                    getFirebaseUsers(UserType.RETAILER)
+                    toolbarTop.title = context?.getString(R.string.retailers)
+                }
+            }
+            setupRecyclerView(users)
+        }
     }
 
 //    private fun getFirebaseUsers() {
@@ -75,14 +85,16 @@ open class UserSelectionFragment : Fragment() {
 //        setupRecyclerView(users)
 //    }
 
-    private fun getFirebaseUsers() {
+    private fun getFirebaseUsers(accountType: UserType) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val uniqueId: String = user!!.uid
         val database = FirebaseDatabase.getInstance()
-        val usersQuery: DatabaseReference = database.getReference("Users")
+        val usersQuery: Query = database.getReference("Users").orderByChild("accountType").equalTo(accountType.toString())
         usersQuery.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
                 val firebaseUser =
                     dataSnapshot.getValue(FirebaseUserInternal::class.java)
-                if (users.none { it.id == firebaseUser?.id }) {
+                if (users.none { it.id == firebaseUser?.id } && firebaseUser?.id != uniqueId) {
                     users.add(firebaseUser!!)
                 }
                 activity?.runOnUiThread { setupRecyclerView(users) }
