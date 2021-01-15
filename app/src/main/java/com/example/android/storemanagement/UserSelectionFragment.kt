@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getCurrentFirebaseUserInternal
@@ -21,6 +24,7 @@ open class UserSelectionFragment : Fragment() {
     private var users = mutableListOf<FirebaseUserInternal>()
 
     lateinit var onNavigationChangedListener: OnNavigationChangedListener
+    private lateinit var topToolbar: Toolbar
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,11 +40,30 @@ open class UserSelectionFragment : Fragment() {
         view.toolbarTop.setNavigationOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
+        topToolbar = view!!.findViewById(R.id.toolbarTop)
+        topToolbar.inflateMenu(R.menu.users_filter_menu)
+        topToolbar.overflowIcon = ContextCompat.getDrawable(context!!, R.drawable.ic_baseline_filter_alt)
         return view
     }
 
     override fun onStart() {
         super.onStart()
+        setHasOptionsMenu(true)
+        topToolbar.setOnMenuItemClickListener(Toolbar.OnMenuItemClickListener { item ->
+            Toast.makeText(context, item.title, Toast.LENGTH_SHORT).show()
+            when (item.itemId) {
+                R.id.user_name_ascending ->
+                    filterByNameAscending()
+                R.id.user_name_descending ->
+                    filterByNameDescending()
+                R.id.user_email_ascending ->
+                    filterByEmailAscending()
+                R.id.user_email_descending ->
+                    filterByEmailDescending()
+            }
+            true
+        })
+
         getCurrentFirebaseUserInternal { firebaseUser ->
 
             when (firebaseUser.accountType) {
@@ -59,6 +82,30 @@ open class UserSelectionFragment : Fragment() {
             }
             setupRecyclerView(users)
         }
+    }
+
+    private fun filterByNameAscending() {
+        val userNameComparator = compareBy<FirebaseUserInternal> { it.name }
+        val orderedUsers = users.sortedWith(userNameComparator)
+        setupRecyclerView(orderedUsers)
+    }
+
+    private fun filterByNameDescending() {
+        val userNameComparator = compareByDescending<FirebaseUserInternal> { it.name }
+        val orderedUsers = users.sortedWith(userNameComparator)
+        setupRecyclerView(orderedUsers)
+    }
+
+    private fun filterByEmailAscending() {
+        val userNameComparator = compareBy<FirebaseUserInternal> { it.email }
+        val orderedUsers = users.sortedWith(userNameComparator)
+        setupRecyclerView(orderedUsers)
+    }
+
+    private fun filterByEmailDescending() {
+        val userNameComparator = compareByDescending<FirebaseUserInternal> { it.email }
+        val orderedUsers = users.sortedWith(userNameComparator)
+        setupRecyclerView(orderedUsers)
     }
 
 //    private fun getFirebaseUsers() {

@@ -52,10 +52,26 @@ object CreateProductFieldValidator {
         nameLayout: TextInputLayout,
         priceLayout: TextInputLayout,
         overchargeLayout: TextInputLayout,
-        barcodeLayout: TextInputLayout
+        barcodeLayout: TextInputLayout,
+        nameView: EditText,
+        priceView: EditText,
+        barcodeView: EditText
     ): Boolean {
-        return nameLayout.error == null && priceLayout.error == null && overchargeLayout.error == null && barcodeLayout.error == null
+        return !areFieldsErroneous(nameLayout, priceLayout, overchargeLayout, barcodeLayout) && areAllFieldsFilled(nameView, priceView, barcodeView)
     }
+
+    private fun areFieldsErroneous(
+        nameLayout: TextInputLayout,
+        priceLayout: TextInputLayout,
+        overchargeLayout: TextInputLayout,
+        barcodeLayout: TextInputLayout
+    ) = nameLayout.error != null || priceLayout.error != null || overchargeLayout.error != null || barcodeLayout.error != null
+
+    private fun areAllFieldsFilled(
+        nameView: EditText,
+        priceView: EditText,
+        barcodeView: EditText
+    ) = nameView.text.isNotEmpty() && priceView.text.isNotEmpty() && barcodeView.text.isNotEmpty()
 
     private fun validateName(nameView: EditText, nameLayout: TextInputLayout, isNameDuplicatedAction: (String) -> Boolean): Boolean {
         val name = nameView.text.toString()

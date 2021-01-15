@@ -72,38 +72,48 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageViewW" />
 
-    <RadioButton
-        android:id="@+id/vendorButton"
+    <RadioGroup
+        android:id="@+id/typesGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/vendor"
-        android:textColor="@color/darkBarColor_a"
-        android:textSize="17sp"
-        app:layout_constraintStart_toStartOf="@+id/account_type_text"
-        app:layout_constraintTop_toBottomOf="@+id/account_type_text" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/account_type_text">
 
-    <RadioButton
-        android:id="@+id/retailerButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/retailer"
-        android:textColor="@color/darkBarColor_a"
-        android:textSize="17sp"
-        app:layout_constraintStart_toStartOf="@+id/account_type_text"
-        app:layout_constraintTop_toBottomOf="@+id/vendorButton" />
+        <RadioButton
+            android:id="@+id/vendorButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/vendor"
+            android:textColor="@color/darkBarColor_a"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="@+id/account_type_text"
+            app:layout_constraintTop_toBottomOf="@+id/account_type_text" />
 
-    <RadioButton
-        android:id="@+id/customerButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/customer"
-        android:textColor="@color/darkBarColor_a"
-        android:textSize="17sp"
-        app:layout_constraintStart_toStartOf="@+id/account_type_text"
-        app:layout_constraintTop_toBottomOf="@+id/retailerButton" />
+        <RadioButton
+            android:id="@+id/retailerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/retailer"
+            android:textColor="@color/darkBarColor_a"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="@+id/account_type_text"
+            app:layout_constraintTop_toBottomOf="@+id/vendorButton" />
+
+        <RadioButton
+            android:id="@+id/customerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/customer"
+            android:textColor="@color/darkBarColor_a"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="@+id/account_type_text"
+            app:layout_constraintTop_toBottomOf="@+id/retailerButton" />
+
+    </RadioGroup>
 
     <Button
         android:id="@+id/buttonSave"
@@ -111,8 +121,8 @@
         android:layout_height="@dimen/login_button_height"
         android:layout_marginBottom="@dimen/login_button_margin"
         android:background="@drawable/button_shape"
-        android:text="@string/save_button"
         android:enabled="false"
+        android:text="@string/save_button"
         android:textColor="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

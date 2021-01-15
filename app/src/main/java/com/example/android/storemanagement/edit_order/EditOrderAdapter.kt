@@ -12,10 +12,15 @@ import com.example.android.storemanagement.create_order.CreateOrderFieldValidato
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isEditOrderQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderHolder
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getFirebaseUserOrderContents
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.products_database.Product
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 class EditOrderAdapter(
     private val context: Context,
@@ -24,14 +29,21 @@ class EditOrderAdapter(
     private val canOrderBeEdited: () -> Boolean
 ) : RecyclerView.Adapter<CreateOrderHolder>() {
 
+    private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var productsInOrder = emptyList<OrderContent>() // Cached copy of products
     private var products = emptyList<Product>()
     private var firebaseOrderContents = emptyList<FirebaseOrderContent>()
     private var firebaseUserProducts = emptyList<FirebaseProduct>()
     private var areFirebaseOrderContentsLoaded = false
 
+    var enabledProductsWithErrors = mutableMapOf<String, Boolean>()
+
     //barcode -> quantity
     var quantities = mutableMapOf<String, Int>()
+
+    private fun onFieldErrorChangedAction(productName: String, isQuantityCorrect: Boolean) {
+        enabledProductsWithErrors[productName] = isQuantityCorrect
+    }
 
     // Gets the number of items in the list
     override fun getItemCount(): Int {
@@ -46,81 +58,107 @@ class EditOrderAdapter(
 
     // Binds each product in the list to a view
     override fun onBindViewHolder(holder: CreateOrderHolder, position: Int) {
-        if (areFirebaseOrderContentsLoaded) {
-            val currentFirebaseProductInOrder = firebaseOrderContents[position]
-            holder.productName.text = currentFirebaseProductInOrder.productName
-            holder.productPrice.text = currentFirebaseProductInOrder.productPrice
-            holder.productQuantity.setText(currentFirebaseProductInOrder.quantity)
-            firebaseUserProducts.forEach { product ->
-                if (product.barcode == currentFirebaseProductInOrder.productBarcode) {
-                    holder.inStockProductQuantity.text =
-                        context.resources.getString(R.string.in_stock_quantity).plus(" ").plus(product.quantity)
-                }
-            }
+//        if (areFirebaseOrderContentsLoaded) {
+        val currentFirebaseProductInOrder = firebaseOrderContents[position]
+        holder.productName.text = currentFirebaseProductInOrder.productName
+        holder.productPrice.text = currentFirebaseProductInOrder.productPrice
+        holder.productQuantity.setText(currentFirebaseProductInOrder.quantity)
+        var finalProductAvailableQuantity = 0
+        val orderContents = mutableListOf<FirebaseOrderContent>()
 
-            if (!canOrderBeEdited()) {
-                holder.productQuantity.isEnabled = false
-            }
-            holder.productQuantity.addTextChangedListener(
-                getTextWatcher(
-                    holder,
+        firebaseUserProducts.forEach { product ->
+            if (product.barcode == currentFirebaseProductInOrder.productBarcode) {
+                finalProductAvailableQuantity = product.quantity.toInt() + holder.productQuantity.text.toString().toInt()
+                getFirebaseUserOrderContents(
+                    currentFirebaseProductInOrder.userId,
                     currentFirebaseProductInOrder.productBarcode
-                )
-            )
-            Log.d("Watcher", "quantity addWatcher " + holder.productQuantity.text)
-        } else {
-            val currentProductInOrder = productsInOrder[position]
+                ) { orderContent, childAction ->
+                    when (childAction) {
+                        FirebaseDatabaseOperations.ChildAction.ChildAdded -> {
+                            if (orderContents.none {it.id == orderContent.id}) {
+                                orderContents.add(orderContent)
+                                val orderContentQuantity = orderContent.quantity
+                                finalProductAvailableQuantity -= orderContentQuantity.toInt()
 
-            products.forEach { currentProduct ->
-                if (currentProductInOrder.productBarcode == currentProduct.barcode) {
-                    holder.productName.text = currentProduct.name
-                    holder.productPrice.text = currentProduct.price.toString()
-                    holder.productQuantity.setText(currentProductInOrder.quantity.toString())
+                            }
+                            onInStockQuantityCalculated(holder, finalProductAvailableQuantity, currentFirebaseProductInOrder)
+                            Log.d("Watcher", "quantity addWatcher " + holder.productQuantity.text)
+                        }
+                        FirebaseDatabaseOperations.ChildAction.ChildChanged -> {
+                            val changedOrderContent =
+                                orderContents.first { it.id == orderContent.id }
+                            orderContents.remove(changedOrderContent)
+                            finalProductAvailableQuantity += changedOrderContent.quantity.toInt()
+                            orderContents.add(orderContent)
+
+                            val orderContentQuantity = orderContent.quantity
+                            finalProductAvailableQuantity -= orderContentQuantity.toInt()
+
+                            onInStockQuantityCalculated(holder, finalProductAvailableQuantity, currentFirebaseProductInOrder)
+                            Log.d("Watcher", "quantity addWatcher " + holder.productQuantity.text)
+                        }
+                        FirebaseDatabaseOperations.ChildAction.ChildRemoved -> {
+                            val removedOrderContent =
+                                orderContents.first { it.id == orderContent.id }
+                            orderContents.remove(removedOrderContent)
+
+                            val orderContentQuantity = orderContent.quantity
+                            finalProductAvailableQuantity += orderContentQuantity.toInt()
+
+                            onInStockQuantityCalculated(holder, finalProductAvailableQuantity, currentFirebaseProductInOrder)
+                            Log.d("Watcher", "quantity addWatcher " + holder.productQuantity.text)
+                        }
+                    }
                 }
             }
-
-            if (!canOrderBeEdited()) {
-                holder.productQuantity.isEnabled = false
-            }
-            holder.productQuantity.addTextChangedListener(
-                getTextWatcher(
-                    holder,
-                    currentProductInOrder.productBarcode
-                )
-            )
-            Log.d("Watcher", "quantity addWatcher " + holder.productQuantity.text)
         }
     }
 
-    private fun getTextWatcher(holder: CreateOrderHolder, barcode: String): TextWatcher =
+    private fun onInStockQuantityCalculated(
+        holder: CreateOrderHolder,
+        finalProductAvailableQuantity: Int,
+        currentFirebaseProductInOrder: FirebaseOrderContent
+    ) {
+        holder.inStockProductQuantity.text =
+            context.resources.getString(R.string.in_stock_quantity).plus(" ")
+                .plus(finalProductAvailableQuantity)
+        if (!canOrderBeEdited()) {
+            holder.productQuantity.isEnabled = false
+        }
+        holder.productQuantity.addTextChangedListener(
+            getTextWatcher(
+                holder,
+                currentFirebaseProductInOrder.productBarcode,
+                finalProductAvailableQuantity
+            )
+        )
+        setErroneousField(holder, finalProductAvailableQuantity)
+        val shouldEnableOrderButton = isEditOrderQuantityCorrect(
+            holder.productQuantity,
+            holder.productQuantityLayout,
+            finalProductAvailableQuantity
+        ) && enabledProductsWithErrors.none { !it.value }
+        setOrderButtonEnabled(shouldEnableOrderButton)
+    }
+
+    private fun getTextWatcher(holder: CreateOrderHolder, barcode: String, finalProductAvailableQuantity: Int): TextWatcher =
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
+                setErroneousField(holder, finalProductAvailableQuantity)
+
                 val shouldEnableOrderButton = isEditOrderQuantityCorrect(
                     holder.productQuantity,
-                    holder.productQuantityLayout
-                )
+                    holder.productQuantityLayout,
+                    finalProductAvailableQuantity
+                ) && enabledProductsWithErrors.none { !it.value }
                 setOrderButtonEnabled(shouldEnableOrderButton)
 
                 if (isQuantityCorrect(
                         holder.productQuantity,
-                        holder.productQuantityLayout
+                        holder.productQuantityLayout,
+                        finalProductAvailableQuantity
                     )
                 ) {
-//                    Log.d(
-//                        "Watcher",
-//                        "quantity " + quantities[barcode] + " current quantity " + holder.productQuantity.text.toString()
-//                            .toInt() + " productname " + holder.productName.text.toString() + " lastEditedProduct " + lastEditedProduct
-//                    )
-//                    if (quantities[barcode] == holder.productQuantity.text.toString()
-//                            .toInt() && barcode == lastEditedProduct && !beforeElementIndicator
-//                    ) {
-//                        Log.d("Watcher", "afterElementIndicator")
-//                        afterElementIndicator = true
-//                    } else {
-//                        beforeElementIndicator = false
-//                        lastEditedProduct = barcode
-//                        afterElementIndicator = false
-
                     val quantity: Int = if (holder.productQuantity.text.toString()
                             .isBlank()
                     ) 0 else holder.productQuantity.text.toString().toInt()
@@ -130,19 +168,7 @@ class EditOrderAdapter(
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                if (isQuantityCorrect(
-//                        holder.productQuantity,
-//                        holder.productQuantityLayout
-//                    ) && !beforeElementIndicator
-//                ) {
-//                    beforeElementIndicator = true
-//                    afterElementIndicator = false
-//                    updateFinalPriceAction(getPrice(holder) * -1)
-//                    Log.d(
-//                        "Watcher",
-//                        "watcher price before " + getPrice(holder) * -1 + " for product " + holder.productName.text.toString()
-//                    )
-//                }
+                setErroneousField(holder, finalProductAvailableQuantity)
                 val quantity: Int = if (holder.productQuantity.text.toString()
                         .isBlank()
                 ) 0 else holder.productQuantity.text.toString().toInt()
@@ -154,7 +180,8 @@ class EditOrderAdapter(
                 setOrderButtonEnabled(
                     isQuantityCorrect(
                         holder.productQuantity,
-                        holder.productQuantityLayout
+                        holder.productQuantityLayout,
+                        finalProductAvailableQuantity
                     )
                 )
                 val quantity: Int = if (holder.productQuantity.text.toString()
@@ -164,6 +191,27 @@ class EditOrderAdapter(
                 updateFinalPriceAction(getFinalPrice())
             }
         }
+
+    private fun setErroneousField(
+        holder: CreateOrderHolder,
+        finalProductAvailableQuantity: Int
+    ) {
+        when {
+            isQuantityCorrect(
+                holder.productQuantity,
+                holder.productQuantityLayout,
+                finalProductAvailableQuantity
+            ) -> {
+                onFieldErrorChangedAction(holder.productName.text.toString(), true)
+            }
+            holder.productQuantityLayout.isErrorEnabled -> {
+                onFieldErrorChangedAction(holder.productName.text.toString(), false)
+            }
+            holder.productQuantity.text.isEmpty() -> {
+                onFieldErrorChangedAction(holder.productName.text.toString(), true)
+            }
+        }
+    }
 
     private fun getFinalPrice(): Float {
         var finalPrice = 0F

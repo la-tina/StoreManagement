@@ -38,7 +38,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
     override fun onStart() {
         super.onStart()
         firebaseUser = arguments?.getSerializable(USER_KEY) as FirebaseUserInternal
-        Toast.makeText(context, "Enter at least 1 quantity to make an order.", Toast.LENGTH_LONG)
+        Toast.makeText(context, "Enter at least 1 quantity to make an order.", Toast.LENGTH_SHORT)
             .show()
         finalPrice = 0F
         final_price.text = "0"

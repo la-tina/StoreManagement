@@ -87,6 +87,10 @@
     <string name="delivered_status">Delivered status</string>
     <string name="final_price_ascending">Final price /Ascending/</string>
     <string name="final_price_descending">Final price /Descending/</string>
+    <string name="user_ascending">User /Ascending/</string>
+    <string name="user_descending">User /Descending/</string>
+    <string name="email_ascending">Email /Ascending/</string>
+    <string name="email_descending">Email /Descending/</string>
     <string name="order_by">ORDER BY:</string>
     <string name="quantity_ascending">Quantity /Ascending/</string>
     <string name="quantity_descending">Quantity /Descending/</string>
@@ -111,5 +115,6 @@
     <string name="orders_notifications">Here are all orders\' notifications received from other users.</string>
     <string name="new_order">New order</string>
     <string name="confirm">Confirm</string>
-
+    <string name="facebook_app_id">[APP_ID]</string>
+    <string name="fb_login_protocol_scheme">fb[APP_ID]</string>
 </resources>

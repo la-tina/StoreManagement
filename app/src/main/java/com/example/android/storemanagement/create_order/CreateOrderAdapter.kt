@@ -11,10 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityAboveLimit
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations
+import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.firebase.FirebaseUserInternal
 import kotlinx.android.synthetic.main.create_order_item.view.*
-import kotlinx.android.synthetic.main.fragment_create_order.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 
 class CreateOrderAdapter(
@@ -24,6 +28,7 @@ class CreateOrderAdapter(
     private val firebaseUser: FirebaseUserInternal
 ) : RecyclerView.Adapter<CreateOrderHolder>() {
 
+    private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var firebaseProducts = mutableListOf<FirebaseProduct>() // Cached copy of products
 
     //productName -> quantity
@@ -42,7 +47,7 @@ class CreateOrderAdapter(
         return CreateOrderHolder(view)
     }
 
-    private fun onCheckChangedAction(productName: String, isQuantityCorrect: Boolean) {
+    private fun onFieldErrorChangedAction(productName: String, isQuantityCorrect: Boolean) {
         enabledProducts[productName] = isQuantityCorrect
     }
 
@@ -54,36 +59,83 @@ class CreateOrderAdapter(
         val overcharge = if (currentProduct.overcharge.isBlank()) 0F else currentProduct.overcharge.toFloat()
         holder.productPrice.text = (currentProduct.price.toFloat() + overcharge).toString()
         holder.inStockProductQuantity.visibility = View.VISIBLE
-        holder.inStockProductQuantity.text = context.resources.getString(R.string.in_stock_quantity).plus(" ").plus(currentProduct.quantity)
-        holder.productQuantity.addTextChangedListener(getTextWatcher(holder))
+//        firebaseUserProducts.forEach { product ->
+//            if (currentProduct.barcode == currentFirebaseProductInOrder.productBarcode) {
+        var finalProductAvailableQuantity = currentProduct.quantity.toInt()
+        val orderContents = mutableListOf<FirebaseOrderContent>()
+        onInStockQuantityCalculated(holder, finalProductAvailableQuantity)
+        FirebaseDatabaseOperations.getFirebaseUserOrderContents(
+            firebaseUser.id,
+            currentProduct.barcode
+        ) { orderContent, childAction ->
+            when (childAction) {
+                FirebaseDatabaseOperations.ChildAction.ChildAdded -> {
+                    if (orderContents.none { it.id == orderContent.id }) {
+                        orderContents.add(orderContent)
+                        val orderContentQuantity = orderContent.quantity
+                        finalProductAvailableQuantity -= orderContentQuantity.toInt()
+                    }
 
+                    onInStockQuantityCalculated(holder, finalProductAvailableQuantity)
+                }
+                FirebaseDatabaseOperations.ChildAction.ChildChanged -> {
+                    val changedOrderContent =
+                        orderContents.first { it.id == orderContent.id }
+                    orderContents.remove(changedOrderContent)
+                    finalProductAvailableQuantity += changedOrderContent.quantity.toInt()
+                    orderContents.add(orderContent)
+
+                    val orderContentQuantity = orderContent.quantity
+                    finalProductAvailableQuantity -= orderContentQuantity.toInt()
+
+                    onInStockQuantityCalculated(holder, finalProductAvailableQuantity)
+                }
+                FirebaseDatabaseOperations.ChildAction.ChildRemoved -> {
+                    val removedOrderContent =
+                        orderContents.first { it.id == orderContent.id }
+                    orderContents.remove(removedOrderContent)
+
+                    val orderContentQuantity = orderContent.quantity
+                    finalProductAvailableQuantity += orderContentQuantity.toInt()
+
+                    onInStockQuantityCalculated(holder, finalProductAvailableQuantity)
+                }
+            }
+        }
+    }
+
+    private fun onInStockQuantityCalculated(
+        holder: CreateOrderHolder,
+        finalProductAvailableQuantity: Int
+    ) {
+        holder.inStockProductQuantity.text =
+            context.resources.getString(R.string.in_stock_quantity).plus(" ").plus(finalProductAvailableQuantity)
+        holder.productQuantity.addTextChangedListener(getTextWatcher(holder, finalProductAvailableQuantity))
+
+        setErroneousField(holder, finalProductAvailableQuantity)
         setOrderButtonEnabled(
             isQuantityCorrect(
                 holder.productQuantity,
-                holder.productQuantityLayout
-            )
+                holder.productQuantityLayout,
+                finalProductAvailableQuantity
+            ) && enabledProducts.none { !it.value }
         )
-//            onQuantityChanged(true, holder)
-
     }
 
-    private fun getTextWatcher(holder: CreateOrderHolder): TextWatcher =
+    private fun getTextWatcher(holder: CreateOrderHolder, finalProductAvailableQuantity: Int): TextWatcher =
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 holder.productQuantity.text?.toString()?.let { quantity ->
-//                    holder.productQuantityLayout.error = null
-//                    holder.productQuantityLayout.isErrorEnabled = false
+                    setErroneousField(holder, finalProductAvailableQuantity)
 
-                    if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout))
-                        onQuantityChanged(true, holder)
+                    val shouldEnableOrderButton = isQuantityCorrect(
+                        holder.productQuantity,
+                        holder.productQuantityLayout,
+                        finalProductAvailableQuantity
+                    ) && enabledProducts.none { !it.value }
+                    setOrderButtonEnabled(shouldEnableOrderButton)
 
-                    val shouldEnableOrderButton =
-                        isQuantityCorrect(
-                            holder.productQuantity,
-                            holder.productQuantityLayout
-                        ) && enabledProducts.isNotEmpty()
-
-                    if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout)) {
+                    if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
 
                         onQuantityChanged(shouldEnableOrderButton, holder)
                         setOrderButtonEnabled(shouldEnableOrderButton)
@@ -99,7 +151,16 @@ class CreateOrderAdapter(
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout)) {
+                setErroneousField(holder, finalProductAvailableQuantity)
+
+//                val shouldEnableOrderButton = isQuantityCorrect(
+//                    holder.productQuantity,
+//                    holder.productQuantityLayout,
+//                    finalProductAvailableQuantity
+//                ) && enabledProducts.none { !it.value }
+//                setOrderButtonEnabled(shouldEnableOrderButton)
+
+                if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
                     holder.productQuantity.text?.toString()?.let { quantity ->
                         updateQuantityForProduct(
                             holder.productName.text.toString(),
@@ -112,20 +173,44 @@ class CreateOrderAdapter(
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                setErroneousField(holder, finalProductAvailableQuantity)
+
+//                val shouldEnableOrderButton = isQuantityCorrect(
+//                    holder.productQuantity,
+//                    holder.productQuantityLayout,
+//                    finalProductAvailableQuantity
+//                ) && enabledProducts.none { !it.value }
+//                setOrderButtonEnabled(shouldEnableOrderButton)
+
                 holder.productQuantity.text?.toString()?.let { quantity ->
                     val quantityEdited: Int = if (quantity.isEmpty()) 0 else quantity.toInt()
                     updateQuantityForProduct(holder.productName.text.toString(), quantityEdited)
                     updateFinalPriceAction(getPrice())
                     Log.d("Tina", "quantity onTextChanged$quantityEdited")
                 }
-                setOrderButtonEnabled(
-                    isQuantityCorrect(
-                        holder.productQuantity,
-                        holder.productQuantityLayout
-                    )
-                )
             }
         }
+
+    private fun setErroneousField(
+        holder: CreateOrderHolder,
+        finalProductAvailableQuantity: Int
+    ) {
+        when {
+            isQuantityCorrect(
+                holder.productQuantity,
+                holder.productQuantityLayout,
+                finalProductAvailableQuantity
+            ) -> {
+                onQuantityChanged(true, holder)
+            }
+            holder.productQuantityLayout.isErrorEnabled -> {
+                onQuantityChanged(false, holder)
+            }
+            holder.productQuantity.text.isEmpty() -> {
+                onQuantityChanged(true, holder)
+            }
+        }
+    }
 
     private fun getPrice(): Float {
         var finalPrice = 0F
@@ -141,7 +226,7 @@ class CreateOrderAdapter(
     }
 
     private fun onQuantityChanged(isQuantityCorrect: Boolean, holder: CreateOrderHolder) {
-        onCheckChangedAction(holder.productName.text.toString(), isQuantityCorrect)
+        onFieldErrorChangedAction(holder.productName.text.toString(), isQuantityCorrect)
     }
 
     private fun updateQuantityForProduct(productName: String, quantity: Int) {

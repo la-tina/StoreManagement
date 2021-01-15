@@ -1,8 +1,7 @@
 package com.example.android.storemanagement.create_order
 
-import com.google.android.material.textfield.TextInputLayout
 import android.widget.EditText
-import android.widget.TextView
+import com.google.android.material.textfield.TextInputLayout
 
 
 object CreateOrderFieldValidator {
@@ -11,16 +10,27 @@ object CreateOrderFieldValidator {
 
     private const val MESSAGE_ZERO_QUANTITY = "You can't make an order if the quantity is empty."
 
-    fun isQuantityCorrect(quantityView: EditText, quantityLayout: TextInputLayout): Boolean {
+    fun isQuantityCorrect(quantityView: EditText, quantityLayout: TextInputLayout, finalProductAvailableQuantity: Int): Boolean {
         quantityLayout.error = null
         quantityLayout.isErrorEnabled = false
-        return !isQuantityEmpty(quantityView) && !isQuantityAboveLimit(quantityView)
+        return !isQuantityEmpty(quantityView) && !isQuantityAboveLimit(quantityView) && isQuantityInTheAvailableRange(quantityLayout, quantityView, finalProductAvailableQuantity)
     }
 
-    fun isEditOrderQuantityCorrect(quantityView: EditText, quantityLayout: TextInputLayout): Boolean {
+    private fun isQuantityInTheAvailableRange(quantityLayout: TextInputLayout, quantityView: EditText, finalProductAvailableQuantity: Int): Boolean {
+        return if (!isQuantityInTheAvailableRangeInternal(quantityView.text.toString(), finalProductAvailableQuantity)) {
+            quantityView.error = "Insufficient quantity."
+            quantityLayout.isErrorEnabled = true
+            false
+        } else true
+    }
+
+    private fun isQuantityInTheAvailableRangeInternal(quantity: String, finalProductAvailableQuantity: Int) = if (quantity.isNotEmpty())
+        quantity.toInt() <= finalProductAvailableQuantity else true
+
+    fun isEditOrderQuantityCorrect(quantityView: EditText, quantityLayout: TextInputLayout, finalProductAvailableQuantity: Int): Boolean {
         quantityLayout.error = null
         quantityLayout.isErrorEnabled = false
-        return !isQuantityAboveLimit(quantityView)
+        return !isQuantityAboveLimit(quantityView) && isQuantityInTheAvailableRangeInternal(quantityView.text.toString(), finalProductAvailableQuantity)
     }
 
     private fun isQuantityEmpty(quantity: EditText): Boolean {

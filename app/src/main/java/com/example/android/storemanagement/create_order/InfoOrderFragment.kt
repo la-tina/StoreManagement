@@ -188,6 +188,6 @@ abstract class InfoOrderFragment: Fragment()  {
     }
 
     protected fun setOrderButtonEnabled(enabled: Boolean) {
-        button_add_order.isEnabled = enabled
+        button_add_order?.isEnabled = enabled
     }
 }

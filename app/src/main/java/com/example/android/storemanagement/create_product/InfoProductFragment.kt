@@ -354,7 +354,10 @@ abstract class InfoProductFragment : Fragment() {
                     name_text,
                     price_text,
                     overcharge_text,
-                    barcode_text
+                    barcode_text,
+                    product_name,
+                    product_price,
+                    product_barcode
                 )
             }
 
