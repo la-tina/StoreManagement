@@ -6,9 +6,9 @@ import android.view.View
 import androidx.lifecycle.Observer
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseProduct
 import com.example.android.storemanagement.PRODUCT_KEY
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getFirebaseUserOrderContents
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.products_database.Product
-import com.example.android.storemanagement.toSingleEvent
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
@@ -34,6 +34,10 @@ class EditProductFragment : InfoProductFragment() {
             product_overcharge.setText(product.overcharge.toString())
             product_barcode.setText(product.barcode)
         } else if (product is FirebaseProduct) {
+            user = Firebase.auth.currentUser
+            getFirebaseUserOrderContents(user!!.uid, product.barcode, true) { _, _ ->
+                disableEditFields()
+            }
             product_name.setText(product.name)
             product_price.setText(product.price)
             product_overcharge.setText(product.overcharge)
@@ -66,6 +70,15 @@ class EditProductFragment : InfoProductFragment() {
         } else {
             getAllFirebaseProducts()
         }
+    }
+
+    private fun disableEditFields() {
+        product_name.isEnabled = false
+        product_price.isEnabled = false
+        product_overcharge.isEnabled = false
+        product_overcharge_percentage.isEnabled = false
+        product_barcode.isEnabled = false
+        button_add_product.isEnabled = false
     }
 
     private fun getAllFirebaseProducts() {

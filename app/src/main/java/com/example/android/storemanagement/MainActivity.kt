@@ -191,9 +191,9 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
             accountType.isCheckable = false
             accountType.isEnabled = false
             getCurrentFirebaseUserInternal { fbUserInternal ->
-                val firstLetter: String = fbUserInternal.accountType.substring(0, 1)
-                val accountTypeText = firstLetter + fbUserInternal.accountType.substring(1).toLowerCase(Locale.ROOT)
-                accountType.title = accountTypeText
+//                val firstLetter: String = fbUserInternal.accountType.substring(0, 1)
+//                val accountTypeText = firstLetter + fbUserInternal.accountType.substring(1).toLowerCase(Locale.ROOT)
+                accountType.title = fbUserInternal.accountType
             }
             val logInLogOutItem = menu.findItem(R.id.action_log_in)
             logInLogOutItem.title = this.getString(R.string.action_log_out)

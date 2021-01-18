@@ -38,6 +38,7 @@ open class EditOrderFragment : InfoOrderFragment() {
     private var user: FirebaseUser? = null
     private var currentFirebaseUserProducts = mutableListOf<FirebaseProduct>()
     private var currentOrderUser: FirebaseUserInternal? = null
+    private lateinit var editOrdersAdapter: EditOrderAdapter
 
     var currentOrder: Order? = null
     var currentFirebaseOrder: FirebaseOrder? = null
@@ -83,7 +84,12 @@ open class EditOrderFragment : InfoOrderFragment() {
             button_add_order.visibility = View.GONE
             constraintLayout.maxHeight = 160
         }
-        button_add_order.setOnClickListener { onEditButtonClicked(order) }
+        button_add_order.setOnClickListener {
+//            setupRecyclerView()
+//            if (editOrdersAdapter?.shouldEnableEditButton){
+                onEditButtonClicked(order)
+//            }
+        }
     }
 
     private fun getFirebaseOrderContents(userId: String, fbOrderId: String) {
@@ -263,7 +269,7 @@ open class EditOrderFragment : InfoOrderFragment() {
         create_order_recycler_view?.layoutManager =
             LinearLayoutManager(requireContext())
 
-        val editOrdersAdapter = EditOrderAdapter(
+        editOrdersAdapter = EditOrderAdapter(
             requireContext(),
             ::updateFinalPrice,
             ::setOrderButtonEnabled,

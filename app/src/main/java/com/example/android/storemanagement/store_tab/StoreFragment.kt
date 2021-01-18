@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.create_order_item.*
 import kotlinx.android.synthetic.main.fragment_store.*
 import kotlinx.android.synthetic.main.store_item.*
 
@@ -65,7 +66,7 @@ class StoreFragment : Fragment() {
         if (store_item_quantity != null && savedProductQuantity.isNotBlank())
             store_item_quantity.setText(savedProductQuantity)
 
-        info_text?.text = context?.getString(R.string.store_info)
+        store_info_text?.text = context?.getString(R.string.store_info)
         topToolbar = view!!.findViewById(R.id.toolbarTop)
         topToolbar.inflateMenu(R.menu.products_filer_menu)
         topToolbar.overflowIcon = ContextCompat.getDrawable(context!!, R.drawable.ic_baseline_filter_alt)
@@ -341,7 +342,7 @@ class StoreFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putCharSequence(KEY_QUANTITY_VALUE, store_item_quantity.text)
+        outState.putCharSequence(KEY_QUANTITY_VALUE, product_item_quantity.text)
     }
 
     private fun updateQuantity(barcode: String, quantity: Int) {
@@ -374,7 +375,6 @@ class StoreFragment : Fragment() {
         if (firebaseProductsList.size == 0) {
             store_recycler_view.visibility = View.GONE
             empty_view_products_store.visibility = View.VISIBLE
-            info_text?.visibility = View.GONE
         } else {
             store_recycler_view.visibility = View.VISIBLE
             empty_view_products_store.visibility = View.GONE

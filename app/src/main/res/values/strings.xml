@@ -35,8 +35,8 @@
     <string name="status_confirmed">Confirmed</string>
     <string name="status_cancelled">Cancelled</string>
 
-    <string name="register_text">Continue without login</string>
-    <string name="email_text">Google email</string>
+    <string name="register_text">Continue without login:</string>
+    <string name="google_email_text">Google email</string>
     <string name="password_text">Password</string>
     <string name="login_button_forgotPass"><u>Forgot your password?</u></string>
     <string name="login_button_continue">Continue</string>
@@ -75,7 +75,7 @@
     <string name="in_stock_products_info">Products with a quantity over 5.</string>
     <string name="low_stock_products_info">Products with a quantity below 5.</string>
     <string name="pending_products_info">Products that haven\'t been delivered yet.</string>
-    <string name="store_info">Edit the products\' quantities from here:</string>
+    <string name="store_info">Edit the products\' quantities from here by entering the currently available values.\nThe products\' quantities will be calculated after that.</string>
     <string name="create_order_info">Create an order by entering quantities and press \n \"Add Order\".</string>
     <string name="edit_order_info">Edit the order by changing quantities and press \"Save\". \n The order can be edited because it is in Pending state.</string>
     <string name="view_order_info">The order content for this order. \n It cannot be edited because the order is not in Pending state.</string>
@@ -115,6 +115,9 @@
     <string name="orders_notifications">Here are all orders\' notifications received from other users.</string>
     <string name="new_order">New order</string>
     <string name="confirm">Confirm</string>
-    <string name="facebook_app_id">[APP_ID]</string>
-    <string name="fb_login_protocol_scheme">fb[APP_ID]</string>
+
+    <string name="facebook_app_id">462200458523315</string>
+    <string name="fb_login_protocol_scheme">fb462200458523315</string>
+    <string name="or">or</string>
+    <string name="email_text">Email</string>
 </resources>

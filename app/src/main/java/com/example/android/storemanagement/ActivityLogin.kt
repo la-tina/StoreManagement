@@ -10,6 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.addFirebaseUser
 import com.example.android.storemanagement.firebase.FirebaseUserInternal
+import com.facebook.AccessToken
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.LoginStatusCallback
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
+import com.facebook.login.widget.LoginButton
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -17,6 +25,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -28,16 +37,14 @@ import kotlinx.android.synthetic.main.activity_login.*
 
 class ActivityLogin : AppCompatActivity() {
 
-    private var currentFragment: Fragment? = null
     private lateinit var googleSignInClient: GoogleSignInClient
-    private var account: GoogleSignInAccount? = null
     private lateinit var auth: FirebaseAuth
-
+    private lateinit var loginButton: LoginButton
+    private lateinit var callbackManager: CallbackManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        setDefaultCurrentFragment()
         // Initialize Firebase Auth
         auth = Firebase.auth
 
@@ -57,6 +64,7 @@ class ActivityLogin : AppCompatActivity() {
 
         if (auth.currentUser == null) {
             googleSignInClient.signOut()
+            LoginManager.getInstance().logOut()
         }
         // Set the dimensions of the sign-in button.
         sign_in_button.setSize(SignInButton.SIZE_STANDARD)
@@ -68,6 +76,84 @@ class ActivityLogin : AppCompatActivity() {
         buttonContinue.setOnClickListener {
             openMainActivity()
         }
+
+        val accessToken = AccessToken.getCurrentAccessToken()
+        val isLoggedIn = accessToken != null && !accessToken.isExpired
+        callbackManager = CallbackManager.Factory.create()
+        loginButton = findViewById(R.id.facebook_login_button)
+//        loginButton.setReadPermissions("email", "public_profile", "user_friends")
+        loginButton.setPermissions(listOf(EMAIL))
+
+        loginButton.setOnClickListener {
+            if (!isLoggedIn) {
+                LoginManager.getInstance().logInWithReadPermissions(this, listOf("public_profile"))
+            }
+        }
+
+        // Callback registration
+        loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult?> {
+            override fun onSuccess(loginResult: LoginResult?) {
+                Log.d("LoginActivity", "facebook success $loginResult")
+                handleFacebookAccessToken(loginResult?.accessToken!!)
+            }
+
+            override fun onCancel() {
+                Log.d("LoginActivity", "facebook cancelled")
+                // App code
+            }
+
+            override fun onError(exception: FacebookException) {
+                Log.d("LoginActivity", "facebook error $exception")
+                // App code
+            }
+        })
+
+        LoginManager.getInstance().retrieveLoginStatus(this, object : LoginStatusCallback {
+            override fun onCompleted(accessToken: AccessToken) {
+                // User was previously logged in, can log them in directly here.
+                // If this callback is called, a popup notification appears that says
+                // "Logged in as <User Name>"
+                Log.d("LoginActivity", "facebook onCompleted $accessToken")
+            }
+
+            override fun onFailure() {
+                // No access token could be retrieved for the user
+                Log.d("LoginActivity", "facebook onFailure")
+            }
+
+            override fun onError(exception: Exception) {
+                // An error occurred
+                Log.d("LoginActivity", "facebook onError $exception")
+            }
+        })
+
+        val currentUser = auth.currentUser
+        updateUI(currentUser)
+    }
+
+    private fun handleFacebookAccessToken(token: AccessToken) {
+        Log.d("LoginActivity", "handleFacebookAccessToken:$token")
+
+        val credential = FacebookAuthProvider.getCredential(token.token)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d("LoginActivity", "signInWithCredential:success")
+                    val user = auth.currentUser
+                    updateUI(user)
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w("LoginActivity", "signInWithCredential:failure", task.exception)
+                    Toast.makeText(
+                        baseContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    updateUI(null)
+                }
+
+                // ...
+            }
     }
 
     private fun openAccountTypeSelectionActivity(fbUserId: String) {
@@ -113,6 +199,7 @@ class ActivityLogin : AppCompatActivity() {
 //                GoogleSignIn.getSignedInAccountFromIntent(data)
 //            handleSignInResult(task)
 //        }
+        callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
@@ -157,7 +244,11 @@ class ActivityLogin : AppCompatActivity() {
         if (user != null) {
             // User is signed in
             Log.d("Tina", "signed in $account")
-            addFirebaseUser { fbUserId -> if (fbUserId != null) {checkFirebaseUserType(fbUserId) } else openMainActivity() }
+            addFirebaseUser { fbUserId ->
+                if (fbUserId != null) {
+                    checkFirebaseUserType(fbUserId)
+                } else openMainActivity()
+            }
         } else {
             // No user is signed in
             Log.d("Tina", "no user signed in")
@@ -205,40 +296,6 @@ class ActivityLogin : AppCompatActivity() {
         })
     }
 
-    override fun onStart() {
-        super.onStart()
-        // Check for existing Google Sign In account, if the user is already signed in
-        // the GoogleSignInAccount will be non-null.
-//        val account = GoogleSignIn.getLastSignedInAccount(this)
-//        updateUI(account)
-
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        updateUI(currentUser)
-    }
-
-    private fun setDefaultCurrentFragment() {
-//        val fragment = LoginFragment()
-//        currentFragment = fragment
-//        openLoginTab()
-    }
-
-//    private fun openLoginTab() {
-//        val previouslyAddedLoginFragment = supportFragmentManager.findFragmentByTag(loginTag)
-//        val fragment = (previouslyAddedLoginFragment as? LoginFragment) ?: LoginFragment()
-//
-//        openFragment(fragment, createOrderTag)
-//    }
-//
-//    private fun openRegistrationTab() {
-//        val previouslyAddedRegistrationFragmentt =
-//            supportFragmentManager.findFragmentByTag(registerTag)
-//        val fragment = (previouslyAddedRegistrationFragmentt as? RegistrationFragment)
-//            ?: RegistrationFragment()
-//
-//        openFragment(fragment, createProductTag)
-//    }
-
     private fun openFragment(loginFragment: Fragment, tag: String) {
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.login_fragment_container, loginFragment, tag)
@@ -253,8 +310,6 @@ class ActivityLogin : AppCompatActivity() {
     companion object {
         private const val server_client_id =
             "191395528817-1posttkm7jhstrnk827s1d2h8enc7jla.apps.googleusercontent.com"
-
+        private const val EMAIL = "email"
     }
 }
-
-

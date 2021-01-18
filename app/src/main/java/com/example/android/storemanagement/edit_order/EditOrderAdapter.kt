@@ -40,6 +40,7 @@ class EditOrderAdapter(
 
     //barcode -> quantity
     var quantities = mutableMapOf<String, Int>()
+    var shouldEnableEditButton = false
 
     private fun onFieldErrorChangedAction(productName: String, isQuantityCorrect: Boolean) {
         enabledProductsWithErrors[productName] = isQuantityCorrect
@@ -146,12 +147,12 @@ class EditOrderAdapter(
             override fun afterTextChanged(s: Editable?) {
                 setErroneousField(holder, finalProductAvailableQuantity)
 
-                val shouldEnableOrderButton = isEditOrderQuantityCorrect(
+                shouldEnableEditButton = isEditOrderQuantityCorrect(
                     holder.productQuantity,
                     holder.productQuantityLayout,
                     finalProductAvailableQuantity
                 ) && enabledProductsWithErrors.none { !it.value }
-                setOrderButtonEnabled(shouldEnableOrderButton)
+                setOrderButtonEnabled(shouldEnableEditButton)
 
                 if (isQuantityCorrect(
                         holder.productQuantity,

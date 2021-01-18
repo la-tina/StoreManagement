@@ -74,8 +74,7 @@ class AllProductsFragment : ProductsTabFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_products_container, container, false)
-        return view
+        return inflater.inflate(R.layout.fragment_products_container, container, false)
     }
 
     override fun onStart() {

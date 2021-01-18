@@ -11,7 +11,7 @@ import com.google.firebase.ktx.Firebase
 
 object FirebaseDatabaseOperations {
 
-    enum class ChildAction{
+    enum class ChildAction {
         ChildAdded,
         ChildChanged,
         ChildRemoved
@@ -39,6 +39,7 @@ object FirebaseDatabaseOperations {
 //                    }
 //                }
                 if (!dataSnapshot.exists()) {
+                    Log.d("addFirebaseUser", "id $uniqueId")
                     val userKey = myRef.push().key!!
                     val firebaseUser = FirebaseUserInternal(uniqueId, user.displayName.toString(), user.email.toString(), "")
                     users.add(firebaseUser)
@@ -262,9 +263,79 @@ object FirebaseDatabaseOperations {
         })
     }
 
+    fun checkForFirebaseOrderContentsInternal(
+        userId: String,
+        productsUserId: String,
+        barcode: String,
+        completionHandler: (orderContent: FirebaseOrderContent, childAction: ChildAction) -> Unit
+    ) {
+        val user: FirebaseUser? = Firebase.auth.currentUser
+        if (user != null) {
+            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+            val myRef: DatabaseReference = database.getReference("OrderContent").child(userId)
+
+            myRef.addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                    val firebaseOrderContent: FirebaseOrderContent? =
+                        dataSnapshot.getValue(FirebaseOrderContent::class.java)
+
+                    if (firebaseOrderContent != null && firebaseOrderContent.userId == productsUserId && firebaseOrderContent.productBarcode == barcode) {
+                        val orderContent = FirebaseOrderContent(
+                            firebaseOrderContent.productBarcode,
+                            firebaseOrderContent.productName,
+                            firebaseOrderContent.productPrice,
+                            firebaseOrderContent.productOvercharge,
+                            firebaseOrderContent.quantity,
+                            firebaseOrderContent.orderId,
+                            firebaseOrderContent.userId,
+                            dataSnapshot.key!!
+                        )
+                        getFirebaseOrder(userId, firebaseOrderContent.orderId) { order ->
+                            if (order.orderStatus == OrderStatus.PENDING.toString() || order.orderStatus == OrderStatus.ORDERED.toString()
+                                || order.orderStatus == OrderStatus.CONFIRMED.toString() || order.orderStatus == OrderStatus.DELIVERED.toString()
+                            ) {
+                                completionHandler(orderContent, ChildAction.ChildAdded)
+                            }
+                        }
+                    }
+                }
+
+                override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                    val firebaseOrderContent: FirebaseOrderContent? =
+                        dataSnapshot.getValue(FirebaseOrderContent::class.java)
+
+                    if (firebaseOrderContent != null && firebaseOrderContent.userId == productsUserId && firebaseOrderContent.productBarcode == barcode) {
+                        val orderContent = FirebaseOrderContent(
+                            firebaseOrderContent.productBarcode,
+                            firebaseOrderContent.productName,
+                            firebaseOrderContent.productPrice,
+                            firebaseOrderContent.productOvercharge,
+                            firebaseOrderContent.quantity,
+                            firebaseOrderContent.orderId,
+                            firebaseOrderContent.userId,
+                            dataSnapshot.key!!
+                        )
+                        getFirebaseOrder(userId, firebaseOrderContent.orderId) { order ->
+                            if (order.orderStatus == OrderStatus.PENDING.toString() || order.orderStatus == OrderStatus.ORDERED.toString()
+                                || order.orderStatus == OrderStatus.CONFIRMED.toString() || order.orderStatus == OrderStatus.DELIVERED.toString()
+                            ) {
+                                completionHandler(orderContent, ChildAction.ChildChanged)
+                            }
+                        }
+                    }
+                }
+
+                override fun onChildRemoved(snapshot: DataSnapshot) {}
+                override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+                override fun onCancelled(databaseError: DatabaseError) {}
+            })
+        }
+    }
+
     fun getFirebaseUserOrderContents(
         productsUserId: String,
         barcode: String,
+        checkIfContentsExist: Boolean = false,
         completionHandler: (orderContent: FirebaseOrderContent, childAction: ChildAction) -> Unit
     ) {
         val ref = FirebaseDatabase.getInstance().getReference("Users")
@@ -274,8 +345,22 @@ object FirebaseDatabaseOperations {
 //                for (user in users) {
                 val firebaseUser = dataSnapshot.getValue(FirebaseUserInternal::class.java)
                 if (firebaseUser != null) {
-                    getFirebaseUserOrderContentsInternal(firebaseUser.id, productsUserId, barcode) { orderContent, childAction ->
-                        completionHandler(orderContent, childAction)
+                    if (checkIfContentsExist) {
+                        checkForFirebaseOrderContentsInternal(
+                            firebaseUser.id,
+                            productsUserId,
+                            barcode
+                        ) { orderContent, childAction ->
+                            completionHandler(orderContent, childAction)
+                        }
+                    } else {
+                        getFirebaseUserOrderContentsInternal(
+                            firebaseUser.id,
+                            productsUserId,
+                            barcode
+                        ) { orderContent, childAction ->
+                            completionHandler(orderContent, childAction)
+                        }
                     }
                 }
 //                }
@@ -345,6 +430,7 @@ object FirebaseDatabaseOperations {
                         }
                     }
                 }
+
                 override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                     val firebaseOrderContent: FirebaseOrderContent? =
                         dataSnapshot.getValue(FirebaseOrderContent::class.java)
@@ -367,6 +453,7 @@ object FirebaseDatabaseOperations {
                         }
                     }
                 }
+
                 override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
                 override fun onCancelled(databaseError: DatabaseError) {}
             })

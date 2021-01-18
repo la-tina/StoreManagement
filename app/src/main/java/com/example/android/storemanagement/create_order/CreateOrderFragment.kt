@@ -31,7 +31,8 @@ open class CreateOrderFragment : InfoOrderFragment() {
     override var buttonText: String = "Add Order"
     lateinit var order: Order
     protected lateinit var user: FirebaseUser
-    protected lateinit var firebaseUser: FirebaseUserInternal
+    private lateinit var firebaseUser: FirebaseUserInternal
+    private lateinit var createOrdersAdapter: CreateOrderAdapter
 
     private lateinit var orderContentViewModel: OrderContentViewModel
 
@@ -45,23 +46,17 @@ open class CreateOrderFragment : InfoOrderFragment() {
         info_text?.text = context?.getString(R.string.create_order_info)
 
         button_add_order.setOnClickListener {
-
-//            if (user == null) {
-//                order = Order(finalPrice, formattedDate, OrderStatus.PENDING.toString())
-//                Log.d("Tina", "final price created order $finalPrice")
-//                ordersViewModel.updateFinalPrice(finalPrice, order.id)
-//                ordersViewModel.insert(order, ::updateQuantities)
-//            } else {
-            val firebaseOrder = FirebaseOrder(
-                finalPrice.toString(),
-                getFormattedDate(),
-                OrderStatus.PENDING.toString(),
-                "",
-                firebaseUser.id
-            )
-            val fbOrderId = setFirebaseOrderData(firebaseOrder)
-            updateFirebaseQuantities(fbOrderId)
-
+//            setupRecyclerView()
+//            if (createOrdersAdapter?.shouldEnableOrderButton) {
+                val firebaseOrder = FirebaseOrder(
+                    finalPrice.toString(),
+                    getFormattedDate(),
+                    OrderStatus.PENDING.toString(),
+                    "",
+                    firebaseUser.id
+                )
+                val fbOrderId = setFirebaseOrderData(firebaseOrder)
+                updateFirebaseQuantities(fbOrderId)
 //            }
         }
     }
@@ -89,9 +84,9 @@ open class CreateOrderFragment : InfoOrderFragment() {
 
     private fun updateFirebaseQuantities(firebaseOrderId: String) {
         val quantities = (create_order_recycler_view.adapter as CreateOrderAdapter).quantities
-        quantities.forEach { (productName, quantity) ->
+        quantities.forEach { (productBarcode, quantity) ->
             if (quantity != 0) {
-                createFirebaseOrderContent(productName, firebaseOrderId, quantity)
+                createFirebaseOrderContent(productBarcode, firebaseOrderId, quantity)
             }
         }
         parentFragmentManager.popBackStackImmediate()
@@ -112,15 +107,15 @@ open class CreateOrderFragment : InfoOrderFragment() {
     }
 
     private fun createFirebaseOrderContent(
-        productName: String,
+        productBarcode: String,
         fbOrderId: String,
         currentQuantity: Int
     ) {
-        val currentOrderContent = firebaseProductsList.first { it.name == productName }
+        val currentOrderContent = firebaseProductsList.first { it.barcode == productBarcode }
         val overcharge = if (currentOrderContent.overcharge.isBlank()) 0F else currentOrderContent.overcharge.toFloat()
         val firebaseOrderContent = FirebaseOrderContent(
             currentOrderContent.barcode,
-            productName,
+            currentOrderContent.name,
             (currentOrderContent.price.toFloat() + overcharge).toString(),
             "0",
             currentQuantity.toString(),
@@ -149,7 +144,7 @@ open class CreateOrderFragment : InfoOrderFragment() {
         create_order_recycler_view.layoutManager =
             LinearLayoutManager(requireContext())
 
-        val createOrdersAdapter = CreateOrderAdapter(
+        createOrdersAdapter = CreateOrderAdapter(
             requireContext(),
             ::updateFinalPrice,
             ::setOrderButtonEnabled,
