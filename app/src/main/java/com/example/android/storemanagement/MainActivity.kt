@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.example.android.storemanagement.create_order.CreateOrderFragment
 import com.example.android.storemanagement.create_product.BarcodeScanningActivity
 import com.example.android.storemanagement.create_product.CreateProductFragment
@@ -25,11 +25,12 @@ import com.example.android.storemanagement.create_product.EditProductFragment
 import com.example.android.storemanagement.create_product.InfoProductFragment.Companion.CAMERA_PERMISSION_CODE
 import com.example.android.storemanagement.edit_order.EditOrderFragment
 import com.example.android.storemanagement.edit_order.ViewOrderFragment
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.areThereNewNotifications
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getCurrentFirebaseUserInternal
+import com.example.android.storemanagement.firebase.FirebaseDatabaseNotificationsOperations.areThereNewNotifications
+import com.example.android.storemanagement.firebase.FirebaseDatabaseUsersOperations.getCurrentFirebaseUserInternal
 import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.firebase.FirebaseUserInternal
+import com.example.android.storemanagement.notifications.NotificationsFragment
 import com.example.android.storemanagement.orders_database.Order
 import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.orders_tab.OrdersFragment
@@ -37,6 +38,7 @@ import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_tab.ProductsFragment
 import com.example.android.storemanagement.products_tab.ProductsTabFragment
 import com.example.android.storemanagement.store_tab.StoreFragment
+import com.example.android.storemanagement.users_tab.UserSelectionFragment
 import com.facebook.stetho.Stetho
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
@@ -48,7 +50,6 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.OkHttpClient
 import java.io.File
-import java.util.*
 
 
 open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Observer<List<Order>>,
@@ -62,7 +63,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
     private lateinit var menu: Menu
 
     private val orderViewModel: OrderViewModel by lazy {
-        ViewModelProviders.of(this).get(OrderViewModel::class.java)
+        ViewModelProvider(this).get(OrderViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,8 +95,8 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
             textView.setTextColor(ContextCompat.getColor(this, R.color.darkBarColor))
         }
 
-        deleteDatabase("Product_database")
-        deleteDatabase("Order_database")
+//        deleteDatabase("Product_database")
+//        deleteDatabase("Order_database")
 
         Stetho.initializeWithDefaults(applicationContext)
 
@@ -137,7 +138,6 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
 
     override fun onStart() {
         super.onStart()
-
         bottom_navigation.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_orders -> {
@@ -188,6 +188,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
             userItem.isCheckable = false
             userItem.isEnabled = false
             val accountType = menu.findItem(R.id.account_type_text)
+            accountType.isVisible = true
             accountType.isCheckable = false
             accountType.isEnabled = false
             getCurrentFirebaseUserInternal { fbUserInternal ->
@@ -237,19 +238,36 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
         // Handle action bar item clicks here.
         val id = item.itemId
         if (id == R.id.action_notifications) {
-            Toast.makeText(this, "Notifications", Toast.LENGTH_LONG).show()
-            openNotificationsTab()
-            return true
+            return if (user == null) {
+                showDialogInformation()
+                true
+            } else {
+                Toast.makeText(this, "Notifications", Toast.LENGTH_LONG).show()
+                openNotificationsTab()
+                true
+            }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun showDialogInformation() {
+        val dialog = AlertDialog.Builder(this, R.style.AlertDialog)
+            .setTitle(R.string.info)
+            .setMessage(R.string.no_user_info_notifications)
+            .setPositiveButton(R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+            }.show()
+
+        val textView = dialog.findViewById<View>(android.R.id.message) as TextView
+        textView.textSize = 17f
+        textView.setTextColor(ContextCompat.getColor(this, R.color.darkBarColor))
     }
 
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             R.id.action_about -> {
                 Toast.makeText(this, "About", Toast.LENGTH_SHORT).show()
-//                onNavigationChanged(ABOUT_TAB, null, null)
                 val intent = Intent(this, AboutActivity::class.java)
                 startActivity(intent)
             }
@@ -303,21 +321,24 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
     private fun exportOrdersToCSVFile(csvFile: File) {
         csvWriter().open(csvFile, append = false) {
             // Header
-            writeRow(listOf("Orders"))
-            writeRow(
-                listOf(
-                    "",
-                    "Order ID",
-                    "Order status",
-                    "Date",
-                    "Product in order",
-                    "Quantity",
-                    "Product final price"
+            if (user != null) {
+                writeRow(listOf("Orders"))
+                writeRow(
+                    listOf(
+                        "",
+                        "Order ID",
+                        "Order status",
+                        "Date",
+                        "Product in order",
+                        "Quantity",
+                        "Product final price"
+                    )
                 )
-            )
-            ordersFragment?.addRowOrders(::writeRow)
-            writeRow(emptyList())
-            writeRow(emptyList())
+                ordersFragment?.addRowOrders(::writeRow)
+                writeRow(emptyList())
+                writeRow(emptyList())
+            }
+
             writeRow(listOf("Products"))
             writeRow(listOf("Barcode", "Product", "Price", "Overcharge", "Quantity"))
             ordersFragment?.addRowProducts(::writeRow)

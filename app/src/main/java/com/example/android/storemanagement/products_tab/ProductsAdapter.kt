@@ -3,13 +3,11 @@ package com.example.android.storemanagement.products_tab
 import android.content.Context
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.core.view.isVisible
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getFirebaseUserOrderContents
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrderContentsOperations.getFirebaseUserOrderContents
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.products_database.Product
 import com.google.firebase.auth.FirebaseUser

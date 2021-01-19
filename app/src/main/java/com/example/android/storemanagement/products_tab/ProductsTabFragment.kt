@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.EDIT_PRODUCT_TAB
 import com.example.android.storemanagement.OnNavigationChangedListener
@@ -31,15 +31,15 @@ abstract class ProductsTabFragment : Fragment() {
     protected var user: FirebaseUser? = null
 
     protected val orderContentViewModel: OrderContentViewModel by lazy {
-        ViewModelProviders.of(this).get(OrderContentViewModel::class.java)
+        ViewModelProvider(this).get(OrderContentViewModel::class.java)
     }
 
     protected val orderViewModel: OrderViewModel by lazy {
-        ViewModelProviders.of(this).get(OrderViewModel::class.java)
+        ViewModelProvider(this).get(OrderViewModel::class.java)
     }
 
     private val productViewModel: ProductViewModel by lazy {
-        ViewModelProviders.of(this).get(ProductViewModel::class.java)
+        ViewModelProvider(this).get(ProductViewModel::class.java)
     }
 
     private val allOrderContents = mutableListOf<OrderContent>()

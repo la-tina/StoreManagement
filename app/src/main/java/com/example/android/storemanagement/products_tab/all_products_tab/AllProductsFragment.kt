@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseProductData
+import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.deleteFirebaseProductData
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.products_database.Product
@@ -30,7 +30,7 @@ class AllProductsFragment : ProductsTabFragment() {
 
     override fun setupViewModel() {
         viewModel =
-            ViewModelProviders.of(this)
+            ViewModelProvider(this)
                 .get(AllProductsViewModel(requireActivity().application)::class.java)
     }
 
@@ -196,6 +196,7 @@ class AllProductsFragment : ProductsTabFragment() {
             getFirebaseProducts(database, uniqueId)
 
         } else {
+            setupViewModel()
             viewModel.allProducts.observe(this, Observer { products ->
                 // Update the cached copy of the words in the adapter.
                 products?.let {

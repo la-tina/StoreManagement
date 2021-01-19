@@ -27,12 +27,12 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ActivityLogin"
             android:windowSoftInputMode="adjustPan"/>
         <activity
-            android:name=".ActivityAccountTypeSelection"
+            android:name=".type_selection.ActivityAccountTypeSelection"
             android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".AboutActivity"

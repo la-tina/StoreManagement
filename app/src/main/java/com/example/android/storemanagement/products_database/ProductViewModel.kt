@@ -42,6 +42,7 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         ).productDao()
         repository = ProductRepository(productsDao)
         allProducts = repository.allProducts
+        Log.d("TinaAllProducts", "products $allProducts")
         inStockProducts = repository.inStockProducts
         lowStockProducts = repository.lowStockProducts
     }

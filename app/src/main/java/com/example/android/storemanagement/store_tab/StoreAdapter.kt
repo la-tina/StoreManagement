@@ -8,9 +8,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrectStore
 import com.example.android.storemanagement.create_order.CreateOrderHolder
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations
+import com.example.android.storemanagement.firebase.ChildAction
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrderContentsOperations
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.products_database.Product
@@ -51,21 +52,26 @@ class StoreAdapter(
             var finalProductAvailableQuantity = currentProduct.quantity.toInt()
             val orderContents = mutableListOf<FirebaseOrderContent>()
             setButtonEnabled(holder, currentProduct.barcode, currentProduct.quantity.toInt(), finalProductAvailableQuantity)
-            FirebaseDatabaseOperations.getFirebaseUserOrderContents(
+            FirebaseDatabaseOrderContentsOperations.getFirebaseUserOrderContents(
                 user?.uid!!,
                 currentProduct.barcode
             ) { orderContent, childAction ->
                 when (childAction) {
-                    FirebaseDatabaseOperations.ChildAction.ChildAdded -> {
+                    ChildAction.ChildAdded -> {
                         if (orderContents.none { it.id == orderContent.id }) {
                             orderContents.add(orderContent)
                             val orderContentQuantity = orderContent.quantity
                             finalProductAvailableQuantity -= orderContentQuantity.toInt()
                         }
 
-                        setButtonEnabled(holder, currentProduct.barcode, currentProduct.quantity.toInt(), finalProductAvailableQuantity)
+                        setButtonEnabled(
+                            holder,
+                            currentProduct.barcode,
+                            currentProduct.quantity.toInt(),
+                            finalProductAvailableQuantity
+                        )
                     }
-                    FirebaseDatabaseOperations.ChildAction.ChildChanged -> {
+                    ChildAction.ChildChanged -> {
                         val changedOrderContent =
                             orderContents.first { it.id == orderContent.id }
                         orderContents.remove(changedOrderContent)
@@ -75,9 +81,14 @@ class StoreAdapter(
                         val orderContentQuantity = orderContent.quantity
                         finalProductAvailableQuantity -= orderContentQuantity.toInt()
 
-                        setButtonEnabled(holder, currentProduct.barcode, currentProduct.quantity.toInt(), finalProductAvailableQuantity)
+                        setButtonEnabled(
+                            holder,
+                            currentProduct.barcode,
+                            currentProduct.quantity.toInt(),
+                            finalProductAvailableQuantity
+                        )
                     }
-                    FirebaseDatabaseOperations.ChildAction.ChildRemoved -> {
+                    ChildAction.ChildRemoved -> {
                         val removedOrderContent =
                             orderContents.first { it.id == orderContent.id }
                         orderContents.remove(removedOrderContent)
@@ -85,7 +96,12 @@ class StoreAdapter(
                         val orderContentQuantity = orderContent.quantity
                         finalProductAvailableQuantity += orderContentQuantity.toInt()
 
-                        setButtonEnabled(holder, currentProduct.barcode, currentProduct.quantity.toInt(), finalProductAvailableQuantity)
+                        setButtonEnabled(
+                            holder,
+                            currentProduct.barcode,
+                            currentProduct.quantity.toInt(),
+                            finalProductAvailableQuantity
+                        )
                     }
                 }
             }
@@ -102,10 +118,19 @@ class StoreAdapter(
             )
         } else {
             val currentProduct = products[position]
+            holder.inStockProductQuantity.text =
+                context.resources.getString(R.string.in_stock_quantity).plus(" ").plus(currentProduct.quantity)
             holder.productName.text = currentProduct.name
             holder.productPrice.text = (currentProduct.price + currentProduct.overcharge).toString()
             holder.productQuantity.setText(currentProduct.quantity.toString())
-            holder.productQuantity.addTextChangedListener(getTextWatcher(holder, currentProduct.barcode, currentProduct.quantity, currentProduct.quantity))
+            holder.productQuantity.addTextChangedListener(
+                getTextWatcher(
+                    holder,
+                    currentProduct.barcode,
+                    currentProduct.quantity,
+                    currentProduct.quantity
+                )
+            )
         }
     }
 
@@ -115,19 +140,26 @@ class StoreAdapter(
         uncalculatedProductQuantity: Int,
         finalProductAvailableQuantity: Int
     ) {
-        Log.d("setButtonEnabled",
+        Log.d(
+            "setButtonEnabled",
             "uncalculated $uncalculatedProductQuantity finalProductAvailableQuantity $finalProductAvailableQuantity"
         )
         holder.inStockProductQuantity.text =
             context.resources.getString(R.string.in_stock_quantity).plus(" ").plus(finalProductAvailableQuantity)
-        holder.productQuantity.addTextChangedListener(getTextWatcher(holder, barcode, uncalculatedProductQuantity, finalProductAvailableQuantity))
+        holder.productQuantity.addTextChangedListener(
+            getTextWatcher(
+                holder,
+                barcode,
+                uncalculatedProductQuantity,
+                finalProductAvailableQuantity
+            )
+        )
 
         setErroneousField(holder, barcode, finalProductAvailableQuantity)
         setStoreButtonEnabled(
-            isQuantityCorrect(
+            isQuantityCorrectStore(
                 holder.productQuantity,
-                holder.productQuantityLayout,
-                finalProductAvailableQuantity
+                holder.productQuantityLayout
             ) && enabledProducts.none { !it.value }
         )
     }
@@ -138,10 +170,9 @@ class StoreAdapter(
         finalProductAvailableQuantity: Int
     ) {
         when {
-            isQuantityCorrect(
+            isQuantityCorrectStore(
                 holder.productQuantity,
-                holder.productQuantityLayout,
-                finalProductAvailableQuantity
+                holder.productQuantityLayout
             ) -> {
                 enabledProducts[barcode] = true
             }
@@ -154,25 +185,34 @@ class StoreAdapter(
         }
     }
 
-    private fun getTextWatcher(holder: CreateOrderHolder, barcode: String, uncalculatedProductQuantity: Int, finalProductAvailableQuantity: Int): TextWatcher =
+    private fun getTextWatcher(
+        holder: CreateOrderHolder,
+        barcode: String,
+        uncalculatedProductQuantity: Int,
+        finalProductAvailableQuantity: Int
+    ): TextWatcher =
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 setErroneousField(holder, barcode, finalProductAvailableQuantity)
-                val shouldEnableOrderButton = isQuantityCorrect(
+                val shouldEnableOrderButton = isQuantityCorrectStore(
                     holder.productQuantity,
-                    holder.productQuantityLayout,
-                    finalProductAvailableQuantity
+                    holder.productQuantityLayout
                 ) && enabledProducts.none { !it.value }
                 setStoreButtonEnabled(shouldEnableOrderButton)
                 enabledProducts[barcode] = shouldEnableOrderButton
 
                 if (shouldEnableOrderButton) {
-                    Log.d("setButtonEnabled shouldEnableOrderButton",
+                    Log.d(
+                        "setButtonEnabled shouldEnableOrderButton",
                         "uncalculated $uncalculatedProductQuantity finalProductAvailableQuantity $finalProductAvailableQuantity"
                     )
                     updateQuantityForProduct(
                         barcode,
-                        calculatedProductQuantity(uncalculatedProductQuantity, finalProductAvailableQuantity, holder.productQuantity.text.toString().toInt()).toString()
+                        calculatedProductQuantity(
+                            uncalculatedProductQuantity,
+                            finalProductAvailableQuantity,
+                            holder.productQuantity.text.toString().toInt()
+                        ).toString()
                     )
                     setStoreButtonEnabled(shouldEnableOrderButton)
                 }
@@ -183,12 +223,16 @@ class StoreAdapter(
         }
 
     private fun calculatedProductQuantity(
-        uncalculatedProductQuantity: Int,
+        initialProductQuantity: Int,
         availableProductAvailableQuantity: Int,
         enteredProductQuantity: Int
     ): Int {
         return if (areFirebaseProductsLoaded) {
-            uncalculatedProductQuantity - (availableProductAvailableQuantity - enteredProductQuantity)
+            if (enteredProductQuantity > availableProductAvailableQuantity) { initialProductQuantity + (availableProductAvailableQuantity - enteredProductQuantity) }
+            else {
+                initialProductQuantity - (availableProductAvailableQuantity - enteredProductQuantity)
+            }
+            initialProductQuantity - (availableProductAvailableQuantity - enteredProductQuantity)
         } else {
             enteredProductQuantity
         }

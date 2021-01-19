@@ -4,9 +4,9 @@ import android.text.Editable
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.Observer
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseProduct
 import com.example.android.storemanagement.PRODUCT_KEY
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getFirebaseUserOrderContents
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrderContentsOperations.getFirebaseUserOrderContents
+import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.updateFirebaseProduct
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.products_database.Product
 import com.google.firebase.auth.ktx.auth

@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.type_selection
 
 enum class UserType {
     VENDOR,

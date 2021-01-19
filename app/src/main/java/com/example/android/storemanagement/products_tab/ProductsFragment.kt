@@ -73,12 +73,3 @@ class ProductsFragment : Fragment() {
         tab_layout_products.setupWithViewPager(products_viewpager)
     }
 }
-
-
-
-
-
-
-
-
-

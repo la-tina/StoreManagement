@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.notifications
 
 import android.content.Context
 import android.util.Log
@@ -8,9 +8,10 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getFirebaseOrder
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getFirebaseUser
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseSeenIndicator
+import com.example.android.storemanagement.R
+import com.example.android.storemanagement.firebase.FirebaseDatabaseNotificationsOperations.updateFirebaseSeenIndicator
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrdersOperations.getFirebaseOrder
+import com.example.android.storemanagement.firebase.FirebaseDatabaseUsersOperations.getFirebaseUser
 import com.example.android.storemanagement.firebase.FirebaseNotification
 import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.firebase.FirebaseUserInternal

@@ -10,15 +10,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityAboveLimit
-import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations
-import com.example.android.storemanagement.firebase.FirebaseOrderContent
-import com.example.android.storemanagement.firebase.FirebaseProduct
-import com.example.android.storemanagement.firebase.FirebaseUserInternal
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrectOrder
+import com.example.android.storemanagement.firebase.*
 import kotlinx.android.synthetic.main.create_order_item.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 
 
 class CreateOrderAdapter(
@@ -63,12 +57,12 @@ class CreateOrderAdapter(
         var finalProductAvailableQuantity = currentProduct.quantity.toInt()
         val orderContents = mutableListOf<FirebaseOrderContent>()
         onInStockQuantityCalculated(currentProduct.barcode, holder, finalProductAvailableQuantity)
-        FirebaseDatabaseOperations.getFirebaseUserOrderContents(
+        FirebaseDatabaseOrderContentsOperations.getFirebaseUserOrderContents(
             firebaseUser.id,
             currentProduct.barcode
         ) { orderContent, childAction ->
             when (childAction) {
-                FirebaseDatabaseOperations.ChildAction.ChildAdded -> {
+                ChildAction.ChildAdded -> {
                     if (orderContents.none { it.id == orderContent.id }) {
                         orderContents.add(orderContent)
                         val orderContentQuantity = orderContent.quantity
@@ -77,7 +71,7 @@ class CreateOrderAdapter(
 
                     onInStockQuantityCalculated(currentProduct.barcode, holder, finalProductAvailableQuantity)
                 }
-                FirebaseDatabaseOperations.ChildAction.ChildChanged -> {
+                ChildAction.ChildChanged -> {
                     val changedOrderContent =
                         orderContents.first { it.id == orderContent.id }
                     orderContents.remove(changedOrderContent)
@@ -89,7 +83,7 @@ class CreateOrderAdapter(
 
                     onInStockQuantityCalculated(currentProduct.barcode, holder, finalProductAvailableQuantity)
                 }
-                FirebaseDatabaseOperations.ChildAction.ChildRemoved -> {
+                ChildAction.ChildRemoved -> {
                     val removedOrderContent =
                         orderContents.first { it.id == orderContent.id }
                     orderContents.remove(removedOrderContent)
@@ -114,7 +108,7 @@ class CreateOrderAdapter(
 
         setErroneousField(barcode, holder, finalProductAvailableQuantity)
         setOrderButtonEnabled(
-            isQuantityCorrect(
+            isQuantityCorrectOrder(
                 holder.productQuantity,
                 holder.productQuantityLayout,
                 finalProductAvailableQuantity
@@ -128,14 +122,14 @@ class CreateOrderAdapter(
                 holder.productQuantity.text?.toString()?.let { quantity ->
                     setErroneousField(barcode, holder, finalProductAvailableQuantity)
 
-                    shouldEnableOrderButton = isQuantityCorrect(
+                    shouldEnableOrderButton = isQuantityCorrectOrder(
                         holder.productQuantity,
                         holder.productQuantityLayout,
                         finalProductAvailableQuantity
                     ) && enabledProducts.none { !it.value }
                     setOrderButtonEnabled(shouldEnableOrderButton)
 
-                    if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
+                    if (isQuantityCorrectOrder(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
                         onQuantityChanged(barcode, shouldEnableOrderButton)
                         setOrderButtonEnabled(shouldEnableOrderButton)
 
@@ -159,7 +153,7 @@ class CreateOrderAdapter(
 //                ) && enabledProducts.none { !it.value }
 //                setOrderButtonEnabled(shouldEnableOrderButton)
 
-                if (isQuantityCorrect(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
+                if (isQuantityCorrectOrder(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
                     holder.productQuantity.text?.toString()?.let { quantity ->
                         updateQuantityForProduct(
                             holder.productName.text.toString(),
@@ -196,7 +190,7 @@ class CreateOrderAdapter(
         finalProductAvailableQuantity: Int
     ) {
         when {
-            isQuantityCorrect(
+            isQuantityCorrectOrder(
                 holder.productQuantity,
                 holder.productQuantityLayout,
                 finalProductAvailableQuantity

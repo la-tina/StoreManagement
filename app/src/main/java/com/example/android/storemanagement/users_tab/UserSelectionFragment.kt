@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.users_tab
 
 
 import android.os.Bundle
@@ -10,8 +10,12 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getCurrentFirebaseUserInternal
+import com.example.android.storemanagement.CREATE_ORDER_TAB
+import com.example.android.storemanagement.OnNavigationChangedListener
+import com.example.android.storemanagement.R
+import com.example.android.storemanagement.firebase.FirebaseDatabaseUsersOperations.getCurrentFirebaseUserInternal
 import com.example.android.storemanagement.firebase.FirebaseUserInternal
+import com.example.android.storemanagement.type_selection.UserType
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_users.*
@@ -65,7 +69,6 @@ open class UserSelectionFragment : Fragment() {
         })
 
         getCurrentFirebaseUserInternal { firebaseUser ->
-
             when (firebaseUser.accountType) {
                 UserType.VENDOR.toString() -> {
                     getFirebaseUsers(UserType.VENDOR)

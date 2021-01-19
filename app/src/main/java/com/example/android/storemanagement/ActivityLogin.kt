@@ -6,25 +6,18 @@ import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.addFirebaseUser
+import com.example.android.storemanagement.firebase.FirebaseDatabaseUsersOperations.addFirebaseUser
 import com.example.android.storemanagement.firebase.FirebaseUserInternal
-import com.facebook.AccessToken
-import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
-import com.facebook.LoginStatusCallback
+import com.example.android.storemanagement.type_selection.ActivityAccountTypeSelection
+import com.facebook.*
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -81,7 +74,6 @@ class ActivityLogin : AppCompatActivity() {
         val isLoggedIn = accessToken != null && !accessToken.isExpired
         callbackManager = CallbackManager.Factory.create()
         loginButton = findViewById(R.id.facebook_login_button)
-//        loginButton.setReadPermissions("email", "public_profile", "user_friends")
         loginButton.setPermissions(listOf(EMAIL))
 
         loginButton.setOnClickListener {
@@ -151,8 +143,6 @@ class ActivityLogin : AppCompatActivity() {
                     ).show()
                     updateUI(null)
                 }
-
-                // ...
             }
     }
 
@@ -164,9 +154,11 @@ class ActivityLogin : AppCompatActivity() {
     }
 
     private fun openMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
+        runOnUiThread {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun signIn() {
@@ -191,14 +183,6 @@ class ActivityLogin : AppCompatActivity() {
             }
         }
 
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-//        if (requestCode == RC_SIGN_IN) {
-//            // The Task returned from this call is always completed, no need to attach
-//            // a listener.
-//            val task =
-//                GoogleSignIn.getSignedInAccountFromIntent(data)
-//            handleSignInResult(task)
-//        }
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -221,61 +205,25 @@ class ActivityLogin : AppCompatActivity() {
             }
     }
 
-    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
-//        try {
-//            val account = completedTask.getResult(ApiException::class.java)
-//
-//            Log.d("Tina", "account $account")
-//            // Signed in successfully, show authenticated UI.
-//            updateUI(account)
-//        } catch (e: ApiException) {
-//            // The ApiException status code indicates the detailed failure reason.
-//            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-//            Log.w("FragmentActivity", "signInResult:failed code=" + e.statusCode)
-//            updateUI(null)
-//        }
-    }
-
     private fun updateUI(account: FirebaseUser?) {
-        Log.d("Tina", "updateUI account $account")
         email_text.setText(" ")
         if (account != null) email_text.setText(account.email)
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
             // User is signed in
-            Log.d("Tina", "signed in $account")
             addFirebaseUser { fbUserId ->
                 if (fbUserId != null) {
                     checkFirebaseUserType(fbUserId)
-                } else openMainActivity()
+                } else {
+                    openMainActivity()
+                }
             }
         } else {
             // No user is signed in
-            Log.d("Tina", "no user signed in")
         }
     }
 
     private fun checkFirebaseUserType(fbUserId: String) {
-//        val user = FirebaseAuth.getInstance().currentUser
-//        val uniqueId: String = user!!.uid
-//        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-//        val myRef: Query = database.getReference("Users")
-//        myRef.addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                val users = dataSnapshot.children
-//                for (user in users) {
-//                    val firebaseUser = user.getValue(FirebaseUserInternal::class.java)
-//                    if (firebaseUser?.id == fbUserId) {
-//                        Log.d("UserTina", "fbUser " + firebaseUser.id + " curr " + uniqueId)
-//                        if (firebaseUser.accountType.isBlank()) {
-//                            Log.d("UserTina", " type " + firebaseUser.accountType)
-//                            runOnUiThread { openAccountTypeSelectionActivity(fbUserId) }
-//                        } else {
-//                            runOnUiThread { openMainActivity() }
-//                        }
-//                    }
-//                }
-//            }
         val user = FirebaseAuth.getInstance().currentUser
         val uniqueId: String = user!!.uid
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -283,28 +231,16 @@ class ActivityLogin : AppCompatActivity() {
         myRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val firebaseUser = dataSnapshot.getValue(FirebaseUserInternal::class.java)
-                Log.d("UserTina", "fbUser " + firebaseUser?.id + " curr " + uniqueId)
                 if (firebaseUser != null && firebaseUser.accountType.isBlank()) {
                     runOnUiThread { openAccountTypeSelectionActivity(fbUserId) }
                 } else {
-                    runOnUiThread { openMainActivity() }
+                    openMainActivity()
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
             }
         })
-    }
-
-    private fun openFragment(loginFragment: Fragment, tag: String) {
-        val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.login_fragment_container, loginFragment, tag)
-        transaction.setCustomAnimations(
-            android.R.anim.fade_in,
-            android.R.anim.fade_out
-        )
-        transaction.addToBackStack("a")
-        transaction.commit()
     }
 
     companion object {

@@ -3,8 +3,6 @@ package com.example.android.storemanagement.orders_database
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.setFirebaseOrderData
-import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.products_database.ProductRoomDatabase
 import com.google.firebase.database.FirebaseDatabase

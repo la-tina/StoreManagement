@@ -10,10 +10,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseProductQuantity
+import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.updateFirebaseProductQuantity
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentViewModel
@@ -36,12 +36,19 @@ class StoreFragment : Fragment() {
     protected var user: FirebaseUser? = null
     lateinit var topToolbar: Toolbar
     private val allOrderContents = mutableListOf<OrderContent>()
+    private lateinit var productViewModel: ProductViewModel
 
-    private val productViewModel: ProductViewModel by lazy {
-        ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
+    private fun setupViewModel() {
+        productViewModel =
+            ViewModelProvider(this)
+                .get(ProductViewModel(requireActivity().application)::class.java)
     }
+
+//        private val productViewModel: ProductViewModel by lazy {
+//        ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
+//    }
     private val orderContentViewModel: OrderContentViewModel by lazy {
-        ViewModelProviders.of(this)
+        ViewModelProvider(this)
             .get(OrderContentViewModel(requireActivity().application)::class.java)
     }
 
@@ -95,8 +102,10 @@ class StoreFragment : Fragment() {
         if (user != null) {
             getFirebaseProducts()
         } else {
+            setupViewModel()
             productViewModel.allProducts.observe(this, Observer { products ->
                 // Update the cached copy of the words in the adapter.
+                Log.d("TinaAllProducts", "store products $products")
                 products?.let {
                     setupRecyclerView(products = products)
                 }
@@ -342,7 +351,7 @@ class StoreFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putCharSequence(KEY_QUANTITY_VALUE, product_item_quantity.text)
+        outState.putCharSequence(KEY_QUANTITY_VALUE, product_item_quantity?.text)
     }
 
     private fun updateQuantity(barcode: String, quantity: Int) {
@@ -364,15 +373,15 @@ class StoreFragment : Fragment() {
 
         if (user == null) {
             storeAdapter.setProducts(products, null)
-            setupEmptyView()
+            setupEmptyView(products?.size!!)
         } else {
             storeAdapter.setProducts(null, firebaseProducts)
-            setupEmptyView()
+            setupEmptyView(firebaseProducts?.size!!)
         }
     }
 
-    private fun setupEmptyView() {
-        if (firebaseProductsList.size == 0) {
+    private fun setupEmptyView(productsSize: Int) {
+        if (productsSize == 0) {
             store_recycler_view.visibility = View.GONE
             empty_view_products_store.visibility = View.VISIBLE
         } else {

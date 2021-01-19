@@ -3,7 +3,7 @@ package com.example.android.storemanagement.create_product
 import android.text.Editable
 import android.util.Log
 import androidx.lifecycle.Observer
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations
+import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.addFirebaseProduct
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.products_database.Product
 import com.google.firebase.auth.ktx.auth
@@ -195,7 +195,7 @@ open class CreateProductFragment : InfoProductFragment() {
                 quantity.toString(),
                 ""
             )
-            FirebaseDatabaseOperations.addFirebaseProduct(firebaseProduct)
+            addFirebaseProduct(firebaseProduct)
         }
         parentFragmentManager.popBackStackImmediate()
     }

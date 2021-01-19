@@ -1,10 +1,12 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.type_selection
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatActivity
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseUserType
+import com.example.android.storemanagement.MainActivity
+import com.example.android.storemanagement.R
+import com.example.android.storemanagement.firebase.FirebaseDatabaseUsersOperations.updateFirebaseUserType
 import kotlinx.android.synthetic.main.activity_account_type.*
 import java.util.*
 

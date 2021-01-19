@@ -2,19 +2,19 @@ package com.example.android.storemanagement.edit_order
 
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.ORDER_KEY
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.USER_KEY
 import com.example.android.storemanagement.Utils
 import com.example.android.storemanagement.create_order.InfoOrderFragment
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseOrderContentData
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseOrderData
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getFirebaseUser
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderContent
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderDate
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseOrderFinalPrice
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrderContentsOperations.deleteFirebaseOrderContentData
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrderContentsOperations.updateFirebaseOrderContent
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrdersOperations.deleteFirebaseOrderData
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrdersOperations.updateFirebaseOrderDate
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrdersOperations.updateFirebaseOrderFinalPrice
+import com.example.android.storemanagement.firebase.FirebaseDatabaseUsersOperations.getFirebaseUser
 import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.firebase.FirebaseProduct
@@ -44,7 +44,7 @@ open class EditOrderFragment : InfoOrderFragment() {
     var currentFirebaseOrder: FirebaseOrder? = null
 
     private val orderContentViewModel: OrderContentViewModel by lazy {
-        ViewModelProviders.of(this)
+        ViewModelProvider(this)
             .get(OrderContentViewModel(requireActivity().application)::class.java)
     }
 
@@ -87,7 +87,7 @@ open class EditOrderFragment : InfoOrderFragment() {
         button_add_order.setOnClickListener {
 //            setupRecyclerView()
 //            if (editOrdersAdapter?.shouldEnableEditButton){
-                onEditButtonClicked(order)
+            onEditButtonClicked(order)
 //            }
         }
     }
@@ -118,7 +118,7 @@ open class EditOrderFragment : InfoOrderFragment() {
                                 firebaseOrderContent.userId,
                                 item.key!!
                             )
-                            if (currentFirebaseOrderContents.none {it.productBarcode == firebaseOrderContent.productBarcode} && firebaseOrderContent.orderId == fbOrderId) {
+                            if (currentFirebaseOrderContents.none { it.productBarcode == firebaseOrderContent.productBarcode } && firebaseOrderContent.orderId == fbOrderId) {
                                 currentFirebaseOrderContents.add(orderContent)
                                 getCurrentFirebaseUserProduct(orderContent.userId, orderContent.productBarcode)
                                 activity?.runOnUiThread {
@@ -189,14 +189,14 @@ open class EditOrderFragment : InfoOrderFragment() {
 ////        updateFinalPrice()
 //            ordersViewModel.updateFinalPrice(finalPrice, order.id)
 //        } else {
-            val quantities = (create_order_recycler_view.adapter as EditOrderAdapter).quantities
+        val quantities = (create_order_recycler_view.adapter as EditOrderAdapter).quantities
 
-            quantities.forEach { (barcode, quantity) ->
-                currentFirebaseOrderContents.forEach { content ->
-                    if (content.productBarcode == barcode) {
-                        updateFirebaseQuantity(content.id, quantity)
-                    }
+        quantities.forEach { (barcode, quantity) ->
+            currentFirebaseOrderContents.forEach { content ->
+                if (content.productBarcode == barcode) {
+                    updateFirebaseQuantity(content.id, quantity)
                 }
+            }
 //            }
 
             getFirebaseOrderContents(currentOrderUser!!.id, firebaseOrder.id)

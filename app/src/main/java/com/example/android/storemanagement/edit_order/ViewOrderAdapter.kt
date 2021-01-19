@@ -2,15 +2,9 @@ package com.example.android.storemanagement.edit_order
 
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.create_order.CreateOrderFieldValidator
-import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isEditOrderQuantityCorrect
-import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
 import com.example.android.storemanagement.create_order.CreateOrderHolder
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.order_content_database.OrderContent

@@ -117,8 +117,8 @@
         android:id="@+id/imageViewOrange"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:padding="5dp"
-        android:src="@drawable/orange"
+        android:padding="7dp"
+        android:src="@drawable/lemon"
         app:layout_constraintEnd_toStartOf="@id/imageViewWatermelon"
         app:layout_constraintStart_toEndOf="@id/imageViewAvocado"
         app:layout_constraintTop_toBottomOf="@id/imageViewApple" />

@@ -2,7 +2,7 @@ package com.example.android.storemanagement.edit_order
 
 import android.util.Log
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.ORDER_KEY
 import com.example.android.storemanagement.create_order.InfoOrderFragment
@@ -26,7 +26,7 @@ class ViewOrderFragment : InfoOrderFragment() {
     var currentFirebaseOrderContents: MutableList<FirebaseOrderContent> = mutableListOf()
 
     private val orderContentViewModel: OrderContentViewModel by lazy {
-        ViewModelProviders.of(this).get(OrderContentViewModel(requireActivity().application)::class.java)
+        ViewModelProvider(this).get(OrderContentViewModel(requireActivity().application)::class.java)
     }
 
     override fun onStart() {

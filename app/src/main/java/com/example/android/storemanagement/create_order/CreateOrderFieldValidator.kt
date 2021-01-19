@@ -10,10 +10,16 @@ object CreateOrderFieldValidator {
 
     private const val MESSAGE_ZERO_QUANTITY = "You can't make an order if the quantity is empty."
 
-    fun isQuantityCorrect(quantityView: EditText, quantityLayout: TextInputLayout, finalProductAvailableQuantity: Int): Boolean {
+    fun isQuantityCorrectOrder(quantityView: EditText, quantityLayout: TextInputLayout, finalProductAvailableQuantity: Int): Boolean {
         quantityLayout.error = null
         quantityLayout.isErrorEnabled = false
         return !isQuantityEmpty(quantityView) && !isQuantityAboveLimit(quantityView) && isQuantityInTheAvailableRange(quantityLayout, quantityView, finalProductAvailableQuantity)
+    }
+
+    fun isQuantityCorrectStore(quantityView: EditText, quantityLayout: TextInputLayout): Boolean {
+        quantityLayout.error = null
+        quantityLayout.isErrorEnabled = false
+        return !isQuantityEmpty(quantityView) && !isQuantityAboveLimit(quantityView)
     }
 
     private fun isQuantityInTheAvailableRange(quantityLayout: TextInputLayout, quantityView: EditText, finalProductAvailableQuantity: Int): Boolean {

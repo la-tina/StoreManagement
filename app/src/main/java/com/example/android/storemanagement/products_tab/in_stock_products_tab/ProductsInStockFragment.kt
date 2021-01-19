@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.deleteFirebaseProductData
+import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.deleteFirebaseProductData
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.products_database.Product
@@ -28,7 +28,7 @@ class ProductsInStockFragment : ProductsTabFragment() {
     private lateinit var viewModel: ProductsInStockViewModel
 
     override fun setupViewModel() {
-        viewModel = ViewModelProviders.of(this)
+        viewModel = ViewModelProvider(this)
             .get(ProductsInStockViewModel(requireActivity().application)::class.java)
     }
 
@@ -40,7 +40,7 @@ class ProductsInStockFragment : ProductsTabFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View?  = inflater.inflate(R.layout.fragment_products_container, container, false)
+    ): View? = inflater.inflate(R.layout.fragment_products_container, container, false)
 
     override fun onStart() {
         super.onStart()
@@ -161,6 +161,7 @@ class ProductsInStockFragment : ProductsTabFragment() {
             val database = FirebaseDatabase.getInstance()
             getFirebaseProducts(database, uniqueId)
         } else {
+            setupViewModel()
             viewModel.inStockProducts.observe(this, Observer { products ->
                 // Update the cached copy of the words in the adapter.
                 products?.let {

@@ -1,10 +1,11 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.users_tab
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.storemanagement.R
 import com.example.android.storemanagement.firebase.FirebaseUserInternal
 import kotlinx.android.synthetic.main.user_item.view.*
 
@@ -48,10 +49,14 @@ class UsersAdapter(
         holder.email.text = currentUser.email
         holder.name.text = currentUser.name
 
-        val imageName = imagesNamesList[position]
-        val randomImageId: Int = context.resources.getIdentifier(imageName, DRAWABLE, context.packageName)
+        val imageName: String = if (position > imagesNamesList.size - 1) {
+            getRandomImageName()
+        } else {
+            imagesNamesList[position]
+        }
+        val imageId = context.resources.getIdentifier(imageName, DRAWABLE, context.packageName)
 
-        holder.image.setImageResource(randomImageId)
+        holder.image.setImageResource(imageId)
         holder.itemView.setOnClickListener {
             openCreateOrderFragment(currentUser)
         }

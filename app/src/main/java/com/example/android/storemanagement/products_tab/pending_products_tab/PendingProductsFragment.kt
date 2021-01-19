@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.OnNavigationChangedListener
 import com.example.android.storemanagement.R
@@ -34,7 +34,7 @@ class PendingProductsFragment : ProductsTabFragment() {
 
     override fun setupViewModel() {
         viewModel =
-            ViewModelProviders.of(this)
+            ViewModelProvider(this)
                 .get(PendingProductsViewModel(requireActivity().application)::class.java)
     }
 
@@ -126,7 +126,7 @@ class PendingProductsFragment : ProductsTabFragment() {
         if (user != null) {
             getFirebaseOrders()
         } else {
-            setupEmptyView(empty_view_products, products_recycler_view)
+            setupRecyclerView(firebaseOrderContents = currentFirebaseOrderContents)
         }
 
         setStatusMenuItemsVisibility(true)

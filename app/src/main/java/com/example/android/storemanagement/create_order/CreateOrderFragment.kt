@@ -1,18 +1,14 @@
 package com.example.android.storemanagement.create_order
 
 
-import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.USER_KEY
 import com.example.android.storemanagement.Utils.getFormattedDate
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.setFirebaseOrderContentData
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.setFirebaseOrderData
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrderContentsOperations.setFirebaseOrderContentData
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrdersOperations.setFirebaseOrderData
 import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.firebase.FirebaseUserInternal
@@ -48,15 +44,15 @@ open class CreateOrderFragment : InfoOrderFragment() {
         button_add_order.setOnClickListener {
 //            setupRecyclerView()
 //            if (createOrdersAdapter?.shouldEnableOrderButton) {
-                val firebaseOrder = FirebaseOrder(
-                    finalPrice.toString(),
-                    getFormattedDate(),
-                    OrderStatus.PENDING.toString(),
-                    "",
-                    firebaseUser.id
-                )
-                val fbOrderId = setFirebaseOrderData(firebaseOrder)
-                updateFirebaseQuantities(fbOrderId)
+            val firebaseOrder = FirebaseOrder(
+                finalPrice.toString(),
+                getFormattedDate(),
+                OrderStatus.PENDING.toString(),
+                "",
+                firebaseUser.id
+            )
+            val fbOrderId = setFirebaseOrderData(firebaseOrder)
+            updateFirebaseQuantities(fbOrderId)
 //            }
         }
     }

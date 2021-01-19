@@ -1,4 +1,4 @@
-package com.example.android.storemanagement
+package com.example.android.storemanagement.notifications
 
 
 import android.os.Bundle
@@ -11,13 +11,16 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.android.storemanagement.EDIT_ORDER_TAB
+import com.example.android.storemanagement.OnNavigationChangedListener
+import com.example.android.storemanagement.R
 import com.example.android.storemanagement.firebase.*
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.addFirebaseNotification
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.addFirebaseProductForUser
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getFirebaseUser
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.isNotificationAddedForUser
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseProductQuantity
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.updateFirebaseProductQuantityForUser
+import com.example.android.storemanagement.firebase.FirebaseDatabaseNotificationsOperations.addFirebaseNotification
+import com.example.android.storemanagement.firebase.FirebaseDatabaseNotificationsOperations.isNotificationAddedForUser
+import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.addFirebaseProductForUser
+import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.updateFirebaseProductQuantity
+import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.updateFirebaseProductQuantityForUser
+import com.example.android.storemanagement.firebase.FirebaseDatabaseUsersOperations.getFirebaseUser
 import com.example.android.storemanagement.orders_tab.OrderStatus
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -193,56 +196,58 @@ open class NotificationsFragment : Fragment() {
 
     private fun getFirebaseNotifications() {
         val user = FirebaseAuth.getInstance().currentUser
-        val uniqueId: String = user!!.uid
-        val database = FirebaseDatabase.getInstance()
-        val notificationsQuery: Query = database.getReference("Notifications").child(uniqueId)
-        notificationsQuery.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
-                val firebaseNotification =
-                    dataSnapshot.getValue(FirebaseNotification::class.java)
-                if (firebaseNotification != null && notifications.none { it.orderId == firebaseNotification.orderId }) {
-                    val notification = FirebaseNotification(
-                        firebaseNotification.orderId,
-                        firebaseNotification.fromUserId,
-                        firebaseNotification.hasTheOrder,
-                        firebaseNotification.seen
-                    )
-                    notifications.add(notification)
-                    val userOrderId =
-                        if (firebaseNotification.hasTheOrder == true.toString()) firebaseNotification.fromUserId else uniqueId
-                    getFirebaseOrders(userOrderId, firebaseNotification.orderId)
-                    activity?.runOnUiThread { setupRecyclerView(notifications, firebaseOrders) }
+        if (user != null) {
+            val uniqueId: String = user!!.uid
+            val database = FirebaseDatabase.getInstance()
+            val notificationsQuery: Query = database.getReference("Notifications").child(uniqueId)
+            notificationsQuery.addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                    val firebaseNotification =
+                        dataSnapshot.getValue(FirebaseNotification::class.java)
+                    if (firebaseNotification != null && notifications.none { it.orderId == firebaseNotification.orderId }) {
+                        val notification = FirebaseNotification(
+                            firebaseNotification.orderId,
+                            firebaseNotification.fromUserId,
+                            firebaseNotification.hasTheOrder,
+                            firebaseNotification.seen
+                        )
+                        notifications.add(notification)
+                        val userOrderId =
+                            if (firebaseNotification.hasTheOrder == true.toString()) firebaseNotification.fromUserId else uniqueId
+                        getFirebaseOrders(userOrderId, firebaseNotification.orderId)
+                        activity?.runOnUiThread { setupRecyclerView(notifications, firebaseOrders) }
+                    }
                 }
-            }
 
-            override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
-                val firebaseNotification =
-                    dataSnapshot.getValue(FirebaseNotification::class.java)
-                if (firebaseNotification != null && notifications.any { it.orderId == firebaseNotification?.orderId }) {
-                    val notificationToBeDeleted: FirebaseNotification =
-                        notifications.first { it.orderId == firebaseNotification?.orderId }
-                    val notification = FirebaseNotification(
-                        firebaseNotification.orderId,
-                        firebaseNotification.fromUserId,
-                        firebaseNotification.hasTheOrder,
-                        firebaseNotification.seen
-                    )
-                    notifications.remove(notificationToBeDeleted)
-                    notifications.add(notification)
-                    val userOrderId =
-                        if (firebaseNotification.hasTheOrder == true.toString()) firebaseNotification.fromUserId else uniqueId
-                    getFirebaseOrders(userOrderId, firebaseNotification.orderId)
-                    activity?.runOnUiThread { setupRecyclerView(notifications, firebaseOrders) }
+                override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {
+                    val firebaseNotification =
+                        dataSnapshot.getValue(FirebaseNotification::class.java)
+                    if (firebaseNotification != null && notifications.any { it.orderId == firebaseNotification?.orderId }) {
+                        val notificationToBeDeleted: FirebaseNotification =
+                            notifications.first { it.orderId == firebaseNotification?.orderId }
+                        val notification = FirebaseNotification(
+                            firebaseNotification.orderId,
+                            firebaseNotification.fromUserId,
+                            firebaseNotification.hasTheOrder,
+                            firebaseNotification.seen
+                        )
+                        notifications.remove(notificationToBeDeleted)
+                        notifications.add(notification)
+                        val userOrderId =
+                            if (firebaseNotification.hasTheOrder == true.toString()) firebaseNotification.fromUserId else uniqueId
+                        getFirebaseOrders(userOrderId, firebaseNotification.orderId)
+                        activity?.runOnUiThread { setupRecyclerView(notifications, firebaseOrders) }
+                    }
                 }
-            }
 
-            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-            }
+                override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                }
 
-            override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
-            override fun onCancelled(databaseError: DatabaseError) {}
-        })
-        activity?.runOnUiThread { setupRecyclerView(notifications, firebaseOrders) }
+                override fun onChildMoved(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
+                override fun onCancelled(databaseError: DatabaseError) {}
+            })
+            activity?.runOnUiThread { setupRecyclerView(notifications, firebaseOrders) }
+        }
     }
 
     private fun getFirebaseOrders(userId: String, orderId: String) {

@@ -10,10 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isEditOrderQuantityCorrect
-import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrect
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrectOrder
 import com.example.android.storemanagement.create_order.CreateOrderHolder
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations
-import com.example.android.storemanagement.firebase.FirebaseDatabaseOperations.getFirebaseUserOrderContents
+import com.example.android.storemanagement.firebase.ChildAction
+import com.example.android.storemanagement.firebase.FirebaseDatabaseOrderContentsOperations.getFirebaseUserOrderContents
 import com.example.android.storemanagement.firebase.FirebaseOrderContent
 import com.example.android.storemanagement.firebase.FirebaseProduct
 import com.example.android.storemanagement.order_content_database.OrderContent
@@ -75,7 +75,7 @@ class EditOrderAdapter(
                     currentFirebaseProductInOrder.productBarcode
                 ) { orderContent, childAction ->
                     when (childAction) {
-                        FirebaseDatabaseOperations.ChildAction.ChildAdded -> {
+                        ChildAction.ChildAdded -> {
                             if (orderContents.none {it.id == orderContent.id}) {
                                 orderContents.add(orderContent)
                                 val orderContentQuantity = orderContent.quantity
@@ -85,7 +85,7 @@ class EditOrderAdapter(
                             onInStockQuantityCalculated(holder, finalProductAvailableQuantity, currentFirebaseProductInOrder)
                             Log.d("Watcher", "quantity addWatcher " + holder.productQuantity.text)
                         }
-                        FirebaseDatabaseOperations.ChildAction.ChildChanged -> {
+                        ChildAction.ChildChanged -> {
                             val changedOrderContent =
                                 orderContents.first { it.id == orderContent.id }
                             orderContents.remove(changedOrderContent)
@@ -98,7 +98,7 @@ class EditOrderAdapter(
                             onInStockQuantityCalculated(holder, finalProductAvailableQuantity, currentFirebaseProductInOrder)
                             Log.d("Watcher", "quantity addWatcher " + holder.productQuantity.text)
                         }
-                        FirebaseDatabaseOperations.ChildAction.ChildRemoved -> {
+                        ChildAction.ChildRemoved -> {
                             val removedOrderContent =
                                 orderContents.first { it.id == orderContent.id }
                             orderContents.remove(removedOrderContent)
@@ -154,7 +154,7 @@ class EditOrderAdapter(
                 ) && enabledProductsWithErrors.none { !it.value }
                 setOrderButtonEnabled(shouldEnableEditButton)
 
-                if (isQuantityCorrect(
+                if (isQuantityCorrectOrder(
                         holder.productQuantity,
                         holder.productQuantityLayout,
                         finalProductAvailableQuantity
@@ -179,7 +179,7 @@ class EditOrderAdapter(
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 setOrderButtonEnabled(
-                    isQuantityCorrect(
+                    isQuantityCorrectOrder(
                         holder.productQuantity,
                         holder.productQuantityLayout,
                         finalProductAvailableQuantity
@@ -198,7 +198,7 @@ class EditOrderAdapter(
         finalProductAvailableQuantity: Int
     ) {
         when {
-            isQuantityCorrect(
+            isQuantityCorrectOrder(
                 holder.productQuantity,
                 holder.productQuantityLayout,
                 finalProductAvailableQuantity

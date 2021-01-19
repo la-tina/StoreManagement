@@ -16,7 +16,7 @@ import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.example.android.storemanagement.BARCODE_ACTIVITY_REQUEST_CODE
 import com.example.android.storemanagement.BARCODE_KEY
 import com.example.android.storemanagement.R
@@ -58,7 +58,7 @@ abstract class InfoProductFragment : Fragment() {
     private lateinit var scannerView: ZBarScannerView
 
     protected val productViewModel: ProductViewModel by lazy {
-        ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
+        ViewModelProvider(this).get(ProductViewModel(requireActivity().application)::class.java)
     }
 
     private var savedProductName: String = ""
@@ -203,6 +203,7 @@ abstract class InfoProductFragment : Fragment() {
             product_overcharge_percentage,
             overcharge_percentage_text
         )
+
         product_overcharge_percentage.addTextChangedListener(textWatcherPercentage)
     }
 
@@ -321,12 +322,16 @@ abstract class InfoProductFragment : Fragment() {
                         }
                     }
                     product_overcharge_percentage -> {
+                        fieldType = CreateProductFieldValidator.ProductFieldElements.PERCENTAGE
                         if (editTextView.text.toString().startsWith(".")) {
                             val text = "0" + editTextView.text.toString()
                             editTextView.setText(text)
                         }
-
-                        fieldType = CreateProductFieldValidator.ProductFieldElements.PERCENTAGE
+                        if (editTextView.text.toString().isEmpty() || editTextView.text.toString().toInt() == 0) {
+                            if (editTextView.text.toString()
+                                    .isEmpty() && product_overcharge.text.toString() != "0"
+                            ) product_overcharge.setText("0")
+                        }
                         if (shouldCalculatePercentage(inputLayoutView, editTextView)
                         ) {
                             val overcharge: Float = (product_overcharge_percentage.text.toString()

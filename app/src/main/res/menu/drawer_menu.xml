@@ -8,6 +8,7 @@
         <item
             android:id="@+id/account_type_text"
             android:icon="@drawable/ic_baseline_local_florist"
+            android:visible="false"
             android:title="@string/type" />
         <item
             android:id="@+id/action_about"
