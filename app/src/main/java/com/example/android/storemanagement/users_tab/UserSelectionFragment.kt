@@ -111,30 +111,6 @@ open class UserSelectionFragment : Fragment() {
         setupRecyclerView(orderedUsers)
     }
 
-//    private fun getFirebaseUsers() {
-//        val user: FirebaseUser? = Firebase.auth.currentUser
-//        val uniqueId: String = user?.uid!!
-//        val database = FirebaseDatabase.getInstance()
-//        val usersQuery: Query = database.getReference("Users")
-//
-//        usersQuery.add(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                for (appleSnapshot in dataSnapshot.children) {
-//                    val firebaseUser =
-//                        dataSnapshot.getValue(FirebaseUserInternal::class.java)
-////                    if (firebaseUser?.id != uniqueId) {
-//                    users.add(firebaseUser!!)
-////                    }
-//                }
-//                setupRecyclerView(users)
-//            }
-//
-//            override fun onCancelled(databaseError: DatabaseError) {
-//            }
-//        })
-//        setupRecyclerView(users)
-//    }
-
     private fun getFirebaseUsers(accountType: UserType) {
         val user = FirebaseAuth.getInstance().currentUser
         val uniqueId: String = user!!.uid

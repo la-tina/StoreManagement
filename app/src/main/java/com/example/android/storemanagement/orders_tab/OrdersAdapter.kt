@@ -12,27 +12,22 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.firebase.FirebaseOrder
-import com.example.android.storemanagement.orders_database.Order
 import kotlinx.android.synthetic.main.order_item.view.*
 
 
 class OrdersAdapter(
     private val context: Context,
-    private val deleteOrderAction: (Order?, FirebaseOrder?) -> Unit,
-    private val openEditOrderTab: (Order?, FirebaseOrder?) -> Unit,
-    private val onOrderStatusChanged: (Order?, FirebaseOrder?, OrderStatus) -> Unit
-    //private val updateQuantitiesOnDelete: (Order) -> Unit
+    private val deleteOrderAction: (FirebaseOrder?) -> Unit,
+    private val openEditOrderTab: (FirebaseOrder?) -> Unit,
+    private val onOrderStatusChanged: (FirebaseOrder?, OrderStatus) -> Unit
 ) :
     RecyclerView.Adapter<OrdersHolder>() {
 
-    private var orders = emptyList<Order>() // Cached copy of orders
     private var firebaseOrders = emptyList<FirebaseOrder>() // Cached copy of firebase orders
     private var editItem: MenuItem? = null
 
-    private var areFirebaseOrdersLoaded = false
-
     // Gets the number of items in the list
-    override fun getItemCount(): Int = if (areFirebaseOrdersLoaded) firebaseOrders.size else orders.size
+    override fun getItemCount(): Int = firebaseOrders.size
 
     // Inflates the item views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrdersHolder =
@@ -40,57 +35,11 @@ class OrdersAdapter(
 
     //Binds each order in the list to a view
     override fun onBindViewHolder(holder: OrdersHolder, position: Int) {
-        val currentOrder: Any = if (areFirebaseOrdersLoaded) firebaseOrders[position] else orders[position]
-        if (currentOrder is Order) {
-            val orderPrice = String.format("%.1f", currentOrder.finalPrice).toFloat().toString()
-            holder.id.text = currentOrder.id.toString()
-            holder.finalPrice.text = orderPrice
-            //String.format("%.1f", finalPrice).toFloat().toString()
-            holder.date.text = currentOrder.date
-
-            when (currentOrder.orderStatus) {
-                OrderStatus.ORDERED.toString() -> {
-                    holder.status.text = context.getString(R.string.status_ordered)
-                    holder.status.setTextColor(context.getColor(R.color.yellow))
-                    holder.view.setBackgroundColor(context.getColor(R.color.light_yellow))
-                }
-                OrderStatus.CONFIRMED.toString() -> {
-                    holder.status.text = context.getString(R.string.status_confirmed)
-                    holder.status.setTextColor(context.getColor(R.color.green))
-                    holder.view.setBackgroundColor(context.getColor(R.color.light_green))
-                }
-                OrderStatus.DELIVERED.toString() -> {
-                    holder.status.text = context.getString(R.string.status_delivered)
-                    holder.status.setTextColor(context.getColor(R.color.colorPrimary))
-                    holder.view.setBackgroundColor(context.getColor(R.color.light_primary))
-                }
-                OrderStatus.CANCELLED.toString() -> {
-                    holder.status.text = context.getString(R.string.status_cancelled)
-                    holder.status.setTextColor(context.getColor(R.color.dark_gray))
-                    holder.view.setBackgroundColor(context.getColor(R.color.light_gray))
-                }
-                else -> {
-                    holder.status.text = context.getString(R.string.status_pending)
-                    holder.status.setTextColor(context.getColor(R.color.orange))
-                    holder.view.setBackgroundColor(context.getColor(R.color.light_orange))
-                }
-            }
-
-            holder.itemView.setOnClickListener {
-                openEditOrderTab(currentOrder, null)
-            }
-
-            if (currentOrder.orderStatus == OrderStatus.DELIVERED.toString()) {
-                holder.imageContextMenu.visibility = View.GONE
-            } else {
-                holder.imageContextMenu.visibility = View.VISIBLE
-            }
-            holder.imageContextMenu.setOnClickListener { view -> showPopup(view, currentOrder, null) }
-        } else if (currentOrder is FirebaseOrder && currentOrder.finalPrice.isNotEmpty()) {
+        val currentOrder: FirebaseOrder = firebaseOrders[position]
+        if (currentOrder.finalPrice.isNotEmpty()) {
             val orderPrice = String.format("%.1f", currentOrder.finalPrice.toFloat()).toFloat().toString()
             holder.id.text = currentOrder.id
             holder.finalPrice.text = orderPrice
-            //String.format("%.1f", finalPrice).toFloat().toString()
             holder.date.text = currentOrder.date
 
             when (currentOrder.orderStatus) {
@@ -122,7 +71,7 @@ class OrdersAdapter(
             }
 
             holder.itemView.setOnClickListener {
-                openEditOrderTab(null, currentOrder)
+                openEditOrderTab(currentOrder)
             }
 
             if (currentOrder.orderStatus == OrderStatus.DELIVERED.toString() || currentOrder.orderStatus == OrderStatus.CANCELLED.toString()) {
@@ -130,30 +79,20 @@ class OrdersAdapter(
             } else {
                 holder.imageContextMenu.visibility = View.VISIBLE
             }
-            holder.imageContextMenu.setOnClickListener { view -> showPopup(view, null, currentOrder) }
+            holder.imageContextMenu.setOnClickListener { view -> showPopup(view, currentOrder) }
         }
     }
 
-    private fun showPopup(view: View, order: Order?, firebaseOrder: FirebaseOrder?) {
+    private fun showPopup(view: View, firebaseOrder: FirebaseOrder?) {
         PopupMenu(context, view).apply {
             inflate(R.menu.context_menu)
 
-            if (areFirebaseOrdersLoaded) {
-                if (firebaseOrder?.orderStatus == OrderStatus.ORDERED.toString()
-                    || firebaseOrder?.orderStatus == OrderStatus.CONFIRMED.toString()
-                ) {
-                    menu.findItem(R.id.order).isVisible = false
-                    menu.findItem(R.id.edit).isVisible = false
-                    menu.findItem(R.id.delete).isVisible = true
-                }
-            } else {
-                if (order?.orderStatus == OrderStatus.ORDERED.toString()
-                    || order?.orderStatus == OrderStatus.CONFIRMED.toString()
-                ) {
-                    menu.findItem(R.id.order).isVisible = false
-                    menu.findItem(R.id.edit).isVisible = false
-                    menu.findItem(R.id.delete).isVisible = true
-                }
+            if (firebaseOrder?.orderStatus == OrderStatus.ORDERED.toString()
+                || firebaseOrder?.orderStatus == OrderStatus.CONFIRMED.toString()
+            ) {
+                menu.findItem(R.id.order).isVisible = false
+                menu.findItem(R.id.edit).isVisible = false
+                menu.findItem(R.id.delete).isVisible = true
             }
 
             setOnMenuItemClickListener { item: MenuItem? ->
@@ -164,7 +103,7 @@ class OrdersAdapter(
                             context.getString(R.string.status_ordered),
                             Toast.LENGTH_SHORT
                         ).show()
-                        onOrderStatusChanged(order, firebaseOrder, OrderStatus.ORDERED)
+                        onOrderStatusChanged(firebaseOrder, OrderStatus.ORDERED)
                     }
                     R.id.delivered -> {
                         Toast.makeText(
@@ -172,7 +111,7 @@ class OrdersAdapter(
                             context.getString(R.string.status_delivered),
                             Toast.LENGTH_SHORT
                         ).show()
-                        onOrderStatusChanged(order, firebaseOrder, OrderStatus.DELIVERED)
+                        onOrderStatusChanged(firebaseOrder, OrderStatus.DELIVERED)
                     }
                     R.id.edit -> {
                         editItem = item
@@ -181,7 +120,7 @@ class OrdersAdapter(
                             context.getString(R.string.edit),
                             Toast.LENGTH_SHORT
                         ).show()
-                        openEditOrderTab(order, firebaseOrder)
+                        openEditOrderTab(firebaseOrder)
                     }
                     R.id.delete -> {
                         Toast.makeText(
@@ -189,8 +128,7 @@ class OrdersAdapter(
                             context.getString(R.string.deleted),
                             Toast.LENGTH_SHORT
                         ).show()
-                        deleteOrderAction(order, firebaseOrder)
-                        //updateQuantitiesOnDelete(order)
+                        deleteOrderAction(firebaseOrder)
                     }
                 }
                 true
@@ -199,23 +137,10 @@ class OrdersAdapter(
         }
     }
 
-    internal fun setOrders(orders: List<Order>?, firebaseOrders: List<FirebaseOrder>?) {
-        if (orders == null) {
-            this.firebaseOrders = firebaseOrders!!
-            areFirebaseOrdersLoaded = true
-        } else {
-            this.orders = orders
-            areFirebaseOrdersLoaded = false
-        }
-
+    internal fun setOrders(firebaseOrders: List<FirebaseOrder>?) {
+        this.firebaseOrders = firebaseOrders!!
         notifyDataSetChanged()
     }
-
-    fun getOrderAtPosition(position: Int): Order =
-        orders[position]
-
-    fun getFirebaseOrderAtPosition(position: Int): FirebaseOrder =
-        firebaseOrders[position]
 }
 
 class OrdersHolder(val view: View) : RecyclerView.ViewHolder(view) {

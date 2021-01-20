@@ -1,9 +1,9 @@
 package com.example.android.storemanagement.products_database
 
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import android.content.Context
 import com.example.android.storemanagement.order_content_database.OrderContent
 import com.example.android.storemanagement.order_content_database.OrderContentDao
 import com.example.android.storemanagement.orders_database.Order
@@ -19,7 +19,8 @@ abstract class ProductRoomDatabase : RoomDatabase() {
 
     abstract fun orderContentDao(): OrderContentDao
 
-    //ProductRoomDatabase is singleton to prevent having multiple instances of the database opened at the same time.
+    //ProductRoomDatabase is singleton to prevent having multiple instances
+    //of the database opened at the same time.
     companion object {
         @Volatile
         private var INSTANCE: ProductRoomDatabase? = null
@@ -28,8 +29,7 @@ abstract class ProductRoomDatabase : RoomDatabase() {
             context: Context
         ): ProductRoomDatabase {
             return INSTANCE ?: synchronized(this) {
-                // Create database here
-                //create a RoomDatabase object in the application context from the ProductRoomDatabase class
+                //Created RoomDatabase object in the application context from the ProductRoomDatabase class
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     ProductRoomDatabase::class.java,
@@ -41,8 +41,3 @@ abstract class ProductRoomDatabase : RoomDatabase() {
         }
     }
 }
-
-
-
-
-

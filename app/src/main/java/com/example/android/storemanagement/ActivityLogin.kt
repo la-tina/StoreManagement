@@ -218,8 +218,6 @@ class ActivityLogin : AppCompatActivity() {
                     openMainActivity()
                 }
             }
-        } else {
-            // No user is signed in
         }
     }
 

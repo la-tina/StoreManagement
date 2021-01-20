@@ -3,7 +3,6 @@ package com.example.android.storemanagement.orders_tab
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,10 +25,6 @@ import com.example.android.storemanagement.firebase.FirebaseDatabaseOrdersOperat
 import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.addFirebaseProduct
 import com.example.android.storemanagement.firebase.FirebaseDatabaseProductsOperations.updateFirebaseProductQuantity
 import com.example.android.storemanagement.firebase.FirebaseDatabaseUsersOperations.getFirebaseUser
-import com.example.android.storemanagement.order_content_database.OrderContent
-import com.example.android.storemanagement.order_content_database.OrderContentViewModel
-import com.example.android.storemanagement.orders_database.Order
-import com.example.android.storemanagement.orders_database.OrderViewModel
 import com.example.android.storemanagement.products_database.Product
 import com.example.android.storemanagement.products_database.ProductViewModel
 import com.google.firebase.auth.FirebaseUser
@@ -46,20 +41,10 @@ open class OrdersFragment : Fragment() {
     protected var user: FirebaseUser? = null
     private lateinit var productsList: List<Product>
 
-    //    var ordersList = mutableListOf<Order>()
     var firebaseOrdersList = mutableListOf<FirebaseOrder>()
     var firebaseOrderContentsList = mutableListOf<FirebaseOrderContent>()
 
-    lateinit var productsInOrderList: List<OrderContent>
     var firebaseProductsList = mutableListOf<FirebaseProduct>()
-
-    private val orderViewModel: OrderViewModel by lazy {
-        ViewModelProvider(this).get(OrderViewModel::class.java)
-    }
-
-    private val orderContentViewModel: OrderContentViewModel by lazy {
-        ViewModelProvider(this).get(OrderContentViewModel::class.java)
-    }
 
     private val productViewModel: ProductViewModel by lazy {
         ViewModelProvider(this).get(ProductViewModel::class.java)
@@ -445,7 +430,7 @@ open class OrdersFragment : Fragment() {
                                 firebaseProduct.quantity,
                                 item.key!!
                             )
-                            Log.d("TinaFirebase", "firebaseProduct onDataChange $product")
+
                             if (!firebaseProductsList.contains(product)) {
                                 firebaseProductsList.add(product)
                                 activity?.runOnUiThread {
@@ -472,7 +457,7 @@ open class OrdersFragment : Fragment() {
                             firebaseNewProduct.quantity,
                             dataSnapshot.key!!
                         )
-                        Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
+
                         if (firebaseProductsList.none { it.barcode == product.barcode }) {
                             firebaseProductsList.add(product)
                             activity?.runOnUiThread {
@@ -494,7 +479,7 @@ open class OrdersFragment : Fragment() {
                             changedFirebaseProduct.quantity,
                             dataSnapshot.key!!
                         )
-                        Log.d("TinaFirebase", "firebaseProduct onChildAdded $product")
+
                         val changedProduct =
                             firebaseProductsList.first { t -> t.id == dataSnapshot.key!! }
                         firebaseProductsList.remove(changedProduct)
@@ -517,7 +502,7 @@ open class OrdersFragment : Fragment() {
                             firebaseRemovedProduct.quantity,
                             dataSnapshot.key!!
                         )
-                        Log.d("TinaFirebase", "firebaseProduct onChildRemoved $product")
+
                         if (!firebaseProductsList.none { it.barcode == product.barcode }) {
                             firebaseProductsList.remove(product)
                             activity?.runOnUiThread {
@@ -557,7 +542,6 @@ open class OrdersFragment : Fragment() {
                                 firebaseOrder.userId
                             )
 
-                            Log.d("TinaFirebase", "firebaseOrder onDataChange $order")
                             if (!firebaseOrdersList.contains(order)) {
                                 firebaseOrdersList.add(order)
                                 activity?.runOnUiThread {
@@ -584,7 +568,6 @@ open class OrdersFragment : Fragment() {
                             firebaseNewOrder.userId
                         )
 
-                        Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
                         if (!firebaseOrdersList.contains(order)) {
                             firebaseOrdersList.add(order)
                             activity?.runOnUiThread {
@@ -606,7 +589,6 @@ open class OrdersFragment : Fragment() {
                             changedFirebaseOrder.userId
                         )
 
-                        Log.d("TinaFirebase", "firebaseOrder onChildAdded $order")
                         if (firebaseOrdersList.contains(order)) {
                             firebaseOrdersList.forEach { firebaseOrder ->
                                 if (firebaseOrder.id == dataSnapshot.key!!) {
@@ -633,7 +615,6 @@ open class OrdersFragment : Fragment() {
                             firebaseRemovedOrder.userId
                         )
 
-                        Log.d("TinaFirebase", "firebaseOrder onChildRemoved $order")
                         if (firebaseOrdersList.contains(order)) {
                             firebaseOrdersList.remove(order)
                             activity?.runOnUiThread {
@@ -649,20 +630,12 @@ open class OrdersFragment : Fragment() {
         }
     }
 
-    private fun updateDate(id: Long) {
-        val formattedDate = getFormattedDate()
-
-        orderViewModel.updateDate(formattedDate, id)
-        updateFirebaseOrderDate(id.toString(), formattedDate)
-    }
-
     private fun updateFirebaseDate(firebaseId: String) {
         val formattedDate = getFormattedDate()
         updateFirebaseOrderDate(firebaseId, formattedDate)
     }
 
     private fun onOrderStatusChanged(
-        order: Order?,
         firebaseOrder: FirebaseOrder?,
         orderStatus: OrderStatus
     ) {
@@ -672,75 +645,22 @@ open class OrdersFragment : Fragment() {
 
             when (orderStatus) {
                 OrderStatus.ORDERED -> {
-                    Log.d("Koni", "onOrderOrdered")
                     val firebaseNotification =
                         FirebaseNotification(firebaseOrder.id, user?.uid!!, true.toString(), false.toString())
                     addFirebaseNotification(firebaseNotification, firebaseOrder.userId)
                 }
                 OrderStatus.DELIVERED -> {
-                    Log.d("Koni", "onOrderDelivered")
-
                     updateDeliveredProducts(firebaseOrder.id)
                 }
             }
         }
     }
 
-    private fun deleteOrder(order: Order?, firebaseOrder: FirebaseOrder?) {
-        Log.d("Koni", "deleteOrder invoked")
-//        if (!order.isOrdered){
-//            productsInOrderList.filter { it.orderId == order.id }.forEach { currentProduct ->
-//                updateProductQuantity(currentProduct)
-//                Log.d("T", "updated quantities")
-//            }
-//        }
-        if (order != null) {
-            orderViewModel.deleteOrder(order)
-        } else if (firebaseOrder != null) {
-            deleteFirebaseOrderData(firebaseOrder.id)
-        }
+    private fun deleteOrder(firebaseOrder: FirebaseOrder?) {
+        deleteFirebaseOrderData(firebaseOrder?.id!!)
     }
 
-//on Edit order
-//    private fun updateProductQuantity(orderContent: OrderContent) {
-//        Log.d("Koni", "updateProductQuantity invoked")
-//        productsList.forEach { product ->
-//            Log.d("Koni", "allProducts?.forEach invoked")
-//            if (orderContent.productBarcode == product.barcode) {
-//                val newQuantity = product.quantity - orderContent.quantity
-//                val productQuantity = if (newQuantity >= 0) newQuantity else 0
-//                //Log.d("Koni", "productViewModel.updateProductQuantity invoked")
-//                productViewModel.updateProductQuantity(product.barcode, productQuantity)
-//                Log.d("Koni", "updated quantity $productQuantity")
-//
-//            }
-//        }
-//    }
-
-//    private fun updateProductQuantity(orderContent: OrderContent) {
-//        Log.d("Koni", "updateProductQuantity invoked")
-//        productsList.forEach { product ->
-//            Log.d("Koni", "allProducts?.forEach invoked")
-//            if (orderContent.productBarcode == product.barcode) {
-//                val newQuantity = product.quantity + orderContent.quantity
-//                //Log.d("Koni", "productViewModel.updateProductQuantity invoked")
-//                productViewModel.updateProductQuantity(product.barcode, newQuantity)
-//                Log.d("Koni", "updated quantity $newQuantity")
-//
-//            }
-//        }
-//    }
-
-    private fun openViewOrderTab(order: Order) {
-        if (::onNavigationChangedListener.isInitialized) {
-            //onNavigationChangedListener.onNavigationChanged(EDIT_ORDER_TAB)
-            listener = onNavigationChangedListener
-        }
-
-        listener?.onNavigationChanged(tabNumber = VIEW_ORDER_TAB, order = order)
-    }
-
-    private fun openEditOrderTab(order: Order?, firebaseOrder: FirebaseOrder?) {
+    private fun openEditOrderTab(firebaseOrder: FirebaseOrder?) {
         getFirebaseUser(user!!.uid) { user -> openEditOrderFragment(user, firebaseOrder) }
     }
 
@@ -780,7 +700,7 @@ open class OrdersFragment : Fragment() {
         orders_recycler_view?.adapter = ordersAdapter
 
         activity?.runOnUiThread {
-            ordersAdapter.setOrders(null, firebaseOrders)
+            ordersAdapter.setOrders(firebaseOrders)
             setupEmptyView()
         }
     }

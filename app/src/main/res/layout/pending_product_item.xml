@@ -22,13 +22,14 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
         android:padding="8dp"
+        android:layout_marginTop="10dp"
         android:text="Name"
         android:textAlignment="viewStart"
         android:textColor="@color/checkBoxColor"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/quantity" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/product_item_status"

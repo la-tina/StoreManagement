@@ -1,40 +1,41 @@
 package com.example.android.storemanagement.products_database
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import android.util.Log
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 
 //The ViewModel's role is to provide data to the UI and survive configuration changes.
-
 class ProductViewModel(application: Application) : AndroidViewModel(application) {
     var names = mutableMapOf<String, String>()
     var prices = mutableMapOf<String, Float>()
     var overcharges = mutableMapOf<String, Float>()
 
-    //Define a parentJob, and a coroutineContext.
+    //Defined parentJob, and a coroutineContext.
     //The coroutineContext, by default, uses the parentJob and the main dispatcher
     //to create a new instance of a CoroutineScope based on the coroutineContext.
-
     private var parentJob = Job()
     private val coroutineContext: CoroutineContext
         get() = parentJob + Dispatchers.Main
     private val scope = CoroutineScope(coroutineContext)
 
-    //Add a private member variable to hold a reference to the repository.
+    //Hold a reference to the repository.
     private val repository: ProductRepository
 
-    //Add a private LiveData member variable to cache the list of products.
+    //LiveData member variable to cache the list of products.
     val allProducts: LiveData<List<Product>>
 
     val inStockProducts: LiveData<List<Product>>
 
     val lowStockProducts: LiveData<List<Product>>
 
-    //Create an init block that gets a reference to the ProductDao from the
+    //Gets a reference to the ProductDao from the
     //ProductRoomDatabase and constructs the ProductRepository based on it.
     init {
         val productsDao = ProductRoomDatabase.getDatabase(
@@ -57,7 +58,6 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun updateQuantity(barcode: String, quantity: Int) = scope.launch(Dispatchers.IO) {
-//            Log.v("Room", "UPDATE QUANTITY")
         repository.updateQuantity(barcode, quantity)
     }
 
@@ -81,13 +81,9 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         repository.updateProductQuantity(barcode, quantity)
     }
 
-
     //when the ViewModel is no longer used
     override fun onCleared() {
         super.onCleared()
         parentJob.cancel()
     }
 }
-
-
-

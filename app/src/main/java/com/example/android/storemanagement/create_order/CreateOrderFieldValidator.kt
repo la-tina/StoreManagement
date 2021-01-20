@@ -43,7 +43,7 @@ object CreateOrderFieldValidator {
         return quantity.text.toString().isBlank() || quantity.text.toString() == "0"
     }
 
-    private fun isQuantityAboveLimit(quantity: EditText): Boolean {
+    fun isQuantityAboveLimit(quantity: EditText): Boolean {
         if (quantity.text.toString().isBlank()) return false
         if (isQuantityAboveLimit(quantity.text.toString().toInt()))
             quantity.error = MESSAGE_QUANTITY_ABOVE_MAX_SIZE

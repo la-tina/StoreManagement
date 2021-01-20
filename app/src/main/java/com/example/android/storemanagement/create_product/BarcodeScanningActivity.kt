@@ -1,17 +1,20 @@
 package com.example.android.storemanagement.create_product
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.android.storemanagement.BARCODE_KEY
+import com.example.android.storemanagement.Utils.PRODUCT_NAME
+import com.example.android.storemanagement.Utils.PRODUCT_OVERCHARGE
+import com.example.android.storemanagement.Utils.PRODUCT_PERCENTAGE
+import com.example.android.storemanagement.Utils.PRODUCT_PRICE
 import me.dm7.barcodescanner.zbar.Result
 import me.dm7.barcodescanner.zbar.ZBarScannerView
-import android.content.Intent
-import com.example.android.storemanagement.BARCODE_KEY
 
 
 //Implementing the ResultHandler interface and overriding handleResult function
-
 class BarcodeScanningActivity : AppCompatActivity(), ZBarScannerView.ResultHandler {
 
     private lateinit var scannerView: ZBarScannerView
@@ -42,7 +45,11 @@ class BarcodeScanningActivity : AppCompatActivity(), ZBarScannerView.ResultHandl
         scannerView.resumeCameraPreview(this)
 
         val returnIntent = Intent()
-        returnIntent.putExtra(BARCODE_KEY,result?.contents)
+        returnIntent.putExtra(BARCODE_KEY, result?.contents)
+        returnIntent.putExtra(PRODUCT_NAME, intent.getStringExtra("productName"))
+        returnIntent.putExtra(PRODUCT_PRICE, intent.getStringExtra("productPrice"))
+        returnIntent.putExtra(PRODUCT_OVERCHARGE, intent.getStringExtra("productOvercharge"))
+        returnIntent.putExtra(PRODUCT_PERCENTAGE, intent.getStringExtra("productPercentage"))
         setResult(Activity.RESULT_OK, returnIntent)
         finish()
     }

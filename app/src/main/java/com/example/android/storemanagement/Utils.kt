@@ -7,6 +7,11 @@ import java.util.*
 
 object Utils {
 
+    const val PRODUCT_NAME = "productName"
+    const val PRODUCT_PRICE = "productPrice"
+    const val PRODUCT_OVERCHARGE = "productOvercharge"
+    const val PRODUCT_PERCENTAGE = "productPercentage"
+
     fun getFormattedDate(): String {
         val simpleDateFormat = SimpleDateFormat("dd/M/yyyy HH:mm:ss", Locale.ROOT)
         val currentDate = simpleDateFormat.format(Date())

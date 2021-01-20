@@ -155,7 +155,7 @@ class StoreAdapter(
             )
         )
 
-        setErroneousField(holder, barcode, finalProductAvailableQuantity)
+        setErroneousField(holder, barcode)
         setStoreButtonEnabled(
             isQuantityCorrectStore(
                 holder.productQuantity,
@@ -166,8 +166,7 @@ class StoreAdapter(
 
     private fun setErroneousField(
         holder: CreateOrderHolder,
-        barcode: String,
-        finalProductAvailableQuantity: Int
+        barcode: String
     ) {
         when {
             isQuantityCorrectStore(
@@ -193,7 +192,7 @@ class StoreAdapter(
     ): TextWatcher =
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                setErroneousField(holder, barcode, finalProductAvailableQuantity)
+                setErroneousField(holder, barcode)
                 val shouldEnableOrderButton = isQuantityCorrectStore(
                     holder.productQuantity,
                     holder.productQuantityLayout
@@ -202,6 +201,7 @@ class StoreAdapter(
                 enabledProducts[barcode] = shouldEnableOrderButton
 
                 if (shouldEnableOrderButton) {
+                    enabledProducts[barcode] = true
                     Log.d(
                         "setButtonEnabled shouldEnableOrderButton",
                         "uncalculated $uncalculatedProductQuantity finalProductAvailableQuantity $finalProductAvailableQuantity"
@@ -218,7 +218,32 @@ class StoreAdapter(
                 }
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                val shouldEnableOrderButton = isQuantityCorrectStore(
+                    holder.productQuantity,
+                    holder.productQuantityLayout
+                ) && enabledProducts.none { !it.value }
+
+                enabledProducts[barcode] = shouldEnableOrderButton
+
+                if (shouldEnableOrderButton) {
+                    enabledProducts[barcode] = true
+                    Log.d(
+                        "setButtonEnabled shouldEnableOrderButton",
+                        "uncalculated $uncalculatedProductQuantity finalProductAvailableQuantity $finalProductAvailableQuantity"
+                    )
+                    updateQuantityForProduct(
+                        barcode,
+                        calculatedProductQuantity(
+                            uncalculatedProductQuantity,
+                            finalProductAvailableQuantity,
+                            holder.productQuantity.text.toString().toInt()
+                        ).toString()
+                    )
+                    setStoreButtonEnabled(shouldEnableOrderButton)
+                }
+            }
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         }
 
@@ -228,8 +253,9 @@ class StoreAdapter(
         enteredProductQuantity: Int
     ): Int {
         return if (areFirebaseProductsLoaded) {
-            if (enteredProductQuantity > availableProductAvailableQuantity) { initialProductQuantity + (availableProductAvailableQuantity - enteredProductQuantity) }
-            else {
+            if (enteredProductQuantity > availableProductAvailableQuantity) {
+                initialProductQuantity + (availableProductAvailableQuantity - enteredProductQuantity)
+            } else {
                 initialProductQuantity - (availableProductAvailableQuantity - enteredProductQuantity)
             }
             initialProductQuantity - (availableProductAvailableQuantity - enteredProductQuantity)
@@ -239,9 +265,8 @@ class StoreAdapter(
     }
 
     private fun updateQuantityForProduct(barcode: String, quantity: String) {
-        when (quantity) {
-            "" -> quantities[barcode] = 0
-            else -> quantities[barcode] = quantity.toInt()
+        if (quantity.isNotEmpty()) {
+            quantities[barcode] = quantity.toInt()
         }
     }
 

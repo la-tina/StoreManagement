@@ -30,7 +30,6 @@ class ProductsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
         products_add_button?.setOnClickListener {
             if (::onNavigationChangedListener.isInitialized)
                 onNavigationChangedListener.onNavigationChanged(CREATE_PRODUCT_TAB)

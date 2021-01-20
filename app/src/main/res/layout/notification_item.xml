@@ -75,15 +75,18 @@
         android:id="@+id/user_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
         android:fontFamily="sans-serif"
         android:padding="8dp"
-        android:layout_marginBottom="20dp"
-        tools:text="Email"
         android:textAlignment="viewStart"
         android:textColor="@color/checkBoxColor"
         android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/image"
         app:layout_constraintBottom_toTopOf="@+id/confirm_button"
-        app:layout_constraintStart_toEndOf="@+id/image" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Email" />
 
     <TextView
         android:id="@+id/cancel_button"

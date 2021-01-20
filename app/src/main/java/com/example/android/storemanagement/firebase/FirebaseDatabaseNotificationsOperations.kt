@@ -1,6 +1,5 @@
 package com.example.android.storemanagement.firebase
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
@@ -54,19 +53,17 @@ object FirebaseDatabaseNotificationsOperations {
         }
     }
 
-    fun areThereNewNotifications(completionHandler: (areAllNotificationsSeen: Boolean) -> Unit) {
+    fun areAllNotificationsSeen(completionHandler: (areAllNotificationsSeen: Boolean) -> Unit) {
         val user: FirebaseUser? = Firebase.auth.currentUser
         if (user != null) {
-            val uniqueId: String = user?.uid!!
+            val uniqueId: String = user.uid
             val ref = FirebaseDatabase.getInstance().getReference("Notifications")
             val notificationsQuery: Query = ref.child(uniqueId)
-            Log.d("TinaNotifications", "")
             notificationsQuery.addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
                     val firebaseNotification = dataSnapshot.getValue(FirebaseNotification::class.java)
                     if (firebaseNotification != null && firebaseNotification.seen == false.toString()) {
                         completionHandler(false)
-                        Log.d("TinaNotifications", "areAllNotSeen false")
                     }
                 }
 
@@ -74,7 +71,6 @@ object FirebaseDatabaseNotificationsOperations {
                     val firebaseNotification = dataSnapshot.getValue(FirebaseNotification::class.java)
                     if (firebaseNotification != null && firebaseNotification.seen == false.toString()) {
                         completionHandler(false)
-                        Log.d("TinaNotifications", "areAllNotSeen false")
                     }
                 }
 

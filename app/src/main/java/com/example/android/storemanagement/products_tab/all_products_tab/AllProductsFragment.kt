@@ -155,14 +155,16 @@ class AllProductsFragment : ProductsTabFragment() {
     private fun filterByAscendingPrice() {
         if (user != null) {
             val ascendingPriceComparator = compareBy<FirebaseProduct> { it.price.toFloat() }
-            val sortedOrderContentsList = firebaseProductsList.sortedWith(ascendingPriceComparator)
+            val priceOverchargeComparator = ascendingPriceComparator.thenBy { it.overcharge }
+            val sortedOrderContentsList = firebaseProductsList.sortedWith(priceOverchargeComparator)
             setupRecyclerView(firebaseProducts = sortedOrderContentsList)
         } else {
             viewModel.allProducts.observe(this, Observer { products ->
                 // Update the cached copy of the words in the adapter.
                 products?.let {
                     val ascendingPriceComparator = compareByDescending<Product> { it.price }
-                    val sortedProductList = products.sortedWith(ascendingPriceComparator)
+                    val priceOverchargeComparator = ascendingPriceComparator.thenBy { it.overcharge }
+                    val sortedProductList = products.sortedWith(priceOverchargeComparator)
                     setupRecyclerView(products = sortedProductList)
                 }
             })
@@ -172,14 +174,16 @@ class AllProductsFragment : ProductsTabFragment() {
     private fun filterByDescendingPrice() {
         if (user != null) {
             val descendingPriceComparator = compareByDescending<FirebaseProduct> { it.price.toFloat() }
-            val sortedOrderContentsList = firebaseProductsList.sortedWith(descendingPriceComparator)
+            val priceOverchargeComparator = descendingPriceComparator.thenByDescending { it.overcharge }
+            val sortedOrderContentsList = firebaseProductsList.sortedWith(priceOverchargeComparator)
             setupRecyclerView(firebaseProducts = sortedOrderContentsList)
         } else {
             viewModel.allProducts.observe(this, Observer { products ->
                 // Update the cached copy of the words in the adapter.
                 products?.let {
                     val descendingPriceComparator = compareByDescending<Product> { it.price }
-                    val sortedProductList = products.sortedWith(descendingPriceComparator)
+                    val priceOverchargeComparator = descendingPriceComparator.thenByDescending { it.overcharge }
+                    val sortedProductList = products.sortedWith(priceOverchargeComparator)
                     setupRecyclerView(products = sortedProductList)
                 }
             })

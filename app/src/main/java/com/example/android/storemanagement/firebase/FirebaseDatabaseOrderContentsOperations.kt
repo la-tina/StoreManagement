@@ -3,7 +3,6 @@ package com.example.android.storemanagement.firebase
 import android.util.Log
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOrdersOperations.getFirebaseOrder
 import com.example.android.storemanagement.orders_tab.OrderStatus
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
@@ -54,7 +53,7 @@ object FirebaseDatabaseOrderContentsOperations {
         return fbOrderContent
     }
 
-    fun checkForFirebaseOrderContentsInternal(
+    fun checkForAvailableOrderContentsInternal(
         userId: String,
         productsUserId: String,
         barcode: String,
@@ -70,7 +69,10 @@ object FirebaseDatabaseOrderContentsOperations {
                     val firebaseOrderContent: FirebaseOrderContent? =
                         dataSnapshot.getValue(FirebaseOrderContent::class.java)
 
-                    if (firebaseOrderContent != null && firebaseOrderContent.userId == productsUserId && firebaseOrderContent.productBarcode == barcode) {
+                    if (firebaseOrderContent != null
+                        && firebaseOrderContent.userId == productsUserId
+                        && firebaseOrderContent.productBarcode == barcode
+                    ) {
                         val orderContent = FirebaseOrderContent(
                             firebaseOrderContent.productBarcode,
                             firebaseOrderContent.productName,
@@ -132,12 +134,10 @@ object FirebaseDatabaseOrderContentsOperations {
         val ref = FirebaseDatabase.getInstance().getReference("Users")
         ref.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
-//                val user = dataSnapshot.children
-//                for (user in users) {
                 val firebaseUser = dataSnapshot.getValue(FirebaseUserInternal::class.java)
                 if (firebaseUser != null) {
                     if (checkIfContentsExist) {
-                        checkForFirebaseOrderContentsInternal(
+                        checkForAvailableOrderContentsInternal(
                             firebaseUser.id,
                             productsUserId,
                             barcode
@@ -154,7 +154,6 @@ object FirebaseDatabaseOrderContentsOperations {
                         }
                     }
                 }
-//                }
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot, prevChildKey: String?) {}
@@ -280,9 +279,7 @@ object FirebaseDatabaseOrderContentsOperations {
 
         orderContentQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                for (appleSnapshot in dataSnapshot.children) {
                 dataSnapshot.ref.removeValue()
-//                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -301,9 +298,7 @@ object FirebaseDatabaseOrderContentsOperations {
 
         orderContentsQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                for (dataSnapshot in dataSnapshot.children) {
                 dataSnapshot.ref.child("quantity").setValue(quantity)
-//                }
             }
 
             override fun onCancelled(error: DatabaseError) {}

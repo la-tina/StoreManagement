@@ -25,7 +25,7 @@ import com.example.android.storemanagement.create_product.EditProductFragment
 import com.example.android.storemanagement.create_product.InfoProductFragment.Companion.CAMERA_PERMISSION_CODE
 import com.example.android.storemanagement.edit_order.EditOrderFragment
 import com.example.android.storemanagement.edit_order.ViewOrderFragment
-import com.example.android.storemanagement.firebase.FirebaseDatabaseNotificationsOperations.areThereNewNotifications
+import com.example.android.storemanagement.firebase.FirebaseDatabaseNotificationsOperations.areAllNotificationsSeen
 import com.example.android.storemanagement.firebase.FirebaseDatabaseUsersOperations.getCurrentFirebaseUserInternal
 import com.example.android.storemanagement.firebase.FirebaseOrder
 import com.example.android.storemanagement.firebase.FirebaseProduct
@@ -174,7 +174,6 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
         super.onResume()
         hideKeyboard(this as Activity)
         navigation_view?.setNavigationItemSelectedListener(this)
-
         toolbarMain?.setNavigationOnClickListener {
             openCloseNavigationDrawer()
         }
@@ -193,7 +192,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
             accountType.isEnabled = false
             getCurrentFirebaseUserInternal { fbUserInternal ->
 //                val firstLetter: String = fbUserInternal.accountType.substring(0, 1)
-//                val accountTypeText = firstLetter + fbUserInternal.accountType.substring(1).toLowerCase(Locale.ROOT)
+//                val accountTypeText = csfirstLetter + fbUserInternal.accountType.substring(1).toLowerCase(Locale.ROOT)
                 accountType.title = fbUserInternal.accountType
             }
             val logInLogOutItem = menu.findItem(R.id.action_log_in)
@@ -207,7 +206,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
     }
 
     private fun setNotificationIcon() {
-        areThereNewNotifications { areAllNotificationsSeen ->
+        areAllNotificationsSeen { areAllNotificationsSeen ->
             Log.d("TinaNotifications", "Main $areAllNotificationsSeen")
             when (areAllNotificationsSeen) {
                 true -> toolbarMain.overflowIcon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_notifications)
@@ -377,7 +376,6 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
         tabNumber: Int,
         product: Product?,
         firebaseProduct: FirebaseProduct?,
-        order: Order?,
         firebaseOrder: FirebaseOrder?,
         firebaseUser: FirebaseUserInternal?
     ) {
@@ -385,8 +383,8 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
             CREATE_ORDER_TAB -> openCreateOrderTab(firebaseUser!!)
             CREATE_PRODUCT_TAB -> openCreateProductTab()
             EDIT_PRODUCT_TAB -> openEditProductTab(product, firebaseProduct)
-            EDIT_ORDER_TAB -> openEditOrderTab(firebaseUser!!, order, firebaseOrder)
-            VIEW_ORDER_TAB -> openViewOrderTab(order, firebaseOrder)
+            EDIT_ORDER_TAB -> openEditOrderTab(firebaseUser!!, firebaseOrder)
+            VIEW_ORDER_TAB -> openViewOrderTab(firebaseOrder)
             USERS_TAB -> openUsersTab()
         }
     }
@@ -477,10 +475,10 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
         openCreateTab(fragment, editProductTag)
     }
 
-    private fun openEditOrderTab(firebaseUser: FirebaseUserInternal, order: Order?, firebaseOrder: FirebaseOrder?) {
+    private fun openEditOrderTab(firebaseUser: FirebaseUserInternal, firebaseOrder: FirebaseOrder?) {
         val previouslyAddedEditOrderFragment = supportFragmentManager.findFragmentByTag(editOrderTag)
         val fragment = (previouslyAddedEditOrderFragment as? EditOrderFragment) ?: EditOrderFragment()
-        if (order == null) {
+        if (firebaseOrder != null) {
             val bundle = Bundle().apply {
                 putSerializable(ORDER_KEY, firebaseOrder)
                 putSerializable(USER_KEY, firebaseUser)
@@ -491,14 +489,11 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
         openCreateTab(fragment, editOrderTag)
     }
 
-    private fun openViewOrderTab(order: Order?, firebaseOrder: FirebaseOrder?) {
+    private fun openViewOrderTab(firebaseOrder: FirebaseOrder?) {
         val previouslyAddedViewOrderFragment = supportFragmentManager.findFragmentByTag(viewOrderTag)
         val fragment = (previouslyAddedViewOrderFragment as? ViewOrderFragment) ?: ViewOrderFragment()
-        if (order == null) {
+        if (firebaseOrder != null) {
             val bundle = Bundle().apply { putSerializable(VIEW_ORDER_KEY, firebaseOrder) }
-            fragment.arguments = bundle
-        } else {
-            val bundle = Bundle().apply { putSerializable(VIEW_ORDER_KEY, order) }
             fragment.arguments = bundle
         }
 
@@ -567,7 +562,6 @@ interface OnNavigationChangedListener {
         tabNumber: Int,
         product: Product? = null,
         firebaseProduct: FirebaseProduct? = null,
-        order: Order? = null,
         firebaseOrder: FirebaseOrder? = null,
         firebaseUser: FirebaseUserInternal? = null
     )

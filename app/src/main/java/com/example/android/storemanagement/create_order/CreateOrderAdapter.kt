@@ -47,13 +47,10 @@ class CreateOrderAdapter(
     // Binds each product in the list to a view
     override fun onBindViewHolder(holder: CreateOrderHolder, position: Int) {
         val currentProduct = firebaseProducts[position]
-
         holder.productName.text = currentProduct.name
         val overcharge = if (currentProduct.overcharge.isBlank()) 0F else currentProduct.overcharge.toFloat()
         holder.productPrice.text = (currentProduct.price.toFloat() + overcharge).toString()
         holder.inStockProductQuantity.visibility = View.VISIBLE
-//        firebaseUserProducts.forEach { product ->
-//            if (currentProduct.barcode == currentFirebaseProductInOrder.productBarcode) {
         var finalProductAvailableQuantity = currentProduct.quantity.toInt()
         val orderContents = mutableListOf<FirebaseOrderContent>()
         onInStockQuantityCalculated(currentProduct.barcode, holder, finalProductAvailableQuantity)
@@ -134,11 +131,10 @@ class CreateOrderAdapter(
                         setOrderButtonEnabled(shouldEnableOrderButton)
 
                         updateQuantityForProduct(
-                            holder.productName.text.toString(),
+                            barcode,
                             quantity.toInt()
                         )
                         updateFinalPriceAction(getPrice())
-                        Log.d("TinaOrder", "afterTextChanged quantity " + quantity.toInt())
                     }
                 }
             }
@@ -156,7 +152,7 @@ class CreateOrderAdapter(
                 if (isQuantityCorrectOrder(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
                     holder.productQuantity.text?.toString()?.let { quantity ->
                         updateQuantityForProduct(
-                            holder.productName.text.toString(),
+                            barcode,
                             quantity.toInt()
                         )
                         updateFinalPriceAction(getPrice())
@@ -177,7 +173,7 @@ class CreateOrderAdapter(
 
                 holder.productQuantity.text?.toString()?.let { quantity ->
                     val quantityEdited: Int = if (quantity.isEmpty()) 0 else quantity.toInt()
-                    updateQuantityForProduct(holder.productName.text.toString(), quantityEdited)
+                    updateQuantityForProduct(barcode, quantityEdited)
                     updateFinalPriceAction(getPrice())
                     Log.d("Tina", "quantity onTextChanged$quantityEdited")
                 }

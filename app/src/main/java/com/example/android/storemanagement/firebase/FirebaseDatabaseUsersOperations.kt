@@ -60,10 +60,10 @@ object FirebaseDatabaseUsersOperations {
         userQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val users = dataSnapshot.children
-                for (user in users) {
-                    val firebaseUser = user.getValue(FirebaseUserInternal::class.java)
+                for (fbUser in users) {
+                    val firebaseUser = fbUser.getValue(FirebaseUserInternal::class.java)
                     if (firebaseUser?.id == uniqueId) {
-                        completionHandler(firebaseUser!!)
+                        completionHandler(firebaseUser)
                     }
                 }
             }

@@ -20,6 +20,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.android.storemanagement.BARCODE_ACTIVITY_REQUEST_CODE
 import com.example.android.storemanagement.BARCODE_KEY
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.Utils.PRODUCT_NAME
+import com.example.android.storemanagement.Utils.PRODUCT_OVERCHARGE
+import com.example.android.storemanagement.Utils.PRODUCT_PERCENTAGE
+import com.example.android.storemanagement.Utils.PRODUCT_PRICE
 import com.example.android.storemanagement.create_product.CreateProductFieldValidator.areAllFieldsValid
 import com.example.android.storemanagement.create_product.CreateProductFieldValidator.isFieldValid
 import com.example.android.storemanagement.products_database.ProductViewModel
@@ -52,6 +56,7 @@ abstract class InfoProductFragment : Fragment() {
         const val KEY_PRODUCT_NAME_VALUE = "productNameValue"
         const val KEY_PRODUCT_PRICE_VALUE = "productPriceValue"
         const val KEY_PRODUCT_OVERCHARGE_VALUE = "productOverchargeValue"
+        const val KEY_PRODUCT_OVERCHARGE_PERCENTAGE_VALUE = "productOverchargePercentageValue"
         const val KEY_PRODUCT_BARCODE_VALUE = "productBarcodeValue"
     }
 
@@ -65,6 +70,7 @@ abstract class InfoProductFragment : Fragment() {
     private var savedProductPrice: String = ""
     private var savedProductOvercharge: String = ""
     private var savedProductBarcode: String = ""
+    private var savedProductOverchargePercentage: String = ""
 
     abstract fun isBarcodeDuplicated(barcode: String): Boolean
 
@@ -96,6 +102,8 @@ abstract class InfoProductFragment : Fragment() {
                 savedInstanceState.getCharSequence(KEY_PRODUCT_PRICE_VALUE)?.toString() ?: ""
             savedProductOvercharge =
                 savedInstanceState.getCharSequence(KEY_PRODUCT_OVERCHARGE_VALUE)?.toString() ?: ""
+            savedProductOverchargePercentage =
+                savedInstanceState.getCharSequence(KEY_PRODUCT_OVERCHARGE_PERCENTAGE_VALUE)?.toString() ?: ""
             savedProductBarcode =
                 savedInstanceState.getCharSequence(KEY_PRODUCT_BARCODE_VALUE)?.toString() ?: ""
         }
@@ -115,6 +123,7 @@ abstract class InfoProductFragment : Fragment() {
         product_name.setText(savedProductName)
         product_price.setText(savedProductPrice)
         product_overcharge.setText(savedProductOvercharge)
+        product_overcharge_percentage.setText(savedProductOverchargePercentage)
         product_barcode.setText(savedProductBarcode)
 
         overcharge_percentage_text.isErrorEnabled = false
@@ -223,6 +232,7 @@ abstract class InfoProductFragment : Fragment() {
         outState.putCharSequence(KEY_PRODUCT_NAME_VALUE, product_name.text)
         outState.putCharSequence(KEY_PRODUCT_PRICE_VALUE, product_price.text)
         outState.putCharSequence(KEY_PRODUCT_OVERCHARGE_VALUE, product_overcharge.text)
+        outState.putCharSequence(KEY_PRODUCT_OVERCHARGE_PERCENTAGE_VALUE, product_overcharge_percentage.text)
         outState.putCharSequence(KEY_PRODUCT_BARCODE_VALUE, product_barcode.text)
     }
 
@@ -231,6 +241,10 @@ abstract class InfoProductFragment : Fragment() {
         data?.getStringExtra(BARCODE_KEY)?.let { scannedBarcode ->
             savedProductBarcode = scannedBarcode
         }
+        savedProductName = data?.getStringExtra(PRODUCT_NAME).toString()
+        savedProductPrice = data?.getStringExtra(PRODUCT_PRICE).toString()
+        savedProductOvercharge = data?.getStringExtra(PRODUCT_OVERCHARGE).toString()
+        savedProductOverchargePercentage = data?.getStringExtra(PRODUCT_PERCENTAGE).toString()
     }
 
     private fun onBarcodeButtonPressed() {
@@ -245,6 +259,10 @@ abstract class InfoProductFragment : Fragment() {
             )
         } else {
             val intent = Intent(requireContext(), BarcodeScanningActivity()::class.java)
+            intent.putExtra(PRODUCT_NAME, product_name.text.toString())
+            intent.putExtra(PRODUCT_PRICE, product_price.text.toString())
+            intent.putExtra(PRODUCT_OVERCHARGE, product_overcharge.text.toString())
+            intent.putExtra(PRODUCT_PERCENTAGE, product_overcharge_percentage.text.toString())
             startActivityForResult(
                 intent,
                 BARCODE_ACTIVITY_REQUEST_CODE
