@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isEditOrderQuantityCorrect
-import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrectOrder
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrectForOrder
 import com.example.android.storemanagement.create_order.CreateOrderHolder
 import com.example.android.storemanagement.firebase.ChildAction
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOrderContentsOperations.getFirebaseUserOrderContents
@@ -150,19 +150,16 @@ class EditOrderAdapter(
                 shouldEnableEditButton = isEditOrderQuantityCorrect(
                     holder.productQuantity,
                     holder.productQuantityLayout,
-                    finalProductAvailableQuantity
-                ) && enabledProductsWithErrors.none { !it.value }
+                    finalProductAvailableQuantity) && enabledProductsWithErrors.none { !it.value }
                 setOrderButtonEnabled(shouldEnableEditButton)
 
-                if (isQuantityCorrectOrder(
+                if (isQuantityCorrectForOrder(
                         holder.productQuantity,
                         holder.productQuantityLayout,
-                        finalProductAvailableQuantity
-                    )
-                ) {
-                    val quantity: Int = if (holder.productQuantity.text.toString()
-                            .isBlank()
-                    ) 0 else holder.productQuantity.text.toString().toInt()
+                        finalProductAvailableQuantity)) {
+                    val quantity: Int =
+                        if (holder.productQuantity.text.toString().isBlank()) 0
+                        else holder.productQuantity.text.toString().toInt()
                     updateQuantityForProduct(barcode, quantity)
                     updateFinalPriceAction(getFinalPrice())
                 }
@@ -179,7 +176,7 @@ class EditOrderAdapter(
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 setOrderButtonEnabled(
-                    isQuantityCorrectOrder(
+                    isQuantityCorrectForOrder(
                         holder.productQuantity,
                         holder.productQuantityLayout,
                         finalProductAvailableQuantity
@@ -198,7 +195,7 @@ class EditOrderAdapter(
         finalProductAvailableQuantity: Int
     ) {
         when {
-            isQuantityCorrectOrder(
+            isQuantityCorrectForOrder(
                 holder.productQuantity,
                 holder.productQuantityLayout,
                 finalProductAvailableQuantity

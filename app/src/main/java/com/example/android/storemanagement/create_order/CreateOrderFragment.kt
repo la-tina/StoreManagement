@@ -1,6 +1,7 @@
 package com.example.android.storemanagement.create_order
 
 
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,18 +33,19 @@ open class CreateOrderFragment : InfoOrderFragment() {
 
     private lateinit var orderContentViewModel: OrderContentViewModel
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Toast.makeText(context, "Enter at least 1 quantity to make an order.", Toast.LENGTH_SHORT).show()
+    }
+
     override fun onStart() {
         super.onStart()
         firebaseUser = arguments?.getSerializable(USER_KEY) as FirebaseUserInternal
-        Toast.makeText(context, "Enter at least 1 quantity to make an order.", Toast.LENGTH_SHORT)
-            .show()
         finalPrice = 0F
         final_price.text = "0"
         info_text?.text = context?.getString(R.string.create_order_info)
 
         button_add_order.setOnClickListener {
-//            setupRecyclerView()
-//            if (createOrdersAdapter?.shouldEnableOrderButton) {
             val firebaseOrder = FirebaseOrder(
                 finalPrice.toString(),
                 getFormattedDate(),
@@ -53,7 +55,6 @@ open class CreateOrderFragment : InfoOrderFragment() {
             )
             val fbOrderId = setFirebaseOrderData(firebaseOrder)
             updateFirebaseQuantities(fbOrderId)
-//            }
         }
     }
 
@@ -93,13 +94,11 @@ open class CreateOrderFragment : InfoOrderFragment() {
         orderId: Long,
         currentQuantity: Int
     ) {
-
         val currentBarcode = productViewModel.allProducts.value
             ?.first { product -> product.name == productName }!!.barcode
 
         val orderContent = OrderContent(currentBarcode, orderId, currentQuantity)
         orderContentViewModel.insert(orderContent)
-//        orderContentViewModel.getProductsInOrder(orderId)
     }
 
     private fun createFirebaseOrderContent(
@@ -122,20 +121,6 @@ open class CreateOrderFragment : InfoOrderFragment() {
         setFirebaseOrderContentData(firebaseOrderContent, fbOrderId)
     }
 
-    private fun updateQuantity(productName: String, quantity: Int) {
-        val currentQuantity = productViewModel.allProducts.value
-            ?.first { product -> product.name == productName }?.quantity
-
-        Log.v("Room", "Updating current quantity for $productName $currentQuantity")
-
-        val finalQuantity = if (currentQuantity != null) quantity + currentQuantity else quantity
-
-        Log.v("Room", "Updating final quantity for $productName $finalQuantity")
-
-//        productViewModel.updateQuantity(productName, finalQuantity)
-        Log.d("Tina", "updated quantity for " + productName + "is " + quantity)
-    }
-
     override fun setupRecyclerView() {
         create_order_recycler_view.layoutManager =
             LinearLayoutManager(requireContext())
@@ -148,10 +133,6 @@ open class CreateOrderFragment : InfoOrderFragment() {
         )
         create_order_recycler_view.adapter = createOrdersAdapter
 
-        //ordersViewModel = ViewModelProviders.of(this).get(OrderViewModel::class.java)
-        // Observer on the LiveData
-        // The onChanged() method fires when the observed data changes and the activity is
-        // in the foreground.
         createOrdersAdapter.setProducts(firebaseProductsList)
         setupEmptyView(empty_view_create_order, create_order_recycler_view)
     }

@@ -8,7 +8,7 @@ object CreateProductFieldValidator {
     private var MESSAGE_DUPLICATED_BARCODE = "A product with the same barcode already exists."
     private var MESSAGE_DUPLICATED_NAME = "A product with the same name already exists."
     private const val MESSAGE_EMPTY_BARCODE = "The barcode cannot be empty."
-    private const val MESSAGE_PRICE_MAX_VALUE = "Тhe maximum allowed price is 100lv."
+    private const val MESSAGE_PRICE_MAX_VALUE = "Тhe maximum allowed price is 1000lv."
     private const val MESSAGE_INVALID_PRICE = "Invalid price."
     private const val MESSAGE_OVERCHARGE_MAX_VALUE = "Тhe maximum allowed overcharge is 100lv."
     private const val MESSAGE_INVALID_OVERCHARGE = "Invalid overcharge."

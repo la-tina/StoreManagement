@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
-import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrectStore
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrectForStore
 import com.example.android.storemanagement.create_order.CreateOrderHolder
 import com.example.android.storemanagement.firebase.ChildAction
 import com.example.android.storemanagement.firebase.FirebaseDatabaseOrderContentsOperations
@@ -157,7 +157,7 @@ class StoreAdapter(
 
         setErroneousField(holder, barcode)
         setStoreButtonEnabled(
-            isQuantityCorrectStore(
+            isQuantityCorrectForStore(
                 holder.productQuantity,
                 holder.productQuantityLayout
             ) && enabledProducts.none { !it.value }
@@ -169,7 +169,7 @@ class StoreAdapter(
         barcode: String
     ) {
         when {
-            isQuantityCorrectStore(
+            isQuantityCorrectForStore(
                 holder.productQuantity,
                 holder.productQuantityLayout
             ) -> {
@@ -193,7 +193,7 @@ class StoreAdapter(
         object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 setErroneousField(holder, barcode)
-                val shouldEnableOrderButton = isQuantityCorrectStore(
+                val shouldEnableOrderButton = isQuantityCorrectForStore(
                     holder.productQuantity,
                     holder.productQuantityLayout
                 ) && enabledProducts.none { !it.value }
@@ -219,7 +219,7 @@ class StoreAdapter(
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                val shouldEnableOrderButton = isQuantityCorrectStore(
+                val shouldEnableOrderButton = isQuantityCorrectForStore(
                     holder.productQuantity,
                     holder.productQuantityLayout
                 ) && enabledProducts.none { !it.value }

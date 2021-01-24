@@ -87,12 +87,18 @@ class OrdersAdapter(
         PopupMenu(context, view).apply {
             inflate(R.menu.context_menu)
 
+            if (firebaseOrder?.orderStatus == OrderStatus.PENDING.toString()) {
+                menu.findItem(R.id.delete).isVisible = true
+            }
+            if (firebaseOrder?.orderStatus == OrderStatus.CONFIRMED.toString()) {
+                menu.findItem(R.id.delivered).isVisible = true
+            }
             if (firebaseOrder?.orderStatus == OrderStatus.ORDERED.toString()
                 || firebaseOrder?.orderStatus == OrderStatus.CONFIRMED.toString()
             ) {
                 menu.findItem(R.id.order).isVisible = false
                 menu.findItem(R.id.edit).isVisible = false
-                menu.findItem(R.id.delete).isVisible = true
+                menu.findItem(R.id.delete).isVisible = false
             }
 
             setOnMenuItemClickListener { item: MenuItem? ->

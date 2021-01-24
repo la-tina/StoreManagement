@@ -223,7 +223,6 @@
             android:background="@drawable/custom_button"
             android:enabled="false"
             android:gravity="center"
-            android:textColor="@color/colorAccent"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

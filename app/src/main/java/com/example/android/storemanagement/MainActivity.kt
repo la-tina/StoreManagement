@@ -95,9 +95,6 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
             textView.setTextColor(ContextCompat.getColor(this, R.color.darkBarColor))
         }
 
-//        deleteDatabase("Product_database")
-//        deleteDatabase("Order_database")
-
         Stetho.initializeWithDefaults(applicationContext)
 
         OkHttpClient.Builder()

@@ -128,7 +128,7 @@ object FirebaseDatabaseOrderContentsOperations {
     fun getFirebaseUserOrderContents(
         productsUserId: String,
         barcode: String,
-        checkIfContentsExist: Boolean = false,
+        doContentsExist: Boolean = false,
         completionHandler: (orderContent: FirebaseOrderContent, childAction: ChildAction) -> Unit
     ) {
         val ref = FirebaseDatabase.getInstance().getReference("Users")
@@ -136,20 +136,14 @@ object FirebaseDatabaseOrderContentsOperations {
             override fun onChildAdded(dataSnapshot: DataSnapshot, prevChildKey: String?) {
                 val firebaseUser = dataSnapshot.getValue(FirebaseUserInternal::class.java)
                 if (firebaseUser != null) {
-                    if (checkIfContentsExist) {
-                        checkForAvailableOrderContentsInternal(
-                            firebaseUser.id,
-                            productsUserId,
-                            barcode
-                        ) { orderContent, childAction ->
+                    if (doContentsExist) {
+                        checkForAvailableOrderContentsInternal(firebaseUser.id, productsUserId, barcode)
+                        { orderContent, childAction ->
                             completionHandler(orderContent, childAction)
                         }
                     } else {
-                        getFirebaseUserOrderContentsInternal(
-                            firebaseUser.id,
-                            productsUserId,
-                            barcode
-                        ) { orderContent, childAction ->
+                        getFirebaseUserOrderContentsInternal(firebaseUser.id, productsUserId, barcode)
+                        { orderContent, childAction ->
                             completionHandler(orderContent, childAction)
                         }
                     }

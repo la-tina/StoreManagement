@@ -11,6 +11,7 @@ object Utils {
     const val PRODUCT_PRICE = "productPrice"
     const val PRODUCT_OVERCHARGE = "productOvercharge"
     const val PRODUCT_PERCENTAGE = "productPercentage"
+    const val PRODUCT_BARCODE = "productBarcode"
 
     fun getFormattedDate(): String {
         val simpleDateFormat = SimpleDateFormat("dd/M/yyyy HH:mm:ss", Locale.ROOT)

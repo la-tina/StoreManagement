@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -13,13 +14,16 @@ import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.android.storemanagement.BARCODE_ACTIVITY_REQUEST_CODE
 import com.example.android.storemanagement.BARCODE_KEY
 import com.example.android.storemanagement.R
+import com.example.android.storemanagement.Utils.PRODUCT_BARCODE
 import com.example.android.storemanagement.Utils.PRODUCT_NAME
 import com.example.android.storemanagement.Utils.PRODUCT_OVERCHARGE
 import com.example.android.storemanagement.Utils.PRODUCT_PERCENTAGE
@@ -27,6 +31,7 @@ import com.example.android.storemanagement.Utils.PRODUCT_PRICE
 import com.example.android.storemanagement.create_product.CreateProductFieldValidator.areAllFieldsValid
 import com.example.android.storemanagement.create_product.CreateProductFieldValidator.isFieldValid
 import com.example.android.storemanagement.products_database.ProductViewModel
+import com.facebook.FacebookSdk.getApplicationContext
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -52,7 +57,7 @@ abstract class InfoProductFragment : Fragment() {
 
     companion object {
         const val CAMERA_PERMISSION_CODE = 0
-        const val MAX_PRICE = 100
+        const val MAX_PRICE = 1000
         const val KEY_PRODUCT_NAME_VALUE = "productNameValue"
         const val KEY_PRODUCT_PRICE_VALUE = "productPriceValue"
         const val KEY_PRODUCT_OVERCHARGE_VALUE = "productOverchargeValue"
@@ -161,6 +166,7 @@ abstract class InfoProductFragment : Fragment() {
         hideKeyboard(activity as Activity)
 
         user = Firebase.auth.currentUser
+
         button_add_product.setOnClickListener {
             onButtonClicked(
                 product_name.text,
@@ -229,11 +235,11 @@ abstract class InfoProductFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putCharSequence(KEY_PRODUCT_NAME_VALUE, product_name.text)
-        outState.putCharSequence(KEY_PRODUCT_PRICE_VALUE, product_price.text)
-        outState.putCharSequence(KEY_PRODUCT_OVERCHARGE_VALUE, product_overcharge.text)
-        outState.putCharSequence(KEY_PRODUCT_OVERCHARGE_PERCENTAGE_VALUE, product_overcharge_percentage.text)
-        outState.putCharSequence(KEY_PRODUCT_BARCODE_VALUE, product_barcode.text)
+        outState.putCharSequence(KEY_PRODUCT_NAME_VALUE, product_name.text.toString())
+        outState.putCharSequence(KEY_PRODUCT_PRICE_VALUE, product_price.text.toString())
+        outState.putCharSequence(KEY_PRODUCT_OVERCHARGE_VALUE, product_overcharge.text.toString())
+        outState.putCharSequence(KEY_PRODUCT_OVERCHARGE_PERCENTAGE_VALUE, product_overcharge_percentage.text.toString())
+        outState.putCharSequence(KEY_PRODUCT_BARCODE_VALUE, product_barcode.text.toString())
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -241,10 +247,14 @@ abstract class InfoProductFragment : Fragment() {
         data?.getStringExtra(BARCODE_KEY)?.let { scannedBarcode ->
             savedProductBarcode = scannedBarcode
         }
-        savedProductName = data?.getStringExtra(PRODUCT_NAME).toString()
-        savedProductPrice = data?.getStringExtra(PRODUCT_PRICE).toString()
-        savedProductOvercharge = data?.getStringExtra(PRODUCT_OVERCHARGE).toString()
-        savedProductOverchargePercentage = data?.getStringExtra(PRODUCT_PERCENTAGE).toString()
+        val preferences = activity?.getSharedPreferences("PREFERENCE", AppCompatActivity.MODE_PRIVATE)
+        if (data?.getStringExtra(BARCODE_KEY) == null) {
+            savedProductBarcode = preferences?.getString(PRODUCT_BARCODE, "") ?: ""
+        }
+        savedProductName = preferences?.getString(PRODUCT_NAME, "") ?: ""
+        savedProductPrice = preferences?.getString(PRODUCT_PRICE, "") ?: ""
+        savedProductOvercharge = preferences?.getString(PRODUCT_OVERCHARGE, "") ?: ""
+        savedProductOverchargePercentage = preferences?.getString(PRODUCT_PERCENTAGE, "") ?: ""
     }
 
     private fun onBarcodeButtonPressed() {
@@ -259,10 +269,14 @@ abstract class InfoProductFragment : Fragment() {
             )
         } else {
             val intent = Intent(requireContext(), BarcodeScanningActivity()::class.java)
-            intent.putExtra(PRODUCT_NAME, product_name.text.toString())
-            intent.putExtra(PRODUCT_PRICE, product_price.text.toString())
-            intent.putExtra(PRODUCT_OVERCHARGE, product_overcharge.text.toString())
-            intent.putExtra(PRODUCT_PERCENTAGE, product_overcharge_percentage.text.toString())
+            activity?.getSharedPreferences("PREFERENCE", AppCompatActivity.MODE_PRIVATE)
+                ?.edit()
+                ?.putString(PRODUCT_NAME, product_name.text.toString())
+                ?.putString(PRODUCT_PRICE, product_price.text.toString())
+                ?.putString(PRODUCT_BARCODE, product_barcode.text.toString())
+                ?.putString(PRODUCT_OVERCHARGE, product_overcharge.text.toString())
+                ?.putString(PRODUCT_PERCENTAGE, product_overcharge_percentage.text.toString())
+                ?.apply()
             startActivityForResult(
                 intent,
                 BARCODE_ACTIVITY_REQUEST_CODE

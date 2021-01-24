@@ -46,10 +46,6 @@ class BarcodeScanningActivity : AppCompatActivity(), ZBarScannerView.ResultHandl
 
         val returnIntent = Intent()
         returnIntent.putExtra(BARCODE_KEY, result?.contents)
-        returnIntent.putExtra(PRODUCT_NAME, intent.getStringExtra("productName"))
-        returnIntent.putExtra(PRODUCT_PRICE, intent.getStringExtra("productPrice"))
-        returnIntent.putExtra(PRODUCT_OVERCHARGE, intent.getStringExtra("productOvercharge"))
-        returnIntent.putExtra(PRODUCT_PERCENTAGE, intent.getStringExtra("productPercentage"))
         setResult(Activity.RESULT_OK, returnIntent)
         finish()
     }

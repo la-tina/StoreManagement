@@ -21,7 +21,6 @@
         android:text="@string/store_management"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

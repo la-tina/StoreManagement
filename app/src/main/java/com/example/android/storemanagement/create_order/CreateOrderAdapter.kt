@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityAboveLimit
-import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrectOrder
+import com.example.android.storemanagement.create_order.CreateOrderFieldValidator.isQuantityCorrectForOrder
 import com.example.android.storemanagement.firebase.*
 import kotlinx.android.synthetic.main.create_order_item.view.*
 
@@ -105,7 +105,7 @@ class CreateOrderAdapter(
 
         setErroneousField(barcode, holder, finalProductAvailableQuantity)
         setOrderButtonEnabled(
-            isQuantityCorrectOrder(
+            isQuantityCorrectForOrder(
                 holder.productQuantity,
                 holder.productQuantityLayout,
                 finalProductAvailableQuantity
@@ -119,14 +119,14 @@ class CreateOrderAdapter(
                 holder.productQuantity.text?.toString()?.let { quantity ->
                     setErroneousField(barcode, holder, finalProductAvailableQuantity)
 
-                    shouldEnableOrderButton = isQuantityCorrectOrder(
+                    shouldEnableOrderButton = isQuantityCorrectForOrder(
                         holder.productQuantity,
                         holder.productQuantityLayout,
                         finalProductAvailableQuantity
                     ) && enabledProducts.none { !it.value }
                     setOrderButtonEnabled(shouldEnableOrderButton)
 
-                    if (isQuantityCorrectOrder(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
+                    if (isQuantityCorrectForOrder(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
                         onQuantityChanged(barcode, shouldEnableOrderButton)
                         setOrderButtonEnabled(shouldEnableOrderButton)
 
@@ -149,7 +149,7 @@ class CreateOrderAdapter(
 //                ) && enabledProducts.none { !it.value }
 //                setOrderButtonEnabled(shouldEnableOrderButton)
 
-                if (isQuantityCorrectOrder(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
+                if (isQuantityCorrectForOrder(holder.productQuantity, holder.productQuantityLayout, finalProductAvailableQuantity)) {
                     holder.productQuantity.text?.toString()?.let { quantity ->
                         updateQuantityForProduct(
                             barcode,
@@ -186,7 +186,7 @@ class CreateOrderAdapter(
         finalProductAvailableQuantity: Int
     ) {
         when {
-            isQuantityCorrectOrder(
+            isQuantityCorrectForOrder(
                 holder.productQuantity,
                 holder.productQuantityLayout,
                 finalProductAvailableQuantity

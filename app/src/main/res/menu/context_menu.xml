@@ -5,11 +5,13 @@
         android:title="@string/order" />
     <item
         android:id="@+id/delivered"
-        android:title="@string/delivered" />
+        android:title="@string/delivered"
+        android:visible="false"/>
     <item
         android:id="@+id/edit"
         android:title="@string/edit" />
     <item
         android:id="@+id/delete"
-        android:title="@string/delete" />
+        android:title="@string/delete"
+        android:visible="false" />
 </menu>
