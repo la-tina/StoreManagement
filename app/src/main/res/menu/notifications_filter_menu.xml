@@ -12,11 +12,11 @@
         android:id="@+id/old_new_date"
         android:title="@string/date_old_new" />
     <item
-        android:id="@+id/user_ascending"
-        android:title="@string/user_ascending" />
+        android:id="@+id/orders_by_me"
+        android:title="@string/my_orders" />
     <item
-        android:id="@+id/user_descending"
-        android:title="@string/user_descending" />
+        android:id="@+id/external_orders"
+        android:title="@string/external_orders" />
     <item
         android:id="@+id/ordered"
         android:title="@string/ordered_status" />
@@ -26,4 +26,7 @@
     <item
         android:id="@+id/delivered"
         android:title="@string/delivered_status" />
+    <item
+        android:id="@+id/cancelled"
+        android:title="@string/cancelled_status" />
 </menu>

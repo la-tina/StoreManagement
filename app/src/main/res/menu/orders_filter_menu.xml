@@ -21,6 +21,9 @@
         android:id="@+id/confirmed"
         android:title="@string/confirmed_status" />
     <item
+        android:id="@+id/cancelled"
+        android:title="@string/cancelled_status" />
+    <item
         android:id="@+id/delivered"
         android:title="@string/delivered_status" />
     <item

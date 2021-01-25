@@ -48,7 +48,7 @@
         android:id="@+id/imageViewKiwi"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:padding="10dp"
+        android:padding="13dp"
         android:src="@drawable/kiwi"
         app:layout_constraintBottom_toTopOf="@+id/imageViewRaspberry"
         app:layout_constraintEnd_toStartOf="@+id/imageViewApple" />
@@ -58,7 +58,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/peach"
-        android:padding="5dp"
+        android:padding="10dp"
         app:layout_constraintBottom_toTopOf="@+id/imageViewApple"
         app:layout_constraintEnd_toEndOf="@+id/imageViewApple"
         app:layout_constraintStart_toStartOf="@+id/imageViewApple" />
@@ -89,6 +89,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/apple"
+        android:padding="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -108,7 +109,7 @@
         android:id="@+id/imageViewWatermelon"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:padding="7dp"
+        android:padding="12dp"
         android:src="@drawable/watermelon"
         app:layout_constraintStart_toStartOf="@+id/imageViewPineApple"
         app:layout_constraintTop_toBottomOf="@+id/imageViewPineApple" />
@@ -117,7 +118,7 @@
         android:id="@+id/imageViewOrange"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:padding="7dp"
+        android:padding="9dp"
         android:src="@drawable/lemon"
         app:layout_constraintEnd_toStartOf="@id/imageViewWatermelon"
         app:layout_constraintStart_toEndOf="@id/imageViewAvocado"

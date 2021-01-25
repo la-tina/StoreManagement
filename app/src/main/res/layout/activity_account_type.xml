@@ -21,7 +21,6 @@
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="45sp"
-        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -38,8 +37,8 @@
 
     <ImageView
         android:id="@+id/imageViewW"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
         android:src="@drawable/pineapple"
         app:layout_constraintEnd_toStartOf="@+id/imageViewL"
         app:layout_constraintStart_toEndOf="@+id/imageViewO"
@@ -47,8 +46,8 @@
 
     <ImageView
         android:id="@+id/imageViewL"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="95dp"
+        android:layout_height="95dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="30dp"
         android:src="@drawable/cherry"

@@ -30,7 +30,6 @@ import kotlinx.android.synthetic.main.fragment_notifications.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 
 
 open class NotificationsFragment : Fragment() {
@@ -71,16 +70,18 @@ open class NotificationsFragment : Fragment() {
                     filterByNewDate()
                 R.id.old_new_date ->
                     filterByOldDate()
-                R.id.user_ascending ->
-                    filterByUserAscending()
-                R.id.user_descending ->
-                    filterByUserDescending()
+                R.id.orders_by_me ->
+                    filterByOwnership(true)
+                R.id.external_orders ->
+                    filterByOwnership(false)
                 R.id.ordered ->
-                    filterOrderedOrders()
+                    filterByOrderStatus(OrderStatus.ORDERED)
                 R.id.confirmed ->
-                    filterConfirmedOrders()
+                    filterByOrderStatus(OrderStatus.CONFIRMED)
                 R.id.delivered ->
-                    filterDeliveredOrders()
+                    filterByOrderStatus(OrderStatus.DELIVERED)
+                R.id.cancelled ->
+                    filterByOrderStatus(OrderStatus.CANCELLED)
             }
             true
         })
@@ -109,8 +110,8 @@ open class NotificationsFragment : Fragment() {
         setupRecyclerView(orderedNotifications, firebaseOrders)
     }
 
-    private fun filterOrderedOrders() {
-        val sortedOrdersList = firebaseOrders.filter { it.orderStatus == OrderStatus.ORDERED.toString() }
+    private fun filterByOrderStatus(orderStatus: OrderStatus) {
+        val sortedOrdersList = firebaseOrders.filter { it.orderStatus == orderStatus.toString() }
         val orderedNotifications = mutableListOf<FirebaseNotification>()
         sortedOrdersList.forEach { order ->
             val notification = notifications.first { it.orderId == order.id }
@@ -119,73 +120,13 @@ open class NotificationsFragment : Fragment() {
         setupRecyclerView(orderedNotifications, firebaseOrders)
     }
 
-    private fun filterConfirmedOrders() {
-        val sortedOrdersList = firebaseOrders.filter { it.orderStatus == OrderStatus.CONFIRMED.toString() }
-        val orderedNotifications = mutableListOf<FirebaseNotification>()
-        sortedOrdersList.forEach { order ->
-            val notification = notifications.first { it.orderId == order.id }
-            orderedNotifications.add(notification)
+    private fun filterByOwnership(ownershipTheOrder: Boolean) {
+        val filteredNotifications = mutableListOf<FirebaseNotification>()
+        notifications.forEach { notification ->
+            if (notification.hasTheOrder == ownershipTheOrder.toString())
+                filteredNotifications.add(notification)
         }
-        setupRecyclerView(orderedNotifications, firebaseOrders)
-    }
-
-    private fun filterDeliveredOrders() {
-        val sortedOrdersList = firebaseOrders.filter { it.orderStatus == OrderStatus.DELIVERED.toString() }
-        val orderedNotifications = mutableListOf<FirebaseNotification>()
-        sortedOrdersList.forEach { order ->
-            val notification = notifications.first { it.orderId == order.id }
-            orderedNotifications.add(notification)
-        }
-        setupRecyclerView(orderedNotifications, firebaseOrders)
-    }
-
-    private fun filterByUserAscending() {
-        coroutineScope.launch {
-            val users = mutableListOf<FirebaseUserInternal>()
-            notifications.forEach { notification ->
-//            val userId: String =
-//                if (currentNotification.hasTheOrder == false.toString()) user!!.uid else currentNotification.fromUserId
-                getFirebaseUser(notification.fromUserId) { user ->
-                    Log.d("tinaNotifications", "user 1st " + user)
-                    users.add(user)
-                }
-            }
-            val usersComparator = compareBy<FirebaseUserInternal> { it.email }
-            val sortedUsersList = users.sortedWith(usersComparator)
-            Log.d("tinaNotifications", "users  " + users)
-            val orderedNotifications = mutableListOf<FirebaseNotification>()
-            sortedUsersList.forEach { user ->
-                Log.d("tinaNotifications", "user 2nd " + user)
-                val notifications = notifications.filter { it.fromUserId == user.id }
-                Log.d("tinaNotifications", "notifications " + notifications)
-                notifications.forEach { notification ->
-                    Log.d("tinaNotifications", "notification " + notification)
-//                    if (!notifications.contains(notification)) {
-                    orderedNotifications.add(notification)
-//                    }
-                }
-            }
-            activity?.runOnUiThread { setupRecyclerView(orderedNotifications, firebaseOrders) }
-        }
-    }
-
-    private fun filterByUserDescending() {
-        coroutineScope.launch {
-            val users = mutableListOf<FirebaseUserInternal>()
-            notifications.forEach { notification ->
-                getFirebaseUser(notification.fromUserId) { user ->
-                    users.add(user)
-                }
-            }
-            val usersComparator = compareByDescending<FirebaseUserInternal> { it.email }
-            val sortedUsersList = users.sortedWith(usersComparator)
-            val orderedNotifications = mutableListOf<FirebaseNotification>()
-            sortedUsersList.forEach { user ->
-                val notifications = notifications.filter { it.fromUserId == user.id }
-                notifications.forEach { notification -> orderedNotifications.add(notification) }
-            }
-            activity?.runOnUiThread { setupRecyclerView(orderedNotifications, firebaseOrders) }
-        }
+        setupRecyclerView(filteredNotifications, firebaseOrders)
     }
 
     override fun onResume() {

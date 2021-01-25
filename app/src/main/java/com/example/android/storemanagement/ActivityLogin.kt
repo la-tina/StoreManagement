@@ -40,6 +40,10 @@ class ActivityLogin : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         // Initialize Firebase Auth
         auth = Firebase.auth
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            updateUI(currentUser)
+        }
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -78,6 +82,7 @@ class ActivityLogin : AppCompatActivity() {
 
         loginButton.setOnClickListener {
             if (!isLoggedIn) {
+                Log.d("LoginActivity", "onClickListener")
                 LoginManager.getInstance().logInWithReadPermissions(this, listOf("public_profile"))
             }
         }
@@ -118,9 +123,6 @@ class ActivityLogin : AppCompatActivity() {
                 Log.d("LoginActivity", "facebook onError $exception")
             }
         })
-
-        val currentUser = auth.currentUser
-        updateUI(currentUser)
     }
 
     private fun handleFacebookAccessToken(token: AccessToken) {
@@ -155,6 +157,7 @@ class ActivityLogin : AppCompatActivity() {
 
     private fun openMainActivity() {
         runOnUiThread {
+            Log.d("Tina", "MainActivity login page")
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
@@ -168,7 +171,6 @@ class ActivityLogin : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
@@ -215,6 +217,7 @@ class ActivityLogin : AppCompatActivity() {
                 if (fbUserId != null) {
                     checkFirebaseUserType(fbUserId)
                 } else {
+                    Log.d("Tina", "updateUI")
                     openMainActivity()
                 }
             }
@@ -230,8 +233,10 @@ class ActivityLogin : AppCompatActivity() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val firebaseUser = dataSnapshot.getValue(FirebaseUserInternal::class.java)
                 if (firebaseUser != null && firebaseUser.accountType.isBlank()) {
+                    Log.d("Tina", "checkFirebaseUserType type")
                     runOnUiThread { openAccountTypeSelectionActivity(fbUserId) }
                 } else {
+                    Log.d("Tina", "checkFirebaseUserType main")
                     openMainActivity()
                 }
             }

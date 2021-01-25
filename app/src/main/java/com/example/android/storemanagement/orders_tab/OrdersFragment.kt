@@ -92,13 +92,15 @@ open class OrdersFragment : Fragment() {
                 R.id.old_new_date ->
                     filterByOldDate()
                 R.id.pending ->
-                    filterPendingOrders()
+                    filterByOrderStatus(OrderStatus.PENDING)
                 R.id.ordered ->
-                    filterOrderedOrders()
+                    filterByOrderStatus(OrderStatus.ORDERED)
                 R.id.confirmed ->
-                    filterConfirmedOrders()
+                    filterByOrderStatus(OrderStatus.CONFIRMED)
                 R.id.delivered ->
-                    filterDeliveredOrders()
+                    filterByOrderStatus(OrderStatus.DELIVERED)
+                R.id.cancelled ->
+                    filterByOrderStatus(OrderStatus.CANCELLED)
                 R.id.final_price_ascending ->
                     filterByAscendingFinalPrice()
                 R.id.final_price_descending ->
@@ -120,23 +122,8 @@ open class OrdersFragment : Fragment() {
         setupRecyclerView(sortedOrdersList)
     }
 
-    private fun filterPendingOrders() {
-        val pendingOrders = firebaseOrdersList.filter { it.orderStatus == OrderStatus.PENDING.toString() }
-        setupRecyclerView(pendingOrders)
-    }
-
-    private fun filterOrderedOrders() {
-        val pendingOrders = firebaseOrdersList.filter { it.orderStatus == OrderStatus.ORDERED.toString() }
-        setupRecyclerView(pendingOrders)
-    }
-
-    private fun filterConfirmedOrders() {
-        val pendingOrders = firebaseOrdersList.filter { it.orderStatus == OrderStatus.CONFIRMED.toString() }
-        setupRecyclerView(pendingOrders)
-    }
-
-    private fun filterDeliveredOrders() {
-        val pendingOrders = firebaseOrdersList.filter { it.orderStatus == OrderStatus.DELIVERED.toString() }
+    private fun filterByOrderStatus(orderStatus: OrderStatus) {
+        val pendingOrders = firebaseOrdersList.filter { it.orderStatus == orderStatus.toString() }
         setupRecyclerView(pendingOrders)
     }
 

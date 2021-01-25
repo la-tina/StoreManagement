@@ -85,6 +85,7 @@
     <string name="ordered_status">Ordered status</string>
     <string name="confirmed_status">Confirmed status</string>
     <string name="delivered_status">Delivered status</string>
+    <string name="cancelled_status">Cancelled status</string>
     <string name="final_price_ascending">Final price /Ascending/</string>
     <string name="final_price_descending">Final price /Descending/</string>
     <string name="user_ascending">User /Ascending/</string>
@@ -121,4 +122,8 @@
     <string name="fb_login_protocol_scheme">fb462200458523315</string>
     <string name="or">or</string>
     <string name="email_text">Email</string>
+    <string name="my_order">My order</string>
+    <string name="my_orders">My orders</string>
+    <string name="external_order">External order</string>
+    <string name="external_orders">External orders</string>
 </resources>

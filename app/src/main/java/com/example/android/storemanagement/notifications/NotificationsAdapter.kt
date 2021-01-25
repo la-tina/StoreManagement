@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.storemanagement.R
 import com.example.android.storemanagement.firebase.FirebaseDatabaseNotificationsOperations.updateFirebaseSeenIndicator
@@ -45,6 +46,7 @@ class NotificationsAdapter(
         val user = FirebaseAuth.getInstance().currentUser
         val userId: String =
             if (currentNotification.hasTheOrder == false.toString()) user!!.uid else currentNotification.fromUserId
+        holder.ownershipIndicator.text =  if (currentNotification.hasTheOrder == true.toString()) context.getString(R.string.my_order) else context.getString(R.string.external_order)
 
         holder.newIndicator.visibility = if (currentNotification.seen == true.toString()) View.INVISIBLE else View.VISIBLE
         if (currentNotification.seen == false.toString()) {
@@ -148,4 +150,5 @@ class NotificationsHolder(val view: View) : RecyclerView.ViewHolder(view) {
     val confirmButton = view.confirm_button!!
     val cancelButton = view.cancel_button!!
     val newIndicator = view.new_indicator!!
+    val ownershipIndicator = view.ownership_text!!
 }

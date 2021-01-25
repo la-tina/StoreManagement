@@ -22,6 +22,6 @@ class ProductsInStockAdapter(
 
     override fun onBindViewHolder(holder: ProductsHolder, position: Int) {
         super.onBindViewHolder(holder, position)
-        holder.productImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.lemon))
+        holder.productImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.orange))
     }
 }

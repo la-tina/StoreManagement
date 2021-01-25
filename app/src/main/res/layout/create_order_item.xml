@@ -92,7 +92,7 @@
         android:id="@+id/imageView"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="10dp"
         android:layout_marginBottom="8dp"
         android:src="@drawable/blueberry"
         app:layout_constraintBottom_toBottomOf="@+id/product_item_text"

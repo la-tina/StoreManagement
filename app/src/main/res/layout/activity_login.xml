@@ -103,6 +103,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginBottom="10dp"
+        android:padding="6dp"
         android:src="@drawable/avocado"
         app:layout_constraintBottom_toTopOf="@+id/register_text"
         app:layout_constraintStart_toEndOf="@+id/imageViewBlueberry"

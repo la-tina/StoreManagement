@@ -74,7 +74,9 @@ class OrdersAdapter(
                 openEditOrderTab(currentOrder)
             }
 
-            if (currentOrder.orderStatus == OrderStatus.DELIVERED.toString() || currentOrder.orderStatus == OrderStatus.CANCELLED.toString()) {
+            if (currentOrder.orderStatus == OrderStatus.DELIVERED.toString()
+                || currentOrder.orderStatus == OrderStatus.CANCELLED.toString()
+                || currentOrder.orderStatus == OrderStatus.ORDERED.toString()) {
                 holder.imageContextMenu.visibility = View.GONE
             } else {
                 holder.imageContextMenu.visibility = View.VISIBLE
