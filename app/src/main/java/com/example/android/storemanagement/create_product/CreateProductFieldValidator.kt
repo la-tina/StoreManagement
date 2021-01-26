@@ -15,7 +15,6 @@ object CreateProductFieldValidator {
     private const val MESSAGE_EMPTY_PRICE = "Тhe price cannot be empty."
     private const val MESSAGE_EMPTY_OVERCHARGE = "Тhe overcharge cannot be empty."
     private const val MESSAGE_EMPTY_NAME = "Product name cannot be empty."
-    private const val MESSAGE_INVALID_PERCENTAGE = "Percentage cannot be negative."
     private const val MESSAGE_NAME_TOO_LONG = "The product name is too long."
     private const val REGEX = "^((?=.)(?=[0-9]+))|([0-9]+)|((?=[0-9]+)(?=.)(?=[0-9]+))\$"
     private const val MAX_PRODUCT_NAME_LENGTh = 20

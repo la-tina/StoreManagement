@@ -44,14 +44,6 @@ class StoreFragment : Fragment() {
                 .get(ProductViewModel(requireActivity().application)::class.java)
     }
 
-//        private val productViewModel: ProductViewModel by lazy {
-//        ViewModelProviders.of(this).get(ProductViewModel(requireActivity().application)::class.java)
-//    }
-    private val orderContentViewModel: OrderContentViewModel by lazy {
-        ViewModelProvider(this)
-            .get(OrderContentViewModel(requireActivity().application)::class.java)
-    }
-
     private var savedProductQuantity: String = ""
 
     override fun onCreateView(

@@ -194,7 +194,6 @@ abstract class ProductsTabFragment : Fragment() {
         if (products.itemCount == 0) {
             recyclerView.visibility = View.GONE
             emptyView.visibility = View.VISIBLE
-//            info_text.visibility = View.GONE
         } else {
             recyclerView.visibility = View.VISIBLE
             emptyView.visibility = View.GONE

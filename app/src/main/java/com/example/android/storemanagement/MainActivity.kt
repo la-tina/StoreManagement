@@ -120,9 +120,7 @@ open class MainActivity : AppCompatActivity(), OnNavigationChangedListener, Obse
 
     }
 
-    override fun onChanged(allOrders: List<Order>?) {
-
-    }
+    override fun onChanged(allOrders: List<Order>?) {}
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

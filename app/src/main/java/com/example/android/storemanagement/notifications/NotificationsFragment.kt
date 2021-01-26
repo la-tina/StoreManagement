@@ -138,7 +138,7 @@ open class NotificationsFragment : Fragment() {
     private fun getFirebaseNotifications() {
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
-            val uniqueId: String = user!!.uid
+            val uniqueId: String = user.uid
             val database = FirebaseDatabase.getInstance()
             val notificationsQuery: Query = database.getReference("Notifications").child(uniqueId)
             notificationsQuery.addChildEventListener(object : ChildEventListener {

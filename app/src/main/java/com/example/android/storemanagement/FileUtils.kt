@@ -22,6 +22,5 @@ fun goToFileIntent(context: Context, file: File): Intent {
     val mimeType = context.contentResolver.getType(contentUri)
     intent.setDataAndType(contentUri, mimeType)
     intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-
     return intent
 }

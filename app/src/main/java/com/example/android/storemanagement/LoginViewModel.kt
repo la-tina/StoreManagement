@@ -12,5 +12,4 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val coroutineContext: CoroutineContext
         get() = parentJob + Dispatchers.Main
     private val scope = CoroutineScope(coroutineContext)
-
 }

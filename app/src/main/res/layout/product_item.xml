@@ -30,8 +30,6 @@
         android:textColor="@color/colorPrimary"
         android:textSize="14sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/quantity"
-        app:layout_constraintBottom_toBottonOf="@+id/quantity"
         app:layout_constraintStart_toEndOf="@+id/product_image"
         app:layout_constraintTop_toTopOf="@+id/quantity"
         tools:text="-MP483478745" />
